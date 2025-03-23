@@ -1,0 +1,304 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model def_api_endpoint_roles {
+  api_endpoint_id   Int
+  role_id           Int
+  def_api_endpoints def_api_endpoints @relation(fields: [api_endpoint_id], references: [api_endpoint_id], onDelete: NoAction, onUpdate: NoAction)
+  def_roles         def_roles         @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([api_endpoint_id, role_id])
+}
+
+model def_api_endpoints {
+  api_endpoint_id        Int                      @id
+  api_endpoint           String?
+  parameter1             String?
+  parameter2             String?
+  method                 String?
+  privilege_id           Int?
+  def_api_endpoint_roles def_api_endpoint_roles[]
+
+  @@unique([api_endpoint, parameter1, parameter2, method])
+}
+
+model def_job_titles {
+  job_title_id   Int     @id
+  job_title_name String?
+}
+
+model def_persons {
+  user_id     Int     @id
+  first_name  String?
+  middle_name String?
+  last_name   String?
+  job_title   String?
+}
+
+model def_privileges {
+  privilege_id                Int                           @id
+  privilege_name              String?
+  def_user_granted_privileges def_user_granted_privileges[]
+}
+
+model def_roles {
+  role_id                Int                      @id
+  role_name              String?
+  def_api_endpoint_roles def_api_endpoint_roles[]
+  def_user_granted_roles def_user_granted_roles[]
+}
+
+model def_tenant_enterprise_setup {
+  tenant_id       Int     @id
+  enterprise_name String?
+  enterprise_type String?
+}
+
+model def_tenants {
+  tenant_id   Int    @id @default(autoincrement())
+  tenant_name String @db.VarChar(50)
+}
+
+model def_user_credentials {
+  user_id  Int     @id
+  password String?
+}
+
+model def_user_granted_privileges {
+  user_id        Int
+  privilege_id   Int
+  def_privileges def_privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users      def_users      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, privilege_id])
+}
+
+model def_user_granted_roles {
+  user_id   Int
+  role_id   Int
+  def_roles def_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users def_users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, role_id])
+}
+
+model def_user_types {
+  user_type_id   Int     @id
+  user_type_name String?
+}
+
+model def_users {
+  user_id                     Int                           @id
+  user_name                   String?
+  user_type                   String?
+  email_addresses             Json?
+  created_by                  Int?
+  created_on                  String?
+  last_updated_by             Int?
+  last_updated_on             String?
+  tenant_id                   Int?
+  profile_picture             Json?
+  def_user_granted_privileges def_user_granted_privileges[]
+  def_user_granted_roles      def_user_granted_roles[]
+}
+
+model data_sources {
+  data_source_id                          Int                      @id
+  datasource_name                         String?                  @db.VarChar(50)
+  description                             String?                  @db.VarChar(250)
+  application_type                        String?                  @db.VarChar(50)
+  application_type_version                String?                  @db.VarChar(50)
+  last_access_synchronization_date        DateTime?                @db.Timestamp(6)
+  last_access_synchronization_status      String?                  @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime?                @db.Timestamp(6)
+  last_transaction_synchronization_status String?                  @db.VarChar(50)
+  default_datasource                      String?                  @db.VarChar(50)
+  created_by                              String?                  @db.VarChar(50)
+  created_on                              DateTime?                @default(now()) @db.Timestamp(6)
+  last_updated_by                         String?                  @db.VarChar(50)
+  last_updated_on                         DateTime?                @default(now()) @db.Timestamp(6)
+  access_points_elements                  access_points_elements[]
+}
+
+model messages {
+  id            String    @id
+  sender        Json?
+  recivers      Json?
+  subject       String?
+  body          String?
+  date          DateTime? @db.Timestamptz(6)
+  status        String?
+  parentid      String?
+  involvedusers Json?
+  readers       Json?
+  holders       Json?
+  recyclebin    Json?
+}
+
+model manage_access_entitlements {
+  entitlement_id              Int                           @id
+  entitlement_name            String                        @db.VarChar(150)
+  description                 String?                       @db.VarChar(250)
+  comments                    String?                       @db.VarChar(200)
+  status                      String                        @db.VarChar(50)
+  effective_date              DateTime                      @db.Date
+  revison                     String?                       @db.VarChar(10)
+  revision_date               DateTime?                     @db.Date
+  created_by                  String?                       @db.VarChar(50)
+  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
+  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
+  access_entitlement_elements access_entitlement_elements[]
+}
+
+model access_points_elements {
+  access_point_id             Int                           @id
+  data_source_id              Int
+  element_name                String?                       @db.VarChar(150)
+  description                 String?                       @db.VarChar(250)
+  platform                    String?                       @db.VarChar(50)
+  element_type                String?                       @db.VarChar(50)
+  access_control              String?                       @db.VarChar(10)
+  change_control              String?                       @db.VarChar(10)
+  audit                       String?                       @db.VarChar(50)
+  created_by                  String?                       @db.VarChar(50)
+  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
+  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
+  access_entitlement_elements access_entitlement_elements[]
+  data_sources                data_sources                  @relation(fields: [data_source_id], references: [data_source_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_data_source")
+}
+
+model manage_global_condition_logic_attributes {
+  id                               Int  @id
+  manage_global_condition_logic_id Int
+  widget_position                  Int?
+  widget_state                     Int?
+}
+
+model manage_global_condition_logics {
+  manage_global_condition_logic_id Int     @id(map: "manage_global_condition_logic_pkey")
+  manage_global_condition_id       Int
+  object                           String?
+  attribute                        String?
+  condition                        String?
+  value                            String?
+}
+
+model manage_global_conditions {
+  manage_global_condition_id Int     @id(map: "manage_global_condition_pkey")
+  name                       String?
+  datasource                 String?
+  description                String?
+  status                     String?
+}
+
+model manage_access_models {
+  manage_access_model_id Int     @id
+  model_name             String?
+  description            String?
+  type                   String?
+  run_status             String?
+  state                  String?
+  last_run_date          String?
+  created_by             String?
+  last_updated_by        String?
+  last_updated_date      String?
+  revision               Int?
+  revision_date          String?
+}
+
+model manage_access_model_logics {
+  manage_access_model_logic_id Int     @id
+  manage_access_model_id       Int
+  filter                       String?
+  object                       String?
+  attribute                    String?
+  condition                    String?
+  value                        String?
+}
+
+model manage_access_model_logic_attributes {
+  id                           Int  @id(map: "manage_access_model_attributes_pkey")
+  manage_access_model_logic_id Int
+  widget_position              Int?
+  widget_state                 Int?
+}
+
+model controls {
+  control_id            Int     @id(map: "create_controls_pkey")
+  control_name          String?
+  description           String?
+  pending_results_count Int?
+  control_type          String?
+  priority              Int?
+  datasources           String?
+  control_last_run      String?
+  control_last_updated  String?
+  status                String?
+  state                 String?
+  result_investigator   String?
+  authorized_data       String?
+  revision              Int?
+  revision_date         String?
+  created_by            String?
+  created_date          String?
+}
+
+model access_entitlement_elements {
+  entitlement_id             Int
+  access_point_id            Int
+  created_by                 String?                    @db.VarChar(50)
+  created_on                 DateTime?                  @default(now()) @db.Timestamp(6)
+  last_updated_by            String?                    @db.VarChar(50)
+  last_updated_on            DateTime?                  @default(now()) @db.Timestamp(6)
+  access_points_elements     access_points_elements     @relation(fields: [access_point_id], references: [access_point_id], onDelete: NoAction, onUpdate: NoAction)
+  manage_access_entitlements manage_access_entitlements @relation(fields: [entitlement_id], references: [entitlement_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([entitlement_id, access_point_id])
+}
+
+model linked_devices {
+  id              Int       @id(map: "liked_devices_pkey") @default(autoincrement())
+  user_id         Int
+  device_type     String?   @db.VarChar(50)
+  browser_name    String?   @db.VarChar(50)
+  browser_version String?   @db.VarChar(20)
+  os              String?   @db.VarChar(50)
+  user_agent      String?
+  added_at        DateTime? @default(now()) @db.Timestamp(6)
+  is_active       Int?
+  ip_address      String?
+  location        String?
+}
+
+model def_processes {
+  process_id        Int    @id
+  process_name      String
+  process_structure Json?
+}
+
+model def_users_v {
+  user_id         Int     @id
+  user_name       String?
+  first_name      String?
+  middle_name     String?
+  last_name       String?
+  email_addresses Json?
+  job_title       String?
+  created_by      Int?
+  created_on      String?
+  last_updated_by Int?
+  last_updated_on String?
+  tenant_id       Int?
+  profile_picture Json?
+
+  @@map("def_users_v")
+}

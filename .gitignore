@@ -1,0 +1,4 @@
+node_modules
+# Keep environment variables out of version control
+.env
+Services/Google-Services/procg-a924f-firebase-adminsdk-fbsvc-4a429b1195.json
