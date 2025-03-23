@@ -1,12 +1,12 @@
-const { PrismaClient } = require("@prisma/client");
+const dotenv = require("dotenv");
 const path = require("path");
 
-const prisma = new PrismaClient();
-
-const dotenv = require("dotenv");
-
-// Load environment variables from .env file
+// Load environment variables from .env file first
 dotenv.config({ path: path.resolve(__dirname, "../.env.server") });
+
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
 
 async function main() {
   // ... you will write your Prisma Client queries here
