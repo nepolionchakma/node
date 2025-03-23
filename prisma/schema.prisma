@@ -62,8 +62,9 @@ model def_tenant_enterprise_setup {
 }
 
 model def_tenants {
-  tenant_id   Int    @id @default(autoincrement())
-  tenant_name String @db.VarChar(50)
+  tenant_id   Int         @id @default(autoincrement())
+  tenant_name String      @db.VarChar(50)
+  def_users   def_users[]
 }
 
 model def_user_credentials {
@@ -75,7 +76,6 @@ model def_user_granted_privileges {
   user_id        Int
   privilege_id   Int
   def_privileges def_privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: NoAction, onUpdate: NoAction)
-  def_users      def_users      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, privilege_id])
 }
@@ -84,7 +84,6 @@ model def_user_granted_roles {
   user_id   Int
   role_id   Int
   def_roles def_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
-  def_users def_users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, role_id])
 }
@@ -95,18 +94,18 @@ model def_user_types {
 }
 
 model def_users {
-  user_id                     Int                           @id
-  user_name                   String?
-  user_type                   String?
-  email_addresses             Json?
-  created_by                  Int?
-  created_on                  String?
-  last_updated_by             Int?
-  last_updated_on             String?
-  tenant_id                   Int?
-  profile_picture             Json?
-  def_user_granted_privileges def_user_granted_privileges[]
-  def_user_granted_roles      def_user_granted_roles[]
+  user_id             Int                   @id
+  user_name           String?
+  user_type           String?
+  email_addresses     Json?
+  profile_picture     Json?
+  created_by          Int?
+  created_on          String?
+  last_updated_by     Int?
+  last_updated_on     String?
+  tenant_id           Int?
+  def_access_profiles def_access_profiles[]
+  def_tenants         def_tenants?          @relation(fields: [tenant_id], references: [tenant_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model data_sources {
@@ -283,6 +282,15 @@ model def_processes {
   process_id        Int    @id
   process_name      String
   process_structure Json?
+}
+
+model def_access_profiles {
+  serial_number Int        @id @default(autoincrement())
+  user_id       Int?
+  profile_type  String     @db.VarChar(50)
+  profile_id    String     @unique @db.VarChar(100)
+  primary_yn    String?    @default("N") @db.Char(1)
+  def_users     def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model def_users_v {

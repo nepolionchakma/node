@@ -8,7 +8,10 @@ const multer = require("multer");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(__dirname, "../.env.server") });
-
+// const DATABASE_URL = process.env.DATABASE_URL;
+// const JWT_SECRET_ACCESS_TOKEN = process.env.JWT_SECRET_ACCESS_TOKEN;
+// console.log(DATABASE_URL, "11111111111111111");
+// console.log(JWT_SECRET_ACCESS_TOKEN, "12222222222222222222222222");
 const PORT = process.env.PORT;
 const server = http.createServer(app);
 
