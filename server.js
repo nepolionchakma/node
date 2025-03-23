@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-require("dotenv").config();
 const path = require("path");
 const app = express();
 const multer = require("multer");
