@@ -7,7 +7,7 @@ const app = express();
 const multer = require("multer");
 
 const dotenv = require("dotenv");
-dotenv.config({ path: path.resolve(__dirname, "../.env.server") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 // const DATABASE_URL = process.env.DATABASE_URL;
 // const JWT_SECRET_ACCESS_TOKEN = process.env.JWT_SECRET_ACCESS_TOKEN;
 // console.log(DATABASE_URL, "11111111111111111");
