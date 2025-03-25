@@ -31,7 +31,6 @@ const orchestrationStudioRoutes = require("./orchestrationStudioRoutes");
 const accessProfileRoutes = require("./accessProfileRoutes");
 
 routes.use(cookieParser());
-routes.use("/test", authentication);
 routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);

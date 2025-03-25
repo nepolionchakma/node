@@ -1,9 +1,9 @@
-const admin = require("firebase-admin");
-
 const decodedKey = Buffer.from(
   process.env.FIREBASE_PRIVATE_KEY_BASE64,
   "base64"
 ).toString("utf-8");
+
+const admin = require("firebase-admin");
 
 const serviceAccount = JSON.parse(decodedKey);
 
@@ -59,18 +59,18 @@ exports.unregisterToken = (req, res) => {
 
 //To send notification to every individual fcm token
 exports.sendNotification = async (req, res) => {
-  const { sender, recivers, subject, body } = req.body;
+  const { id, parentid, date, sender, recivers, subject, body } = req.body;
 
-  if (!sender || !recivers || !subject || !body) {
+  if (!sender || !recivers || !subject || !body || !id || !date || !parentid) {
     return res
       .status(400)
       .send("sender, recivers, subject, and body are required");
   }
 
   let allTokens = new Set();
-  recivers.forEach((username) => {
-    if (userTokens[username]) {
-      userTokens[username].forEach((token) => allTokens.add(token));
+  recivers.forEach((user) => {
+    if (userTokens[user.name]) {
+      userTokens[user.name].forEach((token) => allTokens.add(token));
     }
   });
 
@@ -84,10 +84,13 @@ exports.sendNotification = async (req, res) => {
     try {
       await admin.messaging().send({
         notification: {
-          title: `${sender}: ${subject}`,
+          title: `${sender.name}: ${subject}`,
           body: body,
         },
         token: token,
+        data: {
+          payload: JSON.stringify(req.body), // Sending the entire request body as a string
+        },
       });
       return res
         .status(201)
