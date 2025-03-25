@@ -1,11 +1,13 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["apps"]
 }
 
 model def_api_endpoint_roles {
@@ -15,6 +17,7 @@ model def_api_endpoint_roles {
   def_roles         def_roles         @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([api_endpoint_id, role_id])
+  @@schema("apps")
 }
 
 model def_api_endpoints {
@@ -27,11 +30,14 @@ model def_api_endpoints {
   def_api_endpoint_roles def_api_endpoint_roles[]
 
   @@unique([api_endpoint, parameter1, parameter2, method])
+  @@schema("apps")
 }
 
 model def_job_titles {
   job_title_id   Int     @id
   job_title_name String?
+
+  @@schema("apps")
 }
 
 model def_persons {
@@ -40,12 +46,16 @@ model def_persons {
   middle_name String?
   last_name   String?
   job_title   String?
+
+  @@schema("apps")
 }
 
 model def_privileges {
   privilege_id                Int                           @id
   privilege_name              String?
   def_user_granted_privileges def_user_granted_privileges[]
+
+  @@schema("apps")
 }
 
 model def_roles {
@@ -53,59 +63,74 @@ model def_roles {
   role_name              String?
   def_api_endpoint_roles def_api_endpoint_roles[]
   def_user_granted_roles def_user_granted_roles[]
+
+  @@schema("apps")
 }
 
 model def_tenant_enterprise_setup {
   tenant_id       Int     @id
   enterprise_name String?
   enterprise_type String?
+
+  @@schema("apps")
 }
 
 model def_tenants {
-  tenant_id   Int         @id @default(autoincrement())
-  tenant_name String      @db.VarChar(50)
-  def_users   def_users[]
+  tenant_id   Int    @id @default(autoincrement())
+  tenant_name String @db.VarChar(50)
+
+  @@schema("apps")
 }
 
 model def_user_credentials {
   user_id  Int     @id
   password String?
+
+  @@schema("apps")
 }
 
 model def_user_granted_privileges {
   user_id        Int
   privilege_id   Int
   def_privileges def_privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users      def_users      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, privilege_id])
+  @@schema("apps")
 }
 
 model def_user_granted_roles {
   user_id   Int
   role_id   Int
   def_roles def_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users def_users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, role_id])
+  @@schema("apps")
 }
 
 model def_user_types {
   user_type_id   Int     @id
   user_type_name String?
+
+  @@schema("apps")
 }
 
 model def_users {
-  user_id             Int                   @id
-  user_name           String?
-  user_type           String?
-  email_addresses     Json?
-  profile_picture     Json?
-  created_by          Int?
-  created_on          String?
-  last_updated_by     Int?
-  last_updated_on     String?
-  tenant_id           Int?
-  def_access_profiles def_access_profiles[]
-  def_tenants         def_tenants?          @relation(fields: [tenant_id], references: [tenant_id], onDelete: NoAction, onUpdate: NoAction)
+  user_id                     Int                           @id
+  user_name                   String?
+  user_type                   String?
+  email_addresses             Json?
+  created_by                  Int?
+  created_on                  String?
+  last_updated_by             Int?
+  last_updated_on             String?
+  tenant_id                   Int?
+  profile_picture             Json?
+  def_user_granted_privileges def_user_granted_privileges[]
+  def_user_granted_roles      def_user_granted_roles[]
+
+  @@schema("apps")
 }
 
 model data_sources {
@@ -124,6 +149,8 @@ model data_sources {
   last_updated_by                         String?                  @db.VarChar(50)
   last_updated_on                         DateTime?                @default(now()) @db.Timestamp(6)
   access_points_elements                  access_points_elements[]
+
+  @@schema("apps")
 }
 
 model messages {
@@ -139,6 +166,8 @@ model messages {
   readers       Json?
   holders       Json?
   recyclebin    Json?
+
+  @@schema("apps")
 }
 
 model manage_access_entitlements {
@@ -155,6 +184,8 @@ model manage_access_entitlements {
   last_updated_by             String?                       @db.VarChar(50)
   last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
   access_entitlement_elements access_entitlement_elements[]
+
+  @@schema("apps")
 }
 
 model access_points_elements {
@@ -173,6 +204,8 @@ model access_points_elements {
   last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
   access_entitlement_elements access_entitlement_elements[]
   data_sources                data_sources                  @relation(fields: [data_source_id], references: [data_source_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_data_source")
+
+  @@schema("apps")
 }
 
 model manage_global_condition_logic_attributes {
@@ -180,6 +213,8 @@ model manage_global_condition_logic_attributes {
   manage_global_condition_logic_id Int
   widget_position                  Int?
   widget_state                     Int?
+
+  @@schema("apps")
 }
 
 model manage_global_condition_logics {
@@ -189,6 +224,8 @@ model manage_global_condition_logics {
   attribute                        String?
   condition                        String?
   value                            String?
+
+  @@schema("apps")
 }
 
 model manage_global_conditions {
@@ -197,6 +234,8 @@ model manage_global_conditions {
   datasource                 String?
   description                String?
   status                     String?
+
+  @@schema("apps")
 }
 
 model manage_access_models {
@@ -212,6 +251,8 @@ model manage_access_models {
   last_updated_date      String?
   revision               Int?
   revision_date          String?
+
+  @@schema("apps")
 }
 
 model manage_access_model_logics {
@@ -222,6 +263,8 @@ model manage_access_model_logics {
   attribute                    String?
   condition                    String?
   value                        String?
+
+  @@schema("apps")
 }
 
 model manage_access_model_logic_attributes {
@@ -229,6 +272,8 @@ model manage_access_model_logic_attributes {
   manage_access_model_logic_id Int
   widget_position              Int?
   widget_state                 Int?
+
+  @@schema("apps")
 }
 
 model controls {
@@ -249,6 +294,8 @@ model controls {
   revision_date         String?
   created_by            String?
   created_date          String?
+
+  @@schema("apps")
 }
 
 model access_entitlement_elements {
@@ -262,6 +309,7 @@ model access_entitlement_elements {
   manage_access_entitlements manage_access_entitlements @relation(fields: [entitlement_id], references: [entitlement_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([entitlement_id, access_point_id])
+  @@schema("apps")
 }
 
 model linked_devices {
@@ -276,21 +324,16 @@ model linked_devices {
   is_active       Int?
   ip_address      String?
   location        String?
+
+  @@schema("apps")
 }
 
 model def_processes {
   process_id        Int    @id
   process_name      String
   process_structure Json?
-}
 
-model def_access_profiles {
-  serial_number Int        @id @default(autoincrement())
-  user_id       Int?
-  profile_type  String     @db.VarChar(50)
-  profile_id    String     @unique @db.VarChar(100)
-  primary_yn    String?    @default("N") @db.Char(1)
-  def_users     def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  @@schema("apps")
 }
 
 model def_users_v {
@@ -309,4 +352,5 @@ model def_users_v {
   profile_picture Json?
 
   @@map("def_users_v")
+  @@schema("apps")
 }

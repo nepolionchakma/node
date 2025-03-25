@@ -8,10 +8,8 @@ const multer = require("multer");
 
 const dotenv = require("dotenv");
 dotenv.config({
-  path: path.resolve(__dirname, "../.env.server"),
+  path: path.resolve(__dirname, "../.server_env"),
 });
-const DATABASE_URL = process.env.DATABASE_URL;
-console.log(DATABASE_URL, "DATABASE_URL");
 
 const PORT = process.env.PORT;
 const server = http.createServer(app);
