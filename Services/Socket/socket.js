@@ -2,7 +2,7 @@ const { Redis } = require("ioredis");
 
 let users = {};
 console.log(users);
-const url = process.env.VALKEY_URI;
+const url = process.env.MESSAGE_BROKER;
 
 const pub = new Redis(url);
 const sub = new Redis(url);

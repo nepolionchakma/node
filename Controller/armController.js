@@ -1,6 +1,6 @@
 const { default: axios } = require("axios");
 const { user } = require("../Authentication/Authentication");
-const arm_api_url = process.env.ARM_API_URL;
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
 const pageLimitData = (page, limit) => {
   const pageNumber = parseInt(page);
@@ -15,7 +15,7 @@ const pageLimitData = (page, limit) => {
 };
 
 exports.getARMTasks = async (req, res) => {
-  const response = await axios.get(`${arm_api_url}/Show_Tasks`);
+  const response = await axios.get(`${FLASK_ENDPOINT_URL}/Show_Tasks`);
   const sortedData = response.data.sort(
     (a, b) => b?.arm_task_id - a?.arm_task_id
   );
@@ -25,7 +25,7 @@ exports.getARMTasks = async (req, res) => {
 exports.getARMTasksLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
   const { startNumber, endNumber } = pageLimitData(page, limit);
-  const response = await axios.get(`${arm_api_url}/Show_Tasks`);
+  const response = await axios.get(`${FLASK_ENDPOINT_URL}/Show_Tasks`);
 
   const sortedData = response.data.sort((a, b) => {
     const dateB = new Date(b.creation_date);
@@ -39,13 +39,18 @@ exports.getARMTasksLazyLoading = async (req, res) => {
 };
 exports.getARMTask = async (req, res) => {
   const task_name = req.params.task_name;
-  const response = await axios.get(`${arm_api_url}/Show_Task/${task_name}`);
+  const response = await axios.get(
+    `${FLASK_ENDPOINT_URL}/Show_Task/${task_name}`
+  );
   return res.status(200).json(response.data);
 };
 exports.registerARMTask = async (req, res) => {
   const data = req.body;
   try {
-    const response = await axios.post(`${arm_api_url}/Create_Task`, data);
+    const response = await axios.post(
+      `${FLASK_ENDPOINT_URL}/Create_Task`,
+      data
+    );
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -56,7 +61,7 @@ exports.editARMTask = async (req, res) => {
   const data = req.body;
   try {
     const response = await axios.put(
-      `${arm_api_url}/Update_Task/${task_name}`,
+      `${FLASK_ENDPOINT_URL}/Update_Task/${task_name}`,
       data
     );
     return res.status(200).json(response.data);
@@ -67,7 +72,9 @@ exports.editARMTask = async (req, res) => {
 exports.cancelARMTask = async (req, res) => {
   const task_name = req.params.task_name;
   try {
-    const response = await axios.put(`${arm_api_url}/Cancel_Task/${task_name}`);
+    const response = await axios.put(
+      `${FLASK_ENDPOINT_URL}/Cancel_Task/${task_name}`
+    );
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -79,7 +86,7 @@ exports.getTaskNameParams = async (req, res) => {
   const { task_name } = req.params;
   try {
     const response = await axios.get(
-      `${arm_api_url}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
     );
 
     const sortedData = response.data.sort(
@@ -94,7 +101,7 @@ exports.getUserTaskNameParams = async (req, res) => {
   const { task_name } = req.params;
   try {
     const response = await axios.get(
-      `${arm_api_url}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
     );
 
     const sortedData = response.data.sort(
@@ -110,7 +117,7 @@ exports.getTaskParamsLazyLoading = async (req, res) => {
   try {
     const { startNumber, endNumber } = pageLimitData(page, limit);
     const response = await axios.get(
-      `${arm_api_url}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
     );
 
     const results = response.data.slice(startNumber, endNumber);
@@ -125,7 +132,7 @@ exports.addTaskParams = async (req, res) => {
   const data = req.body;
   try {
     const response = await axios.post(
-      `${arm_api_url}/Add_TaskParams/${task_name}`,
+      `${FLASK_ENDPOINT_URL}/Add_TaskParams/${task_name}`,
       data
     );
 
@@ -140,7 +147,7 @@ exports.updateTaskParams = async (req, res) => {
   const data = req.body;
   try {
     const response = await axios.put(
-      `${arm_api_url}/Update_TaskParams/${task_name}/${arm_param_id}`,
+      `${FLASK_ENDPOINT_URL}/Update_TaskParams/${task_name}/${arm_param_id}`,
       data
     );
     return res.status(200).json(response.data);
@@ -152,7 +159,7 @@ exports.deleteTaskParams = async (req, res) => {
   const { task_name, arm_param_id } = req.params;
   try {
     const response = await axios.put(
-      `${arm_api_url}/Delete_TaskParams/${task_name}/${arm_param_id}`,
+      `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${arm_param_id}`,
       data
     );
     return res.status(200).json(response.data);
@@ -162,7 +169,9 @@ exports.deleteTaskParams = async (req, res) => {
 };
 exports.showExecutionMethods = async (req, res) => {
   try {
-    const response = await axios.get(`${arm_api_url}/Show_ExecutionMethods`);
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`
+    );
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -172,7 +181,9 @@ exports.showExecutionMethodsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
   const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
-    const response = await axios.get(`${arm_api_url}/Show_ExecutionMethods`);
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`
+    );
     const results = response.data.slice(startNumber, endNumber);
     return res.status(200).json(results);
   } catch (error) {
@@ -183,7 +194,7 @@ exports.createExecutionMethod = async (req, res) => {
   const data = req.body;
   try {
     const response = await axios.post(
-      `${arm_api_url}/Create_ExecutionMethod`,
+      `${FLASK_ENDPOINT_URL}/Create_ExecutionMethod`,
       data
     );
     return res.status(200).json(response.data);
@@ -196,7 +207,7 @@ exports.updateExecutionMethod = async (req, res) => {
   const data = req.body;
   try {
     const response = await axios.put(
-      `${arm_api_url}/Update_ExecutionMethod/${internal_execution_method}`,
+      `${FLASK_ENDPOINT_URL}/Update_ExecutionMethod/${internal_execution_method}`,
       data
     );
     return res.status(200).json(response.data);

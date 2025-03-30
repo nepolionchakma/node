@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const { default: axios } = require("axios");
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
-const flash_api_url = process.env.FLASK_API_URL;
+const flash_api_url = process.env.FLASK_ENDPOINT_URL;
 
 const hashPassword = (password) => {
   return new Promise((resolve, reject) => {

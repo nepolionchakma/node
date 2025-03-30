@@ -2,7 +2,7 @@ const prisma = require("../DB/db.config");
 const crypto = require("crypto");
 const { default: axios } = require("axios");
 const { url } = require("inspector");
-const flash_api_url = process.env.FLASK_API_URL;
+const flash_api_url = process.env.FLASK_ENDPOINT_URL;
 //------------Hash Password Start
 
 const hashPassword = (password) => {
