@@ -54,7 +54,13 @@ exports.getTaskSchedule = async (req, res) => {
 exports.getViewRequests = async (req, res) => {
   try {
     const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`);
-    return res.status(200).json(response.data);
+    const sortedData = response.data.sort((a, b) => {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return dateB - dateA;
+    });
+
+    return res.status(200).json(sortedData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -64,9 +70,11 @@ exports.getViewRequestsLazyLoading = async (req, res) => {
   const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`);
-    const sortedData = response.data.sort(
-      (a, b) => b?.request_id - a?.request_id
-    );
+    const sortedData = response.data.sort((a, b) => {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return dateB - dateA;
+    });
     const results = sortedData.slice(startNumber, endNumber);
     return res.status(200).json(results);
   } catch (error) {
@@ -137,9 +145,12 @@ exports.getTaskSchedulesLazyLoadingV1 = async (req, res) => {
     const response = await axios.get(
       `${FLASK_ENDPOINT_URL}/api/v1/Show_TaskSchedules`
     );
-    const sortedData = response.data.sort(
-      (a, b) => b?.arm_task_sche_id - a?.arm_task_sche_id
-    );
+    // sort by time
+    const sortedData = response.data.sort((a, b) => {
+      const dateA = new Date(a.creation_date);
+      const dateB = new Date(b.creation_date);
+      return dateB - dateA;
+    });
 
     const results = sortedData.slice(startNumber, endNumber);
     return res.status(200).json(results);

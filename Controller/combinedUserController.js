@@ -1,11 +1,10 @@
 const prisma = require("../DB/db.config");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const { default: axios } = require("axios");
 dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET;
-const flash_api_url = process.env.FLASK_ENDPOINT_URL;
+
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
 const hashPassword = (password) => {
   return new Promise((resolve, reject) => {
@@ -337,7 +336,7 @@ exports.updateUser = async (req, res) => {
 //Flask API Wrapper
 
 exports.getFlaskCombinedUser = async (req, res) => {
-  const response = await axios.get(`${flash_api_url}/users`);
+  const response = await axios.get(`${FLASK_ENDPOINT_URL}/users`);
   return res.status(200).json(response.data);
 };
 
@@ -345,7 +344,7 @@ exports.createFlaskCombinedUser = async (req, res) => {
   const data = req.body;
 
   try {
-    await axios.post(`${flash_api_url}/users`, data);
+    await axios.post(`${FLASK_ENDPOINT_URL}/users`, data);
     return res.status(201).json({ message: "Record inserted successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });

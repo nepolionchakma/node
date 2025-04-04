@@ -34,18 +34,28 @@ routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);
+
+// Verify user middleware
 routes.use(verifyUser);
+
+//  After verify user
 routes.use("/auth", authentication);
 routes.use("/persons", defPersonsRoutes);
 routes.use("/users", defUsersRoutes);
-routes.use("/tenants", defTenantsRoutes);
 routes.use("/user-credentials", defUserCredentialsRoutes);
+routes.use("/access-profiles", accessProfileRoutes);
+routes.use("/combined-user", combinedUserRoutes);
+
+routes.use("/tenants", defTenantsRoutes);
 routes.use("/messages", messagesRoutes);
 routes.use("/data-sources", dataSourcesRoutes);
+
+// Manage Access Entitlements
 routes.use("/manage-access-entitlements", manageAccessEntitlementsRoutes);
 routes.use("/access-entitlement-elements", accessEntitlementElementsRoutes);
 routes.use("/access-points-element", accessPointsEntitlementsRoutes);
-routes.use("/combined-user", combinedUserRoutes);
+
+// Condition section
 routes.use("/manage-global-conditions", manageGlobalConditionsRoutes);
 routes.use(
   "/manage-global-condition-logics",
@@ -55,14 +65,20 @@ routes.use(
   "/manage-global-condition-logic-attributes",
   manageGlobalConditionsLogicAttributesRoutes
 );
+
+// Access model section
 routes.use("/manage-access-models", manageAccessModelsRoutes);
 routes.use("/manage-access-model-logics", manageAccessModelLogicsRoutes);
 routes.use(
   "/manage-access-model-logic-attributes",
   manageAccessModelLogicAttributesRoutes
 );
+
+// Control section
 routes.use("/controls", controlesRoutes);
 routes.use("/devices", linkedDevicesRoutes);
+
+// ARM Task
 routes.use("/arm-tasks", armRoutes);
 routes.use(
   "/asynchronous-requests-and-task-schedules",
@@ -72,7 +88,8 @@ routes.use(
   "/api/v1/asynchronous-requests-and-task-schedules",
   asynchronousRequestsAndTaskSchedulesRoutes
 );
+
+// Orchestration Studio
 routes.use("/orchestration-studio-process", orchestrationStudioRoutes);
-routes.use("/access-profiles", accessProfileRoutes);
 
 module.exports = routes;

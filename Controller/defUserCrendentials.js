@@ -1,8 +1,8 @@
 const prisma = require("../DB/db.config");
 const crypto = require("crypto");
 const { default: axios } = require("axios");
-const { url } = require("inspector");
-const flash_api_url = process.env.FLASK_ENDPOINT_URL;
+
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 //------------Hash Password Start
 
 const hashPassword = (password) => {
@@ -126,7 +126,7 @@ exports.resetPassword = async (req, res) => {
   try {
     if (findDefUserId) {
       const result = await axios.put(
-        `${flash_api_url}/reset_user_password`,
+        `${FLASK_ENDPOINT_URL}/reset_user_password`,
         data
       );
       if (result.status === 200) {
