@@ -1,5 +1,6 @@
 const prisma = require("../DB/db.config");
 const currentDate = new Date();
+
 exports.getAccessPointsEntitlement = async (req, res) => {
   try {
     const result = await prisma.access_points_elements.findMany({
@@ -33,27 +34,29 @@ exports.getUniqueAccessPointsEntitlement = async (req, res) => {
 };
 //Create User
 exports.createAccessPointsEntitlement = async (req, res) => {
-  const response = await prisma.access_points_elements.findMany();
-  const id =
-    response.length > 0
-      ? Math.max(...response.map((item) => item.access_point_id)) + 1
-      : 1;
-  console.log(id);
+  const maxUserIDResult = await prisma.access_points_elements.aggregate({
+    _max: {
+      access_point_id: true,
+    },
+  });
+
+  const id = maxUserIDResult._max.access_point_id + 1;
   try {
     // Validation  START/---------------------------------/
     const data = req.body;
-
     const findAccessPointsElementName =
       await prisma.access_points_elements.findFirst({
         where: {
           element_name: data.element_name,
         },
       });
-    if (findAccessPointsElementName)
-      return res.status(408).json({ message: "Element Name already exist." });
-    if (!data.element_name || !data.description) {
+    if (findAccessPointsElementName) {
+      return res.status(409).json({ message: "Element Name already exist." });
+    }
+
+    if (!data.element_name) {
       return res.status(422).json({
-        message: "Element name and description is Required",
+        message: "Element name is Required",
       });
     }
     // Validation  End/---------------------------------/

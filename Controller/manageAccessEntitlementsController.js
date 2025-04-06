@@ -1,5 +1,6 @@
 const prisma = require("../DB/db.config");
 const currentDate = new Date();
+
 //Get Data
 exports.getManageAccessEntitlements = async (req, res) => {
   try {
@@ -35,30 +36,27 @@ exports.getUniqueManageAccessEntitlement = async (req, res) => {
 //Create Data
 exports.createManageAccessEntitlement = async (req, res) => {
   try {
-    // Validation  START/---------------------------------/
     const data = req.body;
     //find max id and increment value
-    const response = await prisma.manage_access_entitlements.findMany();
-    const id =
-      response.length > 0
-        ? Math.max(...response.map((item) => item.entitlement_id)) + 1
-        : 1086601;
+    const maxUserIDResult = await prisma.manage_access_entitlements.aggregate({
+      _max: {
+        entitlement_id: true,
+      },
+    });
+
+    const id = maxUserIDResult._max.entitlement_id + 1;
 
     // Validation  START/---------------------------------/
-
     const findManageAccessEntitlementName =
       await prisma.manage_access_entitlements.findFirst({
         where: {
           entitlement_name: data.entitlement_name,
         },
       });
-    if (findManageAccessEntitlementName)
-      return res
-        .status(408)
-        .json({ message: "Entitlement Name already exist." });
-    if (!data.entitlement_name || !data.description) {
-      return res.status(422).json({
-        message: "Entitlement name and description is Required",
+
+    if (findManageAccessEntitlementName) {
+      return res.status(200).json({
+        message: "Entitlement name already exist.",
       });
     }
     // Validation  End/---------------------------------/
@@ -79,7 +77,9 @@ exports.createManageAccessEntitlement = async (req, res) => {
       },
     });
     if (result) {
-      return res.status(201).json(result);
+      return res.status(201).json({
+        message: "Entitlement created successfully.",
+      });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -105,22 +105,17 @@ exports.updateManageAccessEntitlement = async (req, res) => {
     });
     if (!findManageAccessEntitlement) {
       return res.status(404).json({ message: "Data Source Id not found." });
-    } else if (!data.entitlement_name || !data.description) {
-      return res.status(422).json({
-        message: "data source name and description is Required",
-      });
-    } else if (findExistName) {
+    } else if (findExistName && findExistName.entitlement_id !== id) {
       return res
-        .status(408)
+        .status(200)
         .json({ message: "Data Source name already exist." });
     }
     // Validation  End/---------------------------------/
-    const result = await prisma.manage_access_entitlements.update({
+    await prisma.manage_access_entitlements.update({
       where: {
         entitlement_id: id,
       },
       data: {
-        entitlement_id: id,
         entitlement_name: data.entitlement_name,
         description: data.description,
         comments: data.comments,
@@ -134,7 +129,7 @@ exports.updateManageAccessEntitlement = async (req, res) => {
         created_by: data.created_by,
       },
     });
-    return res.status(200).json(result);
+    return res.status(201).json({ message: "Updated Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
