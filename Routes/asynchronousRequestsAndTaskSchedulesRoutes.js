@@ -4,14 +4,6 @@ const asynchronousRequestsAndTaskSchedulesController = require("../Controller/as
 const router = Router();
 
 router.get(
-  "/",
-  asynchronousRequestsAndTaskSchedulesController.getTaskSchedules
-);
-router.get(
-  "/:page/:limit",
-  asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesLazyLoading
-);
-router.get(
   "/:task_name/:arm_param_id",
   asynchronousRequestsAndTaskSchedulesController.getTaskSchedule
 );
@@ -27,23 +19,23 @@ router.get(
 //V1 API replace to main
 router.get(
   "/task-schedules",
-  asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesV1
+  asynchronousRequestsAndTaskSchedulesController.getTaskSchedules
 );
 router.get(
   "/task-schedules/:page/:limit",
-  asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesLazyLoadingV1
+  asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesLazyLoading
 );
 router.post(
   "/create-task-schedule",
-  asynchronousRequestsAndTaskSchedulesController.createTaskScheduleV1
+  asynchronousRequestsAndTaskSchedulesController.createTaskSchedule
 );
 router.put(
   "/update-task-schedule/:task_name",
-  asynchronousRequestsAndTaskSchedulesController.updateTaskScheduleV1
+  asynchronousRequestsAndTaskSchedulesController.updateTaskSchedule
 );
 router.put(
   "/cancel-task-schedule/:task_name",
-  asynchronousRequestsAndTaskSchedulesController.cancelTaskScheduleV1
+  asynchronousRequestsAndTaskSchedulesController.cancelTaskSchedule
 );
 
 module.exports = router;
