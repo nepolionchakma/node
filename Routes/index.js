@@ -84,10 +84,6 @@ routes.use(
   "/asynchronous-requests-and-task-schedules",
   asynchronousRequestsAndTaskSchedulesRoutes
 );
-routes.use(
-  "/api/v1/asynchronous-requests-and-task-schedules",
-  asynchronousRequestsAndTaskSchedulesRoutes
-);
 
 // Orchestration Studio
 routes.use("/orchestration-studio-process", orchestrationStudioRoutes);
