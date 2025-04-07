@@ -23,20 +23,8 @@ router.get(
   "/view-requests/:page/:limit",
   asynchronousRequestsAndTaskSchedulesController.getViewRequestsLazyLoading
 );
-router.post(
-  "/create-task-schedule",
-  asynchronousRequestsAndTaskSchedulesController.createTaskSchedule
-);
-router.put(
-  "/update-task-schedule/:task_name/:redbeat_schedule_name",
-  asynchronousRequestsAndTaskSchedulesController.updateTaskSchedule
-);
-router.put(
-  "/cancel-task-schedule/:task_name/:redbeat_schedule_name",
-  asynchronousRequestsAndTaskSchedulesController.cancelTaskSchedule
-);
 
-//V1 API
+//V1 API replace to main
 router.get(
   "/task-schedules",
   asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesV1
@@ -46,15 +34,16 @@ router.get(
   asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesLazyLoadingV1
 );
 router.post(
-  "/create-task-schedule-v1",
+  "/create-task-schedule",
   asynchronousRequestsAndTaskSchedulesController.createTaskScheduleV1
 );
 router.put(
-  "/update-task-schedule-v1/:task_name",
+  "/update-task-schedule/:task_name",
   asynchronousRequestsAndTaskSchedulesController.updateTaskScheduleV1
 );
 router.put(
-  "/cancel-task-schedule-v1/:task_name",
+  "/cancel-task-schedule/:task_name",
   asynchronousRequestsAndTaskSchedulesController.cancelTaskScheduleV1
 );
+
 module.exports = router;

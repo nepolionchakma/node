@@ -111,7 +111,7 @@ exports.updateTaskSchedule = async (req, res) => {
 };
 exports.cancelTaskSchedule = async (req, res) => {
   const { task_name, redbeat_schedule_name } = req.params;
-  console.log(task_name, redbeat_schedule_name, "params");
+
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Cancel_TaskSchedule/${task_name}/${redbeat_schedule_name}`
@@ -166,7 +166,7 @@ exports.createTaskScheduleV1 = async (req, res) => {
       `${FLASK_ENDPOINT_URL}/api/v1/Create_TaskSchedule`,
       data
     );
-    console.log(response.data, "res");
+
     return res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
