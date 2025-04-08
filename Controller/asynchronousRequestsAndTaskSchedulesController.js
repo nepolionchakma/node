@@ -39,16 +39,12 @@ exports.getViewRequests = async (req, res) => {
 };
 exports.getViewRequestsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`);
-    const sortedData = response.data.sort((a, b) => {
-      const dateA = new Date(a.timestamp);
-      const dateB = new Date(b.timestamp);
-      return dateB - dateA;
-    });
-    const results = sortedData.slice(startNumber, endNumber);
-    return res.status(200).json(results);
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/view_requests/${page}/${limit}`
+    );
+    console.log(response.data, "response.data");
+    return res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
