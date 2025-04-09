@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
-  binaryTargets   = ["native", "debian-openssl-3.0.x"]
   previewFeatures = ["multiSchema"]
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -76,8 +76,9 @@ model def_tenant_enterprise_setup {
 }
 
 model def_tenants {
-  tenant_id   Int    @id @default(autoincrement())
-  tenant_name String @db.VarChar(50)
+  tenant_id   Int         @id
+  tenant_name String?
+  def_users   def_users[]
 
   @@schema("apps")
 }
@@ -121,34 +122,54 @@ model def_users {
   user_name                   String?
   user_type                   String?
   email_addresses             Json?
+  profile_picture             Json?
   created_by                  Int?
   created_on                  String?
   last_updated_by             Int?
   last_updated_on             String?
   tenant_id                   Int?
-  profile_picture             Json?
+  def_access_profiles         def_access_profiles[]
   def_user_granted_privileges def_user_granted_privileges[]
   def_user_granted_roles      def_user_granted_roles[]
+  def_tenants                 def_tenants?                  @relation(fields: [tenant_id], references: [tenant_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("apps")
 }
 
+model def_users_v {
+  user_id         Int     @id
+  user_name       String?
+  first_name      String?
+  middle_name     String?
+  last_name       String?
+  email_addresses Json?
+  job_title       String?
+  created_by      Int?
+  created_on      String?
+  last_updated_by Int?
+  last_updated_on String?
+  tenant_id       Int?
+  profile_picture Json?
+
+  @@map("def_users_v")
+  @@schema("apps")
+}
+
 model data_sources {
-  data_source_id                          Int                      @id
-  datasource_name                         String?                  @db.VarChar(50)
-  description                             String?                  @db.VarChar(250)
-  application_type                        String?                  @db.VarChar(50)
-  application_type_version                String?                  @db.VarChar(50)
-  last_access_synchronization_date        DateTime?                @db.Timestamp(6)
-  last_access_synchronization_status      String?                  @db.VarChar(50)
-  last_transaction_synchronization_date   DateTime?                @db.Timestamp(6)
-  last_transaction_synchronization_status String?                  @db.VarChar(50)
-  default_datasource                      String?                  @db.VarChar(50)
-  created_by                              String?                  @db.VarChar(50)
-  created_on                              DateTime?                @default(now()) @db.Timestamp(6)
-  last_updated_by                         String?                  @db.VarChar(50)
-  last_updated_on                         DateTime?                @default(now()) @db.Timestamp(6)
-  access_points_elements                  access_points_elements[]
+  data_source_id                          Int       @id
+  datasource_name                         String?   @db.VarChar(50)
+  description                             String?   @db.VarChar(250)
+  application_type                        String?   @db.VarChar(50)
+  application_type_version                String?   @db.VarChar(50)
+  last_access_synchronization_date        DateTime? @db.Timestamp(6)
+  last_access_synchronization_status      String?   @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime? @db.Timestamp(6)
+  last_transaction_synchronization_status String?   @db.VarChar(50)
+  default_datasource                      String?   @db.VarChar(50)
+  created_by                              String?   @db.VarChar(50)
+  created_on                              DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by                         String?   @db.VarChar(50)
+  last_updated_on                         DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -159,7 +180,7 @@ model messages {
   recivers      Json?
   subject       String?
   body          String?
-  date          DateTime? @db.Timestamptz(6)
+  date          DateTime? @default(now()) @db.Timestamp(6)
   status        String?
   parentid      String?
   involvedusers Json?
@@ -203,7 +224,6 @@ model access_points_elements {
   last_updated_by             String?                       @db.VarChar(50)
   last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
   access_entitlement_elements access_entitlement_elements[]
-  data_sources                data_sources                  @relation(fields: [data_source_id], references: [data_source_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_data_source")
 
   @@schema("apps")
 }
@@ -218,7 +238,7 @@ model manage_global_condition_logic_attributes {
 }
 
 model manage_global_condition_logics {
-  manage_global_condition_logic_id Int     @id(map: "manage_global_condition_logic_pkey")
+  manage_global_condition_logic_id Int     @id
   manage_global_condition_id       Int
   object                           String?
   attribute                        String?
@@ -229,7 +249,7 @@ model manage_global_condition_logics {
 }
 
 model manage_global_conditions {
-  manage_global_condition_id Int     @id(map: "manage_global_condition_pkey")
+  manage_global_condition_id Int     @id
   name                       String?
   datasource                 String?
   description                String?
@@ -268,7 +288,7 @@ model manage_access_model_logics {
 }
 
 model manage_access_model_logic_attributes {
-  id                           Int  @id(map: "manage_access_model_attributes_pkey")
+  id                           Int  @id
   manage_access_model_logic_id Int
   widget_position              Int?
   widget_state                 Int?
@@ -277,7 +297,7 @@ model manage_access_model_logic_attributes {
 }
 
 model controls {
-  control_id            Int     @id(map: "create_controls_pkey")
+  control_id            Int     @id
   control_name          String?
   description           String?
   pending_results_count Int?
@@ -313,7 +333,7 @@ model access_entitlement_elements {
 }
 
 model linked_devices {
-  id              Int       @id(map: "liked_devices_pkey") @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   user_id         Int
   device_type     String?   @db.VarChar(50)
   browser_name    String?   @db.VarChar(50)
@@ -336,21 +356,23 @@ model def_processes {
   @@schema("apps")
 }
 
-model def_users_v {
-  user_id         Int     @id
-  user_name       String?
-  first_name      String?
-  middle_name     String?
-  last_name       String?
-  email_addresses Json?
-  job_title       String?
-  created_by      Int?
-  created_on      String?
-  last_updated_by Int?
-  last_updated_on String?
-  tenant_id       Int?
-  profile_picture Json?
+model def_access_profiles {
+  serial_number Int        @id
+  user_id       Int?
+  profile_type  String     @db.VarChar(50)
+  profile_id    String     @db.VarChar(100)
+  primary_yn    String?    @default("N") @db.Char(1)
+  def_users     def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("def_users_v")
+  @@schema("apps")
+}
+
+model mobile_menu {
+  menu_id        Int     @id
+  menu_code      String? @unique
+  menu_name      String?
+  menu_desc      String?
+  menu_structure Json?
+
   @@schema("apps")
 }
