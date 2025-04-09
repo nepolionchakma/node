@@ -29,6 +29,7 @@ const asynchronousRequestsAndTaskSchedulesRoutes = require("./asynchronousReques
 const pushNotificationRoutes = require("./pushNotificationRoutes");
 const orchestrationStudioRoutes = require("./orchestrationStudioRoutes");
 const accessProfileRoutes = require("./accessProfileRoutes");
+const mobileMenuRoutes = require("./mobileMenuRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -87,5 +88,8 @@ routes.use(
 
 // Orchestration Studio
 routes.use("/orchestration-studio-process", orchestrationStudioRoutes);
+
+//Mobile Menu
+routes.use("/mobile-menu", mobileMenuRoutes);
 
 module.exports = routes;
