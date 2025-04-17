@@ -43,7 +43,7 @@ exports.getViewRequestsLazyLoading = async (req, res) => {
     const response = await axios.get(
       `${FLASK_ENDPOINT_URL}/view_requests/${page}/${limit}`
     );
-    console.log(response.data, "response.data");
+    // console.log(response.data, "response.data");
     return res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
