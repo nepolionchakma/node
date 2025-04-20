@@ -361,6 +361,37 @@ exports.setToRecycleBin = async (req, res) => {
   }
 };
 
+exports.restoreMessage = async (req, res) => {
+  const { id, user } = req.params;
+
+  try {
+    const messagesToUpdate = await prisma.messages.findUnique({
+      where: {
+        id: id,
+        recyclebin: {
+          array_contains: user,
+        },
+      },
+    });
+    messagesToUpdate.recyclebin = messagesToUpdate.recyclebin.filter(
+      (usr) => usr !== user
+    );
+
+    messagesToUpdate.holders.push(user);
+
+    await prisma.messages.update({
+      where: {
+        id: id,
+      },
+      data: messagesToUpdate,
+    });
+
+    return res.status(200).json({ messages: "Message successfully restored." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 exports.removeUserFromRecycleBin = async (req, res) => {
   const { id, user } = req.params;
   console.log(id, user);
@@ -471,6 +502,7 @@ exports.getTotalDraftMessages = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 exports.getTotalRecycleBinMessages = async (req, res) => {
   try {
     const user = req.params.user;

@@ -26,6 +26,7 @@ router.put(
   "/set-user-into-recyclebin/:id/:user",
   messageController.setToRecycleBin
 );
+router.put("/restore-message/:id/:user", messageController.restoreMessage);
 router.put(
   "/remove-user-from-recyclebin/:id/:user",
   messageController.removeUserFromRecycleBin

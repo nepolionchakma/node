@@ -121,6 +121,11 @@ const socket = (io) => {
       io.to(user).emit("deletedMessage", id);
     });
 
+    socket.on("restoreMessage", ({ id, user }) => {
+      console.log(id, user, "restoreMessage");
+      io.to(user).emit("restoreMessage", id);
+    });
+
     socket.on("multipleDelete", ({ ids, user }) => {
       for (const id of ids) {
         io.to(user).emit("deletedMessage", id);
