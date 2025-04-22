@@ -1,5 +1,7 @@
 const prisma = require("../DB/db.config");
-exports.getControles = async (req, res) => {
+
+//Get All Controls
+exports.getControls = async (req, res) => {
   try {
     const result = await prisma.controls.findMany({
       //sorting desc
@@ -12,8 +14,8 @@ exports.getControles = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-//Get Unique User
-exports.getUniqueControle = async (req, res) => {
+//Get Unique Control
+exports.getUniqueControl = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await prisma.controls.findUnique({
@@ -30,8 +32,8 @@ exports.getUniqueControle = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-//Create User
-exports.createControle = async (req, res) => {
+//Create Control
+exports.createControl = async (req, res) => {
   try {
     // Validation  START/---------------------------------/
     const data = req.body;
@@ -80,8 +82,9 @@ exports.createControle = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-//Update User
-exports.updateControle = async (req, res) => {
+
+//Update Control
+exports.updateControl = async (req, res) => {
   try {
     const data = req.body;
     const id = Number(req.params.id);
@@ -139,7 +142,9 @@ exports.updateControle = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-exports.deleteControle = async (req, res) => {
+
+//Delete Control
+exports.deleteControl = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
