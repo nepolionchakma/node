@@ -5,20 +5,12 @@ const router = Router();
 
 router.get("/", accessPointsEntitlementController.getAccessPointsEntitlement);
 router.get(
-  "/:page/:limit",
-  accessPointsEntitlementController.getPerPageAccessPoints
-);
-router.get(
   "/:ids/:page/:limit",
   accessPointsEntitlementController.filterAccessPointsById
 );
 router.get(
   "/:ids",
   accessPointsEntitlementController.filterAccessPointsForDelete
-);
-router.get(
-  "/:id",
-  accessPointsEntitlementController.getUniqueAccessPointsEntitlement
 );
 router.post(
   "/",
@@ -28,13 +20,22 @@ router.delete(
   "/:id",
   accessPointsEntitlementController.deleteAccessPointsEntitlement
 );
-router.put(
-  "/:id",
-  accessPointsEntitlementController.updateAccessPointsEntitlement
-);
-router.post(
-  "/upsert",
-  accessPointsEntitlementController.upsertAccessPointsEntitlement
-);
+
+// router.put(
+//   "/:id",
+//   accessPointsEntitlementController.updateAccessPointsEntitlement
+// );
+// router.post(
+//   "/upsert",
+//   accessPointsEntitlementController.upsertAccessPointsEntitlement
+// );
+// router.get(
+//   "/:page/:limit",
+//   accessPointsEntitlementController.getPerPageAccessPoints
+// );
+// router.get(
+//   "/:id",
+//   accessPointsEntitlementController.getUniqueAccessPointsEntitlement
+// );
 
 module.exports = router;
