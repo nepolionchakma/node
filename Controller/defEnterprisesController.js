@@ -49,3 +49,28 @@ exports.defTenantEnterpriseSetupLazyLoading = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+exports.defEnterpriseWithLazyLoading = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const offset = (page - 1) * limit;
+  try {
+    const results = await prisma.def_tenants.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        tenant_id: "desc",
+      },
+    });
+    const totalCount = await prisma.def_tenants.count();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
