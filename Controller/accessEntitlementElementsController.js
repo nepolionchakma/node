@@ -43,13 +43,13 @@ exports.getUniqueAccessEntitlementElement = async (req, res) => {
 };
 //Delete Data
 exports.deleteAccessEntitlementElement = async (req, res) => {
-  const { entitlementId, accessPointId } = req.body;
+  const { entitlementId, accessPointId } = req.params;
 
   try {
     const deletedRecord = await prisma.access_entitlement_elements.deleteMany({
       where: {
-        entitlement_id: entitlementId,
-        access_point_id: accessPointId,
+        entitlement_id: Number(entitlementId),
+        access_point_id: Number(accessPointId),
       },
     });
 

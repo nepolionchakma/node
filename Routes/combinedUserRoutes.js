@@ -8,10 +8,10 @@ const router = Router();
 router.get("/:page/:limit", combinedUserController.getUsersWithPageAndLimit);
 // combined users get without page and limit
 router.get("/", combinedUserController.getUsersView);
-router.get("/:id", combinedUserController.getUser);
+router.get("/:user_id", combinedUserController.getUser);
 router.post("/", combinedUserController.createCombinedUser);
 router.put(
-  "/update-profile-image/:id",
+  "/update-profile-image/:user_id",
   // (req, res, next) => {
   //   console.log("Route reached before upload middleware.");
   //   next();
@@ -32,7 +32,7 @@ router.put(
   combinedUserController.updateProfileImage
 );
 
-router.put("/:id", combinedUserController.updateUser);
+router.put("/:user_id", combinedUserController.updateUser);
 
 //Flask API Wrapper
 router.get("/v2", combinedUserController.getFlaskCombinedUser);

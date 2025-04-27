@@ -82,47 +82,19 @@ exports.createDefUserCredential = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-//Update User
-exports.updateDefUserCredential = async (req, res) => {
-  try {
-    const user_data = req.body;
-    console.log(user_data);
-    const user_id = Number(req.params.user_id);
-
-    const findDefUserId = await prisma.def_user_credentials.findUnique({
-      where: {
-        user_id: user_id,
-      },
-    });
-
-    if (findDefUserId) {
-      const result = await prisma.def_user_credentials.update({
-        where: {
-          user_id: user_id,
-        },
-        data: {
-          password: await hashPassword(user_data.password),
-        },
-      });
-      return res.status(200).json(result);
-    } else {
-      return res.status(404).json({ message: "User Credential Id not found." });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
 
 //reset password
 exports.resetPassword = async (req, res) => {
+  const user_id = Number(req.params.user_id);
   const data = req.body;
-  console.log(data, "data def user credential");
+
   // verify user
   const findDefUserId = await prisma.def_user_credentials.findUnique({
     where: {
-      user_id: Number(data.user_id),
+      user_id: user_id,
     },
   });
+
   try {
     if (findDefUserId) {
       const result = await axios.put(

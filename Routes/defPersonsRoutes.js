@@ -5,7 +5,6 @@ const router = Router();
 
 // Routes
 router.get("/", defPersonsController.defPersons);
-router.get("/p", defPersonsController.perPagePersons);
 router.get("/:id", defPersonsController.uniqueDefPerson);
 router.post("/", defPersonsController.createDerPerson);
 router.delete("/:id", defPersonsController.deleteDefPerson);
