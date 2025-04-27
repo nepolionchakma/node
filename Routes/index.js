@@ -30,7 +30,7 @@ const pushNotificationRoutes = require("./pushNotificationRoutes");
 const orchestrationStudioRoutes = require("./orchestrationStudioRoutes");
 const accessProfileRoutes = require("./accessProfileRoutes");
 const mobileMenuRoutes = require("./mobileMenuRoutes");
-const defTenantEnterpriseSetupRoutes = require("./defTenantEnterpriseSetupRoutes");
+const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -93,7 +93,7 @@ routes.use("/orchestration-studio-process", orchestrationStudioRoutes);
 routes.use("/mobile-menu", mobileMenuRoutes);
 
 // Manage_Tenancy_And_Def_Tenant_Enterprise_Setup
-routes.use("/tenants", defTenantsRoutes);
+routes.use("/def-tenants", defTenantsRoutes);
 routes.use("/def-tenant-enterprise-setup", defTenantEnterpriseSetupRoutes);
 
 module.exports = routes;

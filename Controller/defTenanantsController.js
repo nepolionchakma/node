@@ -1,4 +1,5 @@
 const prisma = require("../DB/db.config");
+const { message } = require("./messagesController");
 
 exports.defTenants = async (req, res) => {
   try {
@@ -35,27 +36,57 @@ exports.uniqueDefTenant = async (req, res) => {
   }
 };
 
+exports.defTenantWithLazyLoading = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const offset = (page - 1) * limit;
+  try {
+    const results = await prisma.def_tenants.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        tenant_id: "desc",
+      },
+    });
+    const totalCount = await prisma.def_tenants.count();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 exports.createDefTenant = async (req, res) => {
   try {
-    const defTenantData = req.body;
+    const { tenant_name } = req.body;
 
     const findDefTenats = await prisma.def_tenants.findFirst({
       where: {
-        tenant_name: defTenantData.tenant_name,
+        tenant_name,
       },
     });
 
+    const maxTenantId = await prisma.def_tenants.aggregate({
+      _max: {
+        tenant_id: true,
+      },
+    });
+    const tenant_id = maxTenantId._max.tenant_id + 1;
+    // console.log(findDefTenats, "findDefTenats");
     if (findDefTenats) {
-      return res.status(408).json({ message: "Tenant already exist" });
+      return res.status(409).json({ message: "Tenant Name already exist" });
     }
 
-    const newDefTenant = await prisma.def_tenants.create({
-      data: {
-        tenant_name: defTenantData.tenant_name,
-      },
+    await prisma.def_tenants.create({
+      data: { tenant_id, tenant_name },
     });
 
-    return res.status(201).json(newDefTenant);
+    return res.status(201).json({ message: "Created Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -93,7 +124,7 @@ exports.deleteDefTenant = async (req, res) => {
       },
     });
 
-    return res.status(200).json({ result: "Deleted Successfully" });
+    return res.status(200).json({ message: "Deleted Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -118,7 +149,7 @@ exports.updateDefTenant = async (req, res) => {
       return res.status(422).json({ message: "Tenant_name is required" });
     }
 
-    const updatedDefTenant = await prisma.def_tenants.update({
+    await prisma.def_tenants.update({
       where: {
         tenant_id: defTenantId,
       },
@@ -127,40 +158,41 @@ exports.updateDefTenant = async (req, res) => {
       },
     });
 
-    return res.status(201).json({ updatedDefTenant });
+    return res.status(201).json({ message: "Updated Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
-exports.upsertDefTenant = async (req, res) => {
-  const data = req.body.upsertAttributes || req.body;
 
-  if (!Array.isArray(data)) {
-    return res
-      .status(400)
-      .json({ error: "Invalid input: 'Data' should be an array" });
-  }
+// exports.upsertDefTenant = async (req, res) => {
+//   const data = req.body.upsertAttributes || req.body;
 
-  const upsertResults = [];
+//   if (!Array.isArray(data)) {
+//     return res
+//       .status(400)
+//       .json({ error: "Invalid input: 'Data' should be an array" });
+//   }
 
-  try {
-    for (const item of data) {
-      const result = await prisma.def_tenants.upsert({
-        where: { tenant_id: item.tenant_id },
-        update: {
-          tenant_id: data.tenant_id,
-          tenant_name: item.tenant_name,
-        },
-        create: {
-          tenant_name: item.tenant_name,
-        },
-      });
-      upsertResults.push(result);
-    }
+//   const upsertResults = [];
 
-    return res.status(200).json(upsertResults);
-  } catch (error) {
-    console.error("Error in upsert operation:", error);
-    return res.status(500).json({ error: error.message });
-  }
-};
+//   try {
+//     for (const item of data) {
+//       const result = await prisma.def_tenants.upsert({
+//         where: { tenant_id: item.tenant_id },
+//         update: {
+//           tenant_id: data.tenant_id,
+//           tenant_name: item.tenant_name,
+//         },
+//         create: {
+//           tenant_name: item.tenant_name,
+//         },
+//       });
+//       upsertResults.push(result);
+//     }
+
+//     return res.status(200).json(upsertResults);
+//   } catch (error) {
+//     console.error("Error in upsert operation:", error);
+//     return res.status(500).json({ error: error.message });
+//   }
+// };

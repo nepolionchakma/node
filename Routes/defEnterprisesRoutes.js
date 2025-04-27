@@ -1,5 +1,5 @@
 const Router = require("express");
-const defTenantEnterpriseSetupController = require("../Controller/defTenantEnterpriseSetupController");
+const defTenantEnterpriseSetupController = require("../Controller/defEnterprisesController");
 
 const router = Router();
 
