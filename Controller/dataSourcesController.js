@@ -112,11 +112,12 @@ exports.updateDataSource = async (req, res) => {
       return res.status(422).json({
         message: "data source name and description is Required",
       });
-    } else if (findExistName) {
-      return res
-        .status(408)
-        .json({ message: "Data Source name already exist." });
     }
+    // else if (findExistName) {
+    //   return res
+    //     .status(409)
+    //     .json({ message: "Data Source name already exist." });
+    // }
     // Validation  End/---------------------------------/
     const result = await prisma.data_sources.update({
       where: {

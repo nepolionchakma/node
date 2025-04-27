@@ -1,5 +1,5 @@
 const Router = require("express");
-const defUserCredentialsController = require("../Controller/defUserCrendentials");
+const defUserCredentialsController = require("../Controller/defUserCrendentialsController");
 
 const router = Router();
 
@@ -9,8 +9,10 @@ router.get(
   defUserCredentialsController.getUniqueDefUserCredentials
 );
 router.post("/", defUserCredentialsController.createDefUserCredential);
-router.put("/reset-password", defUserCredentialsController.resetPassword);
-router.put("/:user_id", defUserCredentialsController.updateDefUserCredential);
+router.put(
+  "/reset-password/:user_id",
+  defUserCredentialsController.resetPassword
+);
 router.delete(
   "/:user_id",
   defUserCredentialsController.deleteDefUserCredential

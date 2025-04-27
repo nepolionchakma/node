@@ -114,7 +114,6 @@ exports.createAccessPointsEntitlement = async (req, res) => {
     if (findAccessPointsElementName) {
       return res.status(409).json({ message: "Element Name already exist." });
     }
-
     if (!data.element_name) {
       return res.status(422).json({
         message: "Element name is Required",
@@ -135,9 +134,7 @@ exports.createAccessPointsEntitlement = async (req, res) => {
         created_on: currentDate,
         last_updated_by: data.last_updated_by,
         last_updated_on: currentDate,
-        data_sources: {
-          connect: { data_source_id: data.data_source_id },
-        },
+        data_source_id: data.data_source_id,
       },
     });
     if (result) {

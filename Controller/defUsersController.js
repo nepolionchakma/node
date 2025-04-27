@@ -48,7 +48,7 @@ exports.createDefUser = async (req, res) => {
       },
     });
     if (findDefUserName)
-      return res.status(408).json({ message: "User Name already exist." });
+      return res.status(409).json({ message: "User Name already exist." });
     if (!user_data.user_name || !user_data.user_type) {
       return res.status(422).json({
         message: "user_name, user_type is Required",
@@ -139,28 +139,6 @@ exports.deleteDefUser = async (req, res) => {
       },
     });
     return res.status(200).json({ result: "Deleted Successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-// perPageUsers Data
-exports.perPageUsers = async (req, res) => {
-  const page = parseInt(req.query.page);
-  const limit = parseInt(req.query.limit);
-  const offset = (page - 1) * limit;
-  try {
-    const results = await prisma.def_users.findMany({
-      take: limit,
-      skip: offset,
-    });
-    const totalCount = await prisma.def_users.count();
-    const totalPages = Math.ceil(totalCount / limit);
-
-    return res.status(200).json({
-      results,
-      totalPages,
-      currentPage: page,
-    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

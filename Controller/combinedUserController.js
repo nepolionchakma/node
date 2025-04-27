@@ -169,11 +169,11 @@ exports.getUsersView = async (req, res) => {
   }
 };
 exports.getUser = async (req, res) => {
-  const { id } = req.params;
+  const { user_id } = req.params;
   try {
     const users = await prisma.def_users_v.findUnique({
       where: {
-        user_id: Number(id),
+        user_id: Number(user_id),
       },
     });
 
@@ -215,7 +215,7 @@ exports.updateUser = async (req, res) => {
       job_title,
       password,
     } = req.body;
-    const id = Number(req.params.id);
+    const user_id = Number(req.params.user_id);
     const hashPassword = (password) => {
       return new Promise((resolve, reject) => {
         const salt = crypto.randomBytes(8).toString("hex");
@@ -243,7 +243,7 @@ exports.updateUser = async (req, res) => {
 
     // Validate user ID
     const findDefUserId = await prisma.def_users.findUnique({
-      where: { user_id: id },
+      where: { user_id },
     });
 
     if (!findDefUserId) {
@@ -252,7 +252,7 @@ exports.updateUser = async (req, res) => {
 
     // Update user with profile picture and thumbnail
     await prisma.def_users.update({
-      where: { user_id: id },
+      where: { user_id },
       data: {
         user_name: user_name || findDefUserId.user_name,
         email_addresses: email_addresses || findDefUserId.email_addresses,
@@ -260,7 +260,7 @@ exports.updateUser = async (req, res) => {
     });
 
     await prisma.def_persons.update({
-      where: { user_id: id },
+      where: { user_id },
       data: {
         first_name: first_name || findDefUserId.first_name,
         middle_name: middle_name || findDefUserId.middle_name,
@@ -271,7 +271,7 @@ exports.updateUser = async (req, res) => {
 
     if (password.length > 0) {
       await prisma.def_user_credentials.update({
-        where: { user_id: id },
+        where: { user_id },
         data: {
           password: await hashPassword(password),
         },
@@ -352,7 +352,7 @@ exports.createFlaskCombinedUser = async (req, res) => {
 };
 
 exports.updateProfileImage = async (req, res) => {
-  const { id } = req.params;
+  const { user_id } = req.params;
 
   try {
     if (!req.file) {
@@ -366,7 +366,7 @@ exports.updateProfileImage = async (req, res) => {
 
     // Validate user ID
     const findDefUserId = await prisma.def_users.findUnique({
-      where: { user_id: Number(id) },
+      where: { user_id: Number(user_id) },
     });
 
     if (!findDefUserId) {
@@ -375,7 +375,7 @@ exports.updateProfileImage = async (req, res) => {
 
     // Update user with profile picture and thumbnail
     await prisma.def_users.update({
-      where: { user_id: Number(id) },
+      where: { user_id: Number(user_id) },
       data: {
         profile_picture: {
           original: filePath || findDefUserId.profile_picture,

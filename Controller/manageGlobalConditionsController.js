@@ -39,8 +39,7 @@ exports.createManageGlobalCondition = async (req, res) => {
     const id = Math.max(
       ...response.map((item) => item.manage_global_condition_id)
     );
-    console.log(response);
-    console.log(id);
+
     // Validation  START/---------------------------------/
     const data = req.body;
 
@@ -52,7 +51,7 @@ exports.createManageGlobalCondition = async (req, res) => {
       });
     if (findManageGlobalCondition)
       return res
-        .status(408)
+        .status(409)
         .json({ message: "ManageGlobalCondition Name already exist." });
     if (!data.name) {
       return res.status(422).json({
@@ -100,21 +99,17 @@ exports.updateManageGlobalCondition = async (req, res) => {
     }
     if (!data.name || !data.description) {
       return res.status(422).json({
-        message: "ManageGlobalCondition name and description is Required",
+        message: "Name and description is Required",
       });
+    } else if (findExistName) {
+      return res.status(409).json({ message: "Name already exist." });
     }
-    // else if (findExistName) {
-    //   return res
-    //     .status(408)
-    //     .json({ message: "ManageGlobalCondition name already exist." });
-    // }
     // Validation  End/---------------------------------/
     const result = await prisma.manage_global_conditions.update({
       where: {
         manage_global_condition_id: id,
       },
       data: {
-        manage_global_condition_id: id,
         name: data.name,
         datasource: data.datasource,
         description: data.description,

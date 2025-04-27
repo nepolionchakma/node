@@ -20,7 +20,7 @@ router.post(
   accessEntitlementElementsController.createAccessEntitlementElement
 );
 router.delete(
-  "/",
+  "/:entitlementId/:accessPointId",
   accessEntitlementElementsController.deleteAccessEntitlementElement
 );
 
