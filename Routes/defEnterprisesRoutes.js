@@ -3,10 +3,24 @@ const defTenantEnterpriseSetupController = require("../Controller/defEnterprises
 
 const router = Router();
 
-router.get("/", defTenantEnterpriseSetupController.defTenantEnterpriseSetup);
+router.get("/", defTenantEnterpriseSetupController.getDefEnterprise);
+router.get(
+  "/:tenant_id",
+  defTenantEnterpriseSetupController.uniqueDefEnterprise
+);
 router.get(
   "/:page/:limit",
-  defTenantEnterpriseSetupController.defTenantEnterpriseSetupLazyLoading
+  defTenantEnterpriseSetupController.lazyLoadingDefEnterprise
+);
+router.post("/", defTenantEnterpriseSetupController.createDefEnterprise);
+router.put(
+  "/:tenant_id",
+  defTenantEnterpriseSetupController.updateDefEnterprise
+);
+// router.put("/:id", defTenantsController.updateDefTenant);
+router.delete(
+  "/:tenant_id",
+  defTenantEnterpriseSetupController.deleteDefEnterprise
 );
 
 module.exports = router;
