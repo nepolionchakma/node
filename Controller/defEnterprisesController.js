@@ -99,7 +99,7 @@ exports.createDefEnterprise = async (req, res) => {
 };
 exports.updateDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
-  const { enterprise_name, enterprise_type } = Number(req.body);
+  const { enterprise_name, enterprise_type } = req.body;
   try {
     const isExist = await prisma.def_tenant_enterprise_setup.findFirst({
       where: {
