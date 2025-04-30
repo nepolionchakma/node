@@ -9,13 +9,13 @@ router.get(
   manageGlobalConditionsController.getUniqueManageGlobalCondition
 );
 router.post("/", manageGlobalConditionsController.createManageGlobalCondition);
-router.delete(
-  "/:id",
-  manageGlobalConditionsController.deleteManageGlobalCondition
-);
+
 router.put(
   "/:id",
   manageGlobalConditionsController.updateManageGlobalCondition
+);router.delete(
+  "/:id",
+  manageGlobalConditionsController.deleteManageGlobalCondition
 );
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const { default: axios } = require("axios");
-const { user } = require("../Authentication/Authentication");
 const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
+// ARM Tasks
 const pageLimitData = (page, limit) => {
   const pageNumber = parseInt(page);
   const limitNumber = parseInt(limit);

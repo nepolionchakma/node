@@ -13,6 +13,8 @@ exports.getAccessEntitlementElement = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+// create Data
 exports.createAccessEntitlementElement = async (req, res) => {
   try {
     const result = await prisma.access_entitlement_elements.create({
@@ -23,6 +25,7 @@ exports.createAccessEntitlementElement = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 //get unique Data
 exports.getUniqueAccessEntitlementElement = async (req, res) => {
   try {
@@ -41,6 +44,7 @@ exports.getUniqueAccessEntitlementElement = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 //Delete Data
 exports.deleteAccessEntitlementElement = async (req, res) => {
   const { entitlementId, accessPointId } = req.params;
@@ -64,6 +68,7 @@ exports.deleteAccessEntitlementElement = async (req, res) => {
   } finally {
   }
 };
+
 // perPageAccessEntitlementElement Data
 exports.getPerPageAccessEntitlementElement = async (req, res) => {
   const page = Number(req.params.page);

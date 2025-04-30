@@ -7,7 +7,7 @@ const router = Router();
 router.get("/", defPersonsController.defPersons);
 router.get("/:id", defPersonsController.uniqueDefPerson);
 router.post("/", defPersonsController.createDerPerson);
-router.delete("/:id", defPersonsController.deleteDefPerson);
 router.put("/:id", defPersonsController.updateDefPerson);
+router.delete("/:id", defPersonsController.deleteDefPerson);
 
 module.exports = router;

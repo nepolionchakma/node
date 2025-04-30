@@ -1,5 +1,7 @@
 const axios = require("axios");
 const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+
+// Get Data
 exports.getAccessProfiles = async (req, res) => {
   const { user_id } = req.params;
   try {
@@ -13,6 +15,7 @@ exports.getAccessProfiles = async (req, res) => {
   }
 };
 
+// Create Data
 exports.createProfile = async (req, res) => {
   const data = req.body;
   const { user_id } = req.params;
@@ -27,6 +30,7 @@ exports.createProfile = async (req, res) => {
   }
 };
 
+// Update Data
 exports.updateProfile = async (req, res) => {
   const { user_id, serial_number } = req.params;
   const data = req.body;
@@ -41,6 +45,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+// Delete Data
 exports.deleteProfile = async (req, res) => {
   const { user_id, serial_number } = req.params;
   try {

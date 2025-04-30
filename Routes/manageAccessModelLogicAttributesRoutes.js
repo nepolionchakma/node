@@ -15,17 +15,17 @@ router.post(
   "/",
   manageAccessModelLogicAttributesControllers.createManageAccessModelAttribute
 );
-router.delete(
-  "/:id",
-  manageAccessModelLogicAttributesControllers.deleteManageAccessModelAttribute
+router.post(
+  "/upsert",
+  manageAccessModelLogicAttributesControllers.upsertManageAccessModelAttribute
 );
 router.put(
   "/:id",
   manageAccessModelLogicAttributesControllers.updateManageAccessModelAttribute
 );
-router.post(
-  "/upsert",
-  manageAccessModelLogicAttributesControllers.upsertManageAccessModelAttribute
+router.delete(
+  "/:id",
+  manageAccessModelLogicAttributesControllers.deleteManageAccessModelAttribute
 );
 
 module.exports = router;
