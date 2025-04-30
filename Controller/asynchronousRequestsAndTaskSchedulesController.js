@@ -13,10 +13,10 @@ const pageLimitData = (page, limit) => {
 };
 
 exports.getTaskSchedule = async (req, res) => {
-  const { task_name, arm_param_id } = req.params;
+  const { task_name, def_param_id } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedule/${task_name}/${arm_param_id}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskSchedule/${task_name}/${def_param_id}`
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -57,7 +57,7 @@ exports.getTaskSchedules = async (req, res) => {
     );
 
     const sortedData = response.data.sort(
-      (a, b) => b?.arm_task_sche_id - a?.arm_task_sche_id
+      (a, b) => b?.def_task_sche_id - a?.def_task_sche_id
     );
     return res.status(200).json(sortedData);
   } catch (error) {
