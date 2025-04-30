@@ -50,7 +50,6 @@ exports.getViewRequestsLazyLoading = async (req, res) => {
   }
 };
 
-// V1 API
 exports.getTaskSchedules = async (req, res) => {
   try {
     const response = await axios.get(

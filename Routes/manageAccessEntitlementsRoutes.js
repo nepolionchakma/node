@@ -16,13 +16,13 @@ router.post(
   "/",
   manageAccessEntitlementsController.createManageAccessEntitlement
 );
-router.delete(
-  "/:id",
-  manageAccessEntitlementsController.deleteManageAccessEntitlement
-);
 router.put(
   "/:id",
   manageAccessEntitlementsController.updateManageAccessEntitlement
+);
+router.delete(
+  "/:id",
+  manageAccessEntitlementsController.deleteManageAccessEntitlement
 );
 
 module.exports = router;

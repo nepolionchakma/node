@@ -37,7 +37,7 @@ routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);
 
-// Verify user middleware
+// Verify user - middleware
 routes.use(verifyUser);
 
 //  After verify user

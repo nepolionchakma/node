@@ -1,6 +1,7 @@
 const prisma = require("../DB/db.config");
 const currentDate = new Date();
 
+// get Data
 exports.getAccessPointsEntitlement = async (req, res) => {
   try {
     const result = await prisma.access_points_elements.findMany({
@@ -15,6 +16,7 @@ exports.getAccessPointsEntitlement = async (req, res) => {
   }
 };
 
+// get Data AccessPointsById
 exports.filterAccessPointsById = async (req, res) => {
   const idsParam = req.params.ids; // array of ids
   const stringArray = idsParam.split(",");
@@ -58,6 +60,7 @@ exports.filterAccessPointsById = async (req, res) => {
   }
 };
 
+// get Data AccessPointsForDelete
 exports.filterAccessPointsForDelete = async (req, res) => {
   const idsParam = req.params.ids; // array of ids
   const stringArray = idsParam.split(",");
@@ -94,6 +97,7 @@ exports.filterAccessPointsForDelete = async (req, res) => {
   }
 };
 
+// create Data
 exports.createAccessPointsEntitlement = async (req, res) => {
   const maxUserIDResult = await prisma.access_points_elements.aggregate({
     _max: {
@@ -145,6 +149,7 @@ exports.createAccessPointsEntitlement = async (req, res) => {
   }
 };
 
+//Delete AccessPointsEntitlement
 exports.deleteAccessPointsEntitlement = async (req, res) => {
   try {
     const id = Number(req.params.id);

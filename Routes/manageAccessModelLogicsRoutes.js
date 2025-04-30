@@ -16,13 +16,14 @@ router.post(
   "/upsert",
   manageAccessModelLogicsController.upsertManageAccessModelLogic
 );
-router.delete(
-  "/:id",
-  manageAccessModelLogicsController.deleteManageAccessModelLogic
-);
+
 router.put(
   "/:id",
   manageAccessModelLogicsController.updateManageAccessModelLogic
+);
+router.delete(
+  "/:id",
+  manageAccessModelLogicsController.deleteManageAccessModelLogic
 );
 
 module.exports = router;
