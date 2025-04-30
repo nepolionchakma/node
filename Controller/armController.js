@@ -17,7 +17,7 @@ const pageLimitData = (page, limit) => {
 exports.getARMTasks = async (req, res) => {
   const response = await axios.get(`${FLASK_ENDPOINT_URL}/Show_Tasks`);
   const sortedData = response.data.sort(
-    (a, b) => b?.arm_task_id - a?.arm_task_id
+    (a, b) => b?.def_task_id - a?.def_task_id
   );
   return res.status(200).json(sortedData);
 };
@@ -90,7 +90,7 @@ exports.getTaskNameParams = async (req, res) => {
     );
 
     const sortedData = response.data.sort(
-      (a, b) => b.arm_task_id - a.arm_task_id
+      (a, b) => b.def_task_id - a.def_task_id
     );
     return res.status(200).json(sortedData);
   } catch (error) {
@@ -105,7 +105,7 @@ exports.getUserTaskNameParams = async (req, res) => {
     );
 
     const sortedData = response.data.sort(
-      (a, b) => b.arm_task_id - a.arm_task_id
+      (a, b) => b.def_task_id - a.def_task_id
     );
     return res.status(200).json(sortedData);
   } catch (error) {
@@ -143,11 +143,11 @@ exports.addTaskParams = async (req, res) => {
 };
 
 exports.updateTaskParams = async (req, res) => {
-  const { task_name, arm_param_id } = req.params;
+  const { task_name, def_param_id } = req.params;
   const data = req.body;
   try {
     const response = await axios.put(
-      `${FLASK_ENDPOINT_URL}/Update_TaskParams/${task_name}/${arm_param_id}`,
+      `${FLASK_ENDPOINT_URL}/Update_TaskParams/${task_name}/${def_param_id}`,
       data
     );
     return res.status(200).json(response.data);
@@ -156,10 +156,10 @@ exports.updateTaskParams = async (req, res) => {
   }
 };
 exports.deleteTaskParams = async (req, res) => {
-  const { task_name, arm_param_id } = req.params;
+  const { task_name, def_param_id } = req.params;
   try {
     const response = await axios.put(
-      `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${arm_param_id}`,
+      `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${def_param_id}`,
       data
     );
     return res.status(200).json(response.data);

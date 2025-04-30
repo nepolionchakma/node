@@ -4,7 +4,7 @@ const asynchronousRequestsAndTaskSchedulesController = require("../Controller/as
 const router = Router();
 
 router.get(
-  "/:task_name/:arm_param_id",
+  "/:task_name/:def_param_id",
   asynchronousRequestsAndTaskSchedulesController.getTaskSchedule
 );
 router.get(
