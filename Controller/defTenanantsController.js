@@ -1,14 +1,22 @@
 const prisma = require("../DB/db.config");
-const { message } = require("./messagesController");
+const { default: axios } = require("axios");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
-exports.defTenants = async (req, res) => {
+const pageLimitData = (page, limit) => {
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+  let startNumber = 0;
+  const endNumber = pageNumber * limitNumber;
+  if (pageNumber > 1) {
+    const pageInto = pageNumber - 1;
+    startNumber = pageInto * limitNumber;
+  }
+  return { startNumber, endNumber };
+};
+
+exports.getDefTenants = async (req, res) => {
   try {
-    const defTenants = await prisma.def_tenants.findMany({
-      //sorting desc
-      orderBy: {
-        tenant_id: "desc",
-      },
-    });
+    const defTenants = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`);
 
     return res.status(200).json(defTenants);
   } catch (error) {
@@ -20,11 +28,9 @@ exports.uniqueDefTenant = async (req, res) => {
   try {
     const tenantId = Number(req.params.id);
 
-    const findDefTenant = await prisma.def_tenants.findUnique({
-      where: {
-        tenant_id: tenantId,
-      },
-    });
+    const findDefTenant = await await axios.get(
+      `${FLASK_ENDPOINT_URL}/tenants/${tenantId}`
+    );
 
     if (!findDefTenant) {
       return res.status(404).json({ message: "Tenant is not found" });
@@ -39,17 +45,13 @@ exports.uniqueDefTenant = async (req, res) => {
 exports.defTenantWithLazyLoading = async (req, res) => {
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
-  const offset = (page - 1) * limit;
+  const { startNumber, endNumber } = pageLimitData(page, limit);
+
   try {
-    const results = await prisma.def_tenants.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: {
-        tenant_id: "desc",
-      },
-    });
-    const totalCount = await prisma.def_tenants.count();
-    const totalPages = Math.ceil(totalCount / limit);
+    const response = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`);
+
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
 
     return res.status(200).json({
       results,
@@ -63,30 +65,34 @@ exports.defTenantWithLazyLoading = async (req, res) => {
 
 exports.createDefTenant = async (req, res) => {
   try {
-    const { tenant_name } = req.body;
+    const tenant_name = req.body;
 
-    const findDefTenats = await prisma.def_tenants.findFirst({
-      where: {
-        tenant_name,
-      },
-    });
+    const createDefTenant = await axios.post(
+      `${FLASK_ENDPOINT_URL}/tenants`,
+      tenant_name
+    );
 
-    const maxTenantId = await prisma.def_tenants.aggregate({
-      _max: {
-        tenant_id: true,
-      },
-    });
-    const tenant_id = maxTenantId._max.tenant_id + 1;
-    // console.log(findDefTenats, "findDefTenats");
-    if (findDefTenats) {
-      return res.status(409).json({ message: "Tenant Name already exist" });
+    if (createDefTenant.status === 201) {
+      return res.status(201).json({ message: "Created Successfully" });
     }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
-    await prisma.def_tenants.create({
-      data: { tenant_id, tenant_name },
-    });
+exports.updateDefTenant = async (req, res) => {
+  try {
+    const defTenantId = Number(req.params.id);
+    const defTenantUpdateData = req.body;
 
-    return res.status(201).json({ message: "Created Successfully" });
+    const createDefTenant = await axios.put(
+      `${FLASK_ENDPOINT_URL}/tenants/${defTenantId}`,
+      defTenantUpdateData
+    );
+
+    if (createDefTenant.status === 200) {
+      return res.status(200).json({ message: "Updated Successfully" });
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -96,69 +102,12 @@ exports.deleteDefTenant = async (req, res) => {
   try {
     const defTenantID = Number(req.params.id);
 
-    const findDefTenant = await prisma.def_tenants.findUnique({
-      where: {
-        tenant_id: defTenantID,
-      },
-    });
-
-    if (!findDefTenant) {
-      return res.status(404).json({ message: "Tenant not found" });
+    const findDefTenant = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/tenants/${defTenantID}`
+    );
+    if (findDefTenant.status === 200) {
+      return res.status(200).json({ message: "Deleted Successfully" });
     }
-
-    const relatedUsers = await prisma.def_users.findMany({
-      where: {
-        tenant_id: defTenantID,
-      },
-    });
-
-    if (relatedUsers.length > 0) {
-      return res
-        .status(400)
-        .json({ message: "Cannot delete tenant; there are related users." });
-    }
-
-    await prisma.def_tenants.delete({
-      where: {
-        tenant_id: defTenantID,
-      },
-    });
-
-    return res.status(200).json({ message: "Deleted Successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-exports.updateDefTenant = async (req, res) => {
-  try {
-    const defTenantId = Number(req.params.id);
-    const defTenantData = req.body;
-
-    const findDefTenant = await prisma.def_tenants.findUnique({
-      where: {
-        tenant_id: defTenantId,
-      },
-    });
-
-    if (!findDefTenant) {
-      return res.status(404).json({ message: "Tenant not found" });
-    }
-
-    if (!defTenantData.tenant_name) {
-      return res.status(422).json({ message: "Tenant_name is required" });
-    }
-
-    await prisma.def_tenants.update({
-      where: {
-        tenant_id: defTenantId,
-      },
-      data: {
-        tenant_name: defTenantData.tenant_name,
-      },
-    });
-
-    return res.status(201).json({ message: "Updated Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
