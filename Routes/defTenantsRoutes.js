@@ -3,7 +3,7 @@ const defTenantsController = require("../Controller/defTenanantsController");
 
 const router = Router();
 
-router.get("/", defTenantsController.defTenants);
+router.get("/", defTenantsController.getDefTenants);
 router.get("/:id", defTenantsController.uniqueDefTenant);
 router.get("/:page/:limit", defTenantsController.defTenantWithLazyLoading);
 router.post("/", defTenantsController.createDefTenant);

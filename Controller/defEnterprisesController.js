@@ -1,5 +1,5 @@
-const prisma = require("../DB/db.config");
-const axios = require("axios");
+const { default: axios } = require("axios");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
 const pageLimitData = (page, limit) => {
   const pageNumber = parseInt(page);
@@ -14,62 +14,38 @@ const pageLimitData = (page, limit) => {
 };
 exports.getDefEnterprise = async (req, res) => {
   try {
-    // const defTenants = await axios.get(`${process.env.FLASK_ENDPOINT_URL}/`);
-    const result = await prisma.def_tenant_enterprise_setup.findMany({
-      orderBy: {
-        tenant_id: "desc",
-      },
-    });
+    const result = await axios.get(`${FLASK_ENDPOINT_URL}/get_enterprises`);
 
-    return res.status(200).json(result);
+    return res.status(200).json(result.data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 exports.uniqueDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
 
+  console.log(tenant_id, "result.data");
   try {
-    // const defTenants = await axios.get(`${process.env.FLASK_ENDPOINT_URL}/`);
-    const result = await prisma.def_tenant_enterprise_setup.findUnique({
-      where: {
-        tenant_id,
-      },
-    });
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/get_enterprise/${tenant_id}`
+    );
 
-    return res.status(200).json(result);
+    return res.status(200).json(response.data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(error.status).json({ message: error.message });
   }
 };
-// exports.defTenantEnterpriseSetupLazyLoading = async (req, res) => {
-//   const { page, limit } = req.params;
-//   try {
-//     // const defTenants = await axios.get(`${process.env.FLASK_ENDPOINT_URL}/`);
-
-//     const { startNumber, endNumber } = pageLimitData(page, limit);
-//     const results = data.slice(startNumber, endNumber);
-//     return res.status(200).json(results);
-//   } catch (error) {
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
 
 exports.lazyLoadingDefEnterprise = async (req, res) => {
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
-  const offset = (page - 1) * limit;
-  try {
-    const results = await prisma.def_tenant_enterprise_setup.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: {
-        tenant_id: "desc",
-      },
-    });
-    const totalCount = await prisma.def_tenant_enterprise_setup.count();
-    const totalPages = Math.ceil(totalCount / limit);
+  const { startNumber, endNumber } = pageLimitData(page, limit);
 
+  try {
+    const response = await axios.get(`${FLASK_ENDPOINT_URL}/enterprises`);
+
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
     return res.status(200).json({
       results,
       totalPages,
@@ -81,44 +57,37 @@ exports.lazyLoadingDefEnterprise = async (req, res) => {
 };
 
 exports.createDefEnterprise = async (req, res) => {
-  const { enterprise_name, enterprise_type } = req.body;
+  const tenant_id = Number(req.params.tenant_id);
+  const data = req.body;
   try {
-    const maxTenantId = await prisma.def_tenant_enterprise_setup.aggregate({
-      _max: {
-        tenant_id: true,
-      },
-    });
-    const tenant_id = maxTenantId._max.tenant_id + 1;
-    await prisma.def_tenant_enterprise_setup.create({
-      data: { tenant_id, enterprise_name, enterprise_type },
-    });
-    return res.status(200).json({ message: "Created Successfully." });
+    const response = await axios.post(
+      `${FLASK_ENDPOINT_URL}/create_enterprise/${tenant_id}`,
+      data
+    );
+
+    if (response.status === 201) {
+      return res.status(201).json(response.data);
+    } else {
+      return res.status(404).json({ message: "Tenancy not found." });
+    }
   } catch (error) {
     console.log(error);
   }
 };
 exports.updateDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
-  const { enterprise_name, enterprise_type } = req.body;
+  const data = req.body;
   try {
-    const isExist = await prisma.def_tenant_enterprise_setup.findFirst({
-      where: {
-        tenant_id,
-      },
-    });
-    if (!isExist) {
-      return res.status(404).json({ message: "Not found." });
+    const response = await axios.put(
+      `${FLASK_ENDPOINT_URL}/update_enterprise/${tenant_id}`,
+      data
+    );
+
+    if (response.status === 200) {
+      return res.status(200).json(response.data);
+    } else {
+      return res.status(404).json({ message: "Enterprise not found." });
     }
-    await prisma.def_tenant_enterprise_setup.update({
-      where: {
-        tenant_id,
-      },
-      data: {
-        enterprise_name,
-        enterprise_type,
-      },
-    });
-    return res.status(200).json({ message: "Updated Successfully." });
   } catch (error) {
     console.log(error);
   }
@@ -126,20 +95,15 @@ exports.updateDefEnterprise = async (req, res) => {
 exports.deleteDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
   try {
-    const isExist = await prisma.def_tenant_enterprise_setup.findFirst({
-      where: {
-        tenant_id,
-      },
-    });
-    if (!isExist) {
+    const response = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/delete_enterprise/${tenant_id}`
+    );
+    console.log(response.data, response.status, "response.data");
+    if (response.status === 200) {
+      return res.status(200).json({ message: "Deleted Successfully." });
+    } else {
       return res.status(404).json({ message: "Enterprise not found." });
     }
-    await prisma.def_tenant_enterprise_setup.delete({
-      where: {
-        tenant_id,
-      },
-    });
-    return res.status(200).json({ message: "Deleted Successfully." });
   } catch (error) {
     console.log(error);
   }
