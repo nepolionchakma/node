@@ -16,10 +16,10 @@ router.post(
   "/:tenant_id",
   defTenantEnterpriseSetupController.createDefEnterprise
 );
-router.put(
-  "/:tenant_id",
-  defTenantEnterpriseSetupController.updateDefEnterprise
-);
+// router.put(
+//   "/:tenant_id",
+//   defTenantEnterpriseSetupController.updateDefEnterprise
+// );
 // router.put("/:id", defTenantsController.updateDefTenant);
 router.delete(
   "/:tenant_id",

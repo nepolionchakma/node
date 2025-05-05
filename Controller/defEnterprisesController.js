@@ -74,24 +74,7 @@ exports.createDefEnterprise = async (req, res) => {
     console.log(error);
   }
 };
-exports.updateDefEnterprise = async (req, res) => {
-  const tenant_id = Number(req.params.tenant_id);
-  const data = req.body;
-  try {
-    const response = await axios.put(
-      `${FLASK_ENDPOINT_URL}/update_enterprise/${tenant_id}`,
-      data
-    );
 
-    if (response.status === 200) {
-      return res.status(200).json(response.data);
-    } else {
-      return res.status(404).json({ message: "Enterprise not found." });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
 exports.deleteDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
   try {
@@ -108,3 +91,22 @@ exports.deleteDefEnterprise = async (req, res) => {
     console.log(error);
   }
 };
+
+// exports.updateDefEnterprise = async (req, res) => {
+//   const tenant_id = Number(req.params.tenant_id);
+//   const data = req.body;
+//   try {
+//     const response = await axios.put(
+//       `${FLASK_ENDPOINT_URL}/update_enterprise/${tenant_id}`,
+//       data
+//     );
+
+//     if (response.status === 200) {
+//       return res.status(200).json(response.data);
+//     } else {
+//       return res.status(404).json({ message: "Enterprise not found." });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
