@@ -5,7 +5,6 @@ const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 exports.getDefAccessModels = async (req, res) => {
   try {
     const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_access_models`);
-    console.log(result);
     return res.status(200).json(result.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
