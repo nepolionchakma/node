@@ -20,7 +20,7 @@ const manageGlobalConditionsRoutes = require("../Routes/manageGlobalConditionsRo
 const manageGlobalConditionsLogicsRoutes = require("../Routes/manageGlobalConditionLogicsRoutes");
 const manageGlobalConditionsLogicAttributesRoutes = require("../Routes/manageGlobalConditionLogicAttributesRoutes");
 const defAccessModelsRoutes = require("./defAccessModelsRoutes");
-const manageAccessModelLogicsRoutes = require("../Routes/manageAccessModelLogicsRoutes");
+const defAccessModelLogicsRoutes = require("./defAccessModelLogicsRoutes");
 const manageAccessModelLogicAttributesRoutes = require("./manageAccessModelLogicAttributesRoutes");
 const controlesRoutes = require("./controlsRoutes");
 const linkedDevicesRoutes = require("./linkedDevicesRoutes");
@@ -69,7 +69,7 @@ routes.use(
 
 // Access model section
 routes.use("/def-access-models", defAccessModelsRoutes);
-routes.use("/manage-access-model-logics", manageAccessModelLogicsRoutes);
+routes.use("/def-access-model-logics", defAccessModelLogicsRoutes);
 routes.use(
   "/manage-access-model-logic-attributes",
   manageAccessModelLogicAttributesRoutes
