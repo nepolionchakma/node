@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["apps"]
+  schemas  = ["apps", "test"]
 }
 
 model def_api_endpoint_roles {
@@ -76,7 +76,7 @@ model def_tenant_enterprise_setup {
 }
 
 model def_tenants {
-  tenant_id   Int         @id
+  tenant_id   Int         @id @default(autoincrement())
   tenant_name String?
   def_users   def_users[]
 
@@ -375,4 +375,22 @@ model mobile_menu {
   menu_structure Json?
 
   @@schema("apps")
+}
+
+model departments {
+  department_id   Int         @id @default(autoincrement())
+  department_name String?     @db.VarChar(255)
+  employees       employees[]
+
+  @@schema("test")
+}
+
+model employees {
+  employee_id   Int          @id @default(autoincrement())
+  job_title     String?      @db.VarChar(255)
+  department    Int?
+  employee_name String       @db.VarChar(255)
+  departments   departments? @relation(fields: [department], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("test")
 }
