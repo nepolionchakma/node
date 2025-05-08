@@ -15,10 +15,10 @@ router.post(
   "/",
   defAccessModelLogicAttributesControllers.createDefAccessModelAttribute
 );
-// router.post(
-//   "/upsert",
-//   defAccessModelLogicAttributesControllers.upsertManageAccessModelAttribute
-// );
+router.post(
+  "/upsert",
+  defAccessModelLogicAttributesControllers.upsertDefAccessModelAttribute
+);
 router.put(
   "/:id",
   defAccessModelLogicAttributesControllers.updateDefAccessModelAttribute

@@ -62,45 +62,30 @@ exports.updateDefAccessModelAttribute = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-// exports.upsertManageAccessModelAttribute = async (req, res) => {
-//   const data = req.body.upsertAttributes || req.body;
+exports.upsertDefAccessModelAttribute = async (req, res) => {
+  const data = req.body.upsertAttributes || req.body;
 
-//   if (!Array.isArray(data)) {
-//     return res
-//       .status(400)
-//       .json({ error: "Invalid input: 'Data' should be an array" });
-//   }
-//   const response = await prisma.manage_access_model_logic_attributes.findMany();
-//   const id = Math.max(
-//     ...response.map((item) => item.manage_access_model_logic_id)
-//   );
-//   const upsertResults = [];
+  if (!Array.isArray(data)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid input: 'Data' should be an array" });
+  }
 
-//   try {
-//     for (const item of data) {
-//       const result = await prisma.manage_access_model_logic_attributes.upsert({
-//         where: { id: item.id },
-//         update: {
-//           manage_access_model_logic_id: item.manage_access_model_logic_id,
-//           widget_position: item.widget_position,
-//           widget_state: item.widget_state,
-//         },
-//         create: {
-//           id: item.id,
-//           manage_access_model_logic_id: item.manage_access_model_logic_id,
-//           widget_position: item.widget_position,
-//           widget_state: item.widget_state,
-//         },
-//       });
-//       upsertResults.push(result);
-//     }
+  try {
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_access_model_logic_attributes/upsert
+`,
+      data
+    );
 
-//     return res.status(200).json(upsertResults);
-//   } catch (error) {
-//     console.error("Error in upsert operation:", error);
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
+    if (result) {
+      return res.status(200).json(result.data);
+    }
+  } catch (error) {
+    console.error("Error in upsert operation:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 // Delete attribute
 exports.deleteDefAccessModelAttribute = async (req, res) => {

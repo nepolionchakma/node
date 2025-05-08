@@ -59,59 +59,67 @@ exports.updateDefAccessModelLogic = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-// exports.upsertManageAccessModelLogic = async (req, res) => {
-//   const data = req.body.upsertLogics || req.body;
-//   if (!Array.isArray(data)) {
-//     return res
-//       .status(400)
-//       .json({ error: "Invalid input: 'Data' should be an array" });
-//   }
-//   const response = await prisma.manage_access_model_logics.findMany();
-//   const id = Math.max(
-//     ...response.map((item) => item.manage_access_model_logic_id)
-//   );
-//   const upsertResults = [];
-//   try {
-//     for (const item of data) {
-//       const {
-//         manage_access_model_id,
-//         filter,
-//         object,
-//         attribute,
-//         condition,
-//         value,
-//       } = item;
-//       const result = await prisma.manage_access_model_logics.upsert({
-//         where: {
-//           manage_access_model_logic_id: item.manage_access_model_logic_id,
-//         },
-//         update: {
-//           manage_access_model_logic_id: item.manage_access_model_logic_id,
-//           manage_access_model_id: manage_access_model_id,
-//           filter: filter,
-//           object: object,
-//           attribute: attribute,
-//           condition: condition,
-//           value: value,
-//         },
-//         create: {
-//           manage_access_model_logic_id: item.manage_access_model_logic_id,
-//           manage_access_model_id: manage_access_model_id,
-//           filter: filter,
-//           object: object,
-//           attribute: attribute,
-//           condition: condition,
-//           value: value,
-//         },
-//       });
-//       upsertResults.push(result);
-//       // console.log(result);
-//     }
-//     return res.status(200).json(upsertResults);
-//   } catch (error) {
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
+exports.upsertDefAccessModelLogic = async (req, res) => {
+  const data = req.body.upsertLogics || req.body;
+  if (!Array.isArray(data)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid input: 'Data' should be an array" });
+  }
+
+  // const response = await prisma.manage_access_model_logics.findMany();
+  // const id = Math.max(
+  //   ...response.map((item) => item.manage_access_model_logic_id)
+  // );
+  // const upsertResults = [];
+  try {
+    // for (const item of data) {
+    //   const {
+    //     manage_access_model_id,
+    //     filter,
+    //     object,
+    //     attribute,
+    //     condition,
+    //     value,
+    //   } = item;
+    //   const result = await prisma.manage_access_model_logics.upsert({
+    //     where: {
+    //       manage_access_model_logic_id: item.manage_access_model_logic_id,
+    //     },
+    //     update: {
+    //       manage_access_model_logic_id: item.manage_access_model_logic_id,
+    //       manage_access_model_id: manage_access_model_id,
+    //       filter: filter,
+    //       object: object,
+    //       attribute: attribute,
+    //       condition: condition,
+    //       value: value,
+    //     },
+    //     create: {
+    //       manage_access_model_logic_id: item.manage_access_model_logic_id,
+    //       manage_access_model_id: manage_access_model_id,
+    //       filter: filter,
+    //       object: object,
+    //       attribute: attribute,
+    //       condition: condition,
+    //       value: value,
+    //     },
+    //   });
+    //   upsertResults.push(result);
+    //   // console.log(result);
+    // }
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_access_model_logics/upsert`,
+      data
+    );
+    console.log(result);
+    if (res) {
+      return res.status(200).json(result.data);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 // Delete Model Logic
 exports.deleteDefAccessModelLogic = async (req, res) => {
