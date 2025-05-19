@@ -83,7 +83,7 @@ exports.createDefGlobalConditionLogicAttribute = async (req, res) => {
   }
 };
 
-//Update User
+//Update
 exports.updateDefGlobalConditionLogicAtrribute = async (req, res) => {
   try {
     const data = req.body;
@@ -94,6 +94,134 @@ exports.updateDefGlobalConditionLogicAtrribute = async (req, res) => {
     );
 
     return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// upsert
+exports.upsertDefGlobalConditionLogicArrtibute = async (req, res) => {
+  const data = req.body;
+
+  try {
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/upsert`,
+      data
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    console.error("Error in upsert operation:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteDefGlobalConditionLogicArrtibute = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/${id}`
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+ const prisma = require("../DB/db.config");
+exports.getManageGlobalConditionLogicArrtibutes = async (req, res) => {
+  try {
+    const result =
+      await prisma.manage_global_condition_logic_attributes.findMany({
+        //sorting desc
+        orderBy: {
+          manage_global_condition_logic_id: "desc",
+        },
+      });
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Get Unique User
+exports.getUniqueManageGlobalConditionLogicArrtibute = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result =
+      await prisma.manage_global_condition_logic_attributes.findUnique({
+        where: {
+          id: Number(id),
+        },
+      });
+    if (result) {
+      return res.status(200).json(result);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "ManageGlobalConditionLogicArrtibute not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Create User
+exports.createManageGlobalConditionLogicArrtibute = async (req, res) => {
+  try {
+    const response =
+      await prisma.manage_global_condition_logic_attributes.findMany();
+    const id = Math.max(...response.map((item) => item.id));
+    const data = req.body;
+    const result = await prisma.manage_global_condition_logic_attributes.create(
+      {
+        data: {
+          id: response.length > 0 ? id + 1 : 1,
+          manage_global_condition_logic_id:
+            data.manage_global_condition_logic_id,
+          widget_position: data.widget_position,
+          widget_state: data.widget_state,
+        },
+      }
+    );
+    if (result) {
+      return res.status(201).json(result);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Update User
+exports.updateManageGlobalConditionLogicArrtibute = async (req, res) => {
+  try {
+    const data = req.body;
+    const id = Number(req.params.id);
+    const findExistId =
+      await prisma.manage_global_condition_logic_attributes.findFirst({
+        where: {
+          id: id,
+        },
+      });
+
+    if (!findExistId) {
+      return res.status(404).json({
+        message: "ManageGlobalConditionLogicArrtibute not found",
+      });
+    }
+    // Validation  End/---------------------------------/
+    const result = await prisma.manage_global_condition_logic_attributes.update(
+      {
+        where: {
+          id: id,
+        },
+        data: {
+          id: id,
+          manage_global_condition_logic_id:
+            data.manage_global_condition_logic_id,
+          widget_position: data.widget_position,
+          widget_state: data.widget_state,
+        },
+      }
+    );
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -171,3 +299,4 @@ exports.deleteManageGlobalConditionLogicArrtibute = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+ */

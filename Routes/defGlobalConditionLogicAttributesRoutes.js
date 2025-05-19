@@ -21,7 +21,7 @@ router.post(
 );
 router.post(
   "/upsert",
-  defGlobalConditionLogicAttributesController.upsertManageGlobalConditionLogicArrtibute
+  defGlobalConditionLogicAttributesController.upsertDefGlobalConditionLogicArrtibute
 );
 router.put(
   "/:id",
@@ -29,7 +29,7 @@ router.put(
 );
 router.delete(
   "/:id",
-  defGlobalConditionLogicAttributesController.deleteManageGlobalConditionLogicArrtibute
+  defGlobalConditionLogicAttributesController.deleteDefGlobalConditionLogicArrtibute
 );
 
 module.exports = router;
