@@ -4,6 +4,10 @@ const defGlobalConditionsController = require("../Controller/defGlobalConditions
 const router = Router();
 
 router.get("/", defGlobalConditionsController.getDefGlobalConditions);
+router.get(
+  "/:page/:limit",
+  defGlobalConditionsController.lazyLoadingDefGlobalConditions
+);
 router.get("/:id", defGlobalConditionsController.getUniqueDefGlobalCondition);
 router.post("/", defGlobalConditionsController.createDefGlobalCondition);
 

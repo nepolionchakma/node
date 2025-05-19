@@ -1,5 +1,18 @@
 const { default: axios } = require("axios");
 const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+
+const pageLimitData = (page, limit) => {
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+  let startNumber = 0;
+  const endNumber = pageNumber * limitNumber;
+  if (pageNumber > 1) {
+    const pageInto = pageNumber - 1;
+    startNumber = pageInto * limitNumber;
+  }
+  return { startNumber, endNumber };
+};
+
 exports.getDefGlobalConditions = async (req, res) => {
   try {
     const result = await axios.get(
@@ -10,6 +23,30 @@ exports.getDefGlobalConditions = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+// lazy loading
+exports.lazyLoadingDefGlobalConditions = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { startNumber, endNumber } = pageLimitData(page, limit);
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_conditions`
+    );
+
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //Get Unique
 exports.getUniqueDefGlobalCondition = async (req, res) => {
   try {
