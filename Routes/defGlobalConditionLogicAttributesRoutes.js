@@ -5,19 +5,19 @@ const router = Router();
 
 router.get(
   "/",
-  defGlobalConditionLogicAttributesController.getManageGlobalConditionLogicArrtibutes
+  defGlobalConditionLogicAttributesController.getDefGlobalConditionLogicAttributes
 );
-// router.get(
-//   "/:page/:limit",
-//   defGlobalConditionLogicAttributesController.lazyLoadingDefGlobalConditionLogicAttributes
-// );
+router.get(
+  "/:page/:limit",
+  defGlobalConditionLogicAttributesController.lazyLoadingDefGlobalConditionLogicAttributes
+);
 router.get(
   "/:id",
-  defGlobalConditionLogicAttributesController.getUniqueManageGlobalConditionLogicArrtibute
+  defGlobalConditionLogicAttributesController.getUniqueDefGlobalConditionLogicAttribute
 );
 router.post(
   "/",
-  defGlobalConditionLogicAttributesController.createManageGlobalConditionLogicArrtibute
+  defGlobalConditionLogicAttributesController.createDefGlobalConditionLogicAttribute
 );
 router.post(
   "/upsert",
@@ -25,7 +25,7 @@ router.post(
 );
 router.put(
   "/:id",
-  defGlobalConditionLogicAttributesController.updateManageGlobalConditionLogicArrtibute
+  defGlobalConditionLogicAttributesController.updateDefGlobalConditionLogicAtrribute
 );
 router.delete(
   "/:id",
