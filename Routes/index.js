@@ -18,7 +18,7 @@ const accessPointsEntitlementsRoutes = require("../Routes/accessPointsEntitlemen
 const combinedUserRoutes = require("../Routes/combinedUserRoutes");
 const defGlobalConditionsRoutes = require("./defGlobalConditionsRoutes");
 const defGlobalConditionsLogicsRoutes = require("./defGlobalConditionLogicsRoutes");
-const manageGlobalConditionsLogicAttributesRoutes = require("../Routes/manageGlobalConditionLogicAttributesRoutes");
+const defGlobalConditionsLogicAttributesRoutes = require("./defGlobalConditionLogicAttributesRoutes");
 const defAccessModelsRoutes = require("./defAccessModelsRoutes");
 const defAccessModelLogicsRoutes = require("./defAccessModelLogicsRoutes");
 const defAccessModelLogicAttributesRoutes = require("./defAccessModelLogicAttributesRoutes");
@@ -60,8 +60,8 @@ routes.use("/access-points-element", accessPointsEntitlementsRoutes);
 routes.use("/def-global-conditions", defGlobalConditionsRoutes);
 routes.use("/def-global-condition-logics", defGlobalConditionsLogicsRoutes);
 routes.use(
-  "/manage-global-condition-logic-attributes",
-  manageGlobalConditionsLogicAttributesRoutes
+  "/def-global-condition-logic-attributes",
+  defGlobalConditionsLogicAttributesRoutes
 );
 
 // Access model section
