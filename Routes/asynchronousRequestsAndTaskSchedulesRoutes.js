@@ -12,8 +12,13 @@ router.get(
   asynchronousRequestsAndTaskSchedulesController.getViewRequests
 );
 router.get(
-  "/view-requests/:page/:limit",
+  "/view_requests/:page/:limit",
   asynchronousRequestsAndTaskSchedulesController.getViewRequestsLazyLoading
+);
+
+router.get(
+  "/view_requests/search/:page/:limit",
+  asynchronousRequestsAndTaskSchedulesController.getSearchViewRequestLazyLoading
 );
 
 //V1 API replace to main
