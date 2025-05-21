@@ -70,7 +70,6 @@ exports.upsertDefAccessModelAttribute = async (req, res) => {
 `,
       data
     );
-
     if (result) {
       return res.status(200).json(result.data);
     }
