@@ -15,11 +15,9 @@ const pageLimitData = (page, limit) => {
 };
 
 exports.getARMTasks = async (req, res) => {
-  const response = await axios.get(`${FLASK_ENDPOINT_URL}/Show_Tasks`);
-  const sortedData = response.data.sort(
-    (a, b) => b?.def_task_id - a?.def_task_id
-  );
-  return res.status(200).json(sortedData);
+  const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_async_tasks`);
+
+  return res.status(200).json(response.data);
 };
 
 exports.getARMTasksLazyLoading = async (req, res) => {

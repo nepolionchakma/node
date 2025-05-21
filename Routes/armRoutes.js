@@ -15,7 +15,7 @@ router.put(
 );
 
 // Register/Edit Asynchronous Tasks
-router.get("/show-tasks", armControllers.getARMTasks);
+router.get("/def_async_tasks", armControllers.getARMTasks);
 router.get(
   "/def_async_tasks/:page/:limit",
   armControllers.getARMTasksLazyLoading
