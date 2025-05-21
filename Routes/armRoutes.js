@@ -16,7 +16,14 @@ router.put(
 
 // Register/Edit Asynchronous Tasks
 router.get("/show-tasks", armControllers.getARMTasks);
-router.get("/show-tasks/:page/:limit", armControllers.getARMTasksLazyLoading);
+router.get(
+  "/def_async_tasks/:page/:limit",
+  armControllers.getARMTasksLazyLoading
+);
+router.get(
+  "/def_async_tasks/search/:page/:limit",
+  armControllers.getSearchARMTasksLazyLoading
+);
 router.get("/show-task/:task_name", armControllers.getARMTask);
 router.post("/register-task", armControllers.registerARMTask);
 router.put("/edit-task/:task_name", armControllers.editARMTask);

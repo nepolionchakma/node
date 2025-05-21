@@ -24,19 +24,31 @@ exports.getARMTasks = async (req, res) => {
 
 exports.getARMTasksLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
-  const response = await axios.get(`${FLASK_ENDPOINT_URL}/Show_Tasks`);
 
-  const sortedData = response.data.sort((a, b) => {
-    const dateB = new Date(b.creation_date);
-    const dateA = new Date(a.creation_date);
-    // console.log(dateA, dateB, "sds");
-    return dateB - dateA;
-  });
-
-  const results = sortedData.slice(startNumber, endNumber);
-  return res.status(200).json(results);
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_async_tasks/${page}/${limit}`
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
+exports.getSearchARMTasksLazyLoading = async (req, res) => {
+  const { page, limit } = req.params;
+  const { user_task_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_async_tasks/search/${page}/${limit}?user_task_name=${user_task_name}`
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getARMTask = async (req, res) => {
   const task_name = req.params.task_name;
   const response = await axios.get(
