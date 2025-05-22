@@ -1,4 +1,134 @@
 const prisma = require("../DB/db.config");
+const { default: axios } = require("axios");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+
+const pageLimitData = (page, limit) => {
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+  let startNumber = 0;
+  const endNumber = pageNumber * limitNumber;
+  if (pageNumber > 1) {
+    const pageInto = pageNumber - 1;
+    startNumber = pageInto * limitNumber;
+  }
+  return { startNumber, endNumber };
+};
+// fetch
+exports.getDefGlobalConditionLogicAttributes = async (req, res) => {
+  try {
+    const result = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes`
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// lazyLoading
+exports.lazyLoadingDefGlobalConditionLogicAttributes = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { startNumber, endNumber } = pageLimitData(page, limit);
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes`
+    );
+
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Get Unique
+exports.getUniqueDefGlobalConditionLogicAttribute = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/${id}`
+    );
+    if (result) {
+      return res.status(200).json(result.data);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "ManageGlobalConditionLogicArrtibute not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Create
+exports.createDefGlobalConditionLogicAttribute = async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes`,
+      data
+    );
+    if (result) {
+      return res.status(201).json(result.data);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Update
+exports.updateDefGlobalConditionLogicAtrribute = async (req, res) => {
+  try {
+    const data = req.body;
+    const id = req.params.id;
+    const result = await axios.put(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/${id}`,
+      data
+    );
+
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// upsert
+exports.upsertDefGlobalConditionLogicArrtibute = async (req, res) => {
+  const data = req.body;
+
+  try {
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/upsert`,
+      data
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    console.error("Error in upsert operation:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteDefGlobalConditionLogicArrtibute = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logic_attributes/${id}`
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+ const prisma = require("../DB/db.config");
 exports.getManageGlobalConditionLogicArrtibutes = async (req, res) => {
   try {
     const result =
@@ -169,3 +299,4 @@ exports.deleteManageGlobalConditionLogicArrtibute = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+ */

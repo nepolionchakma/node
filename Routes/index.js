@@ -11,17 +11,17 @@ const defTenantsRoutes = require("../Routes/defTenantsRoutes");
 const defUserCredentialsRoutes = require("../Routes/defUserCredentialsRoutes");
 const authentication = require("../Routes/authenticationRoutes");
 const messagesRoutes = require("../Routes/messagesRoutes");
-const dataSourcesRoutes = require("../Routes/dataSourcesRoutes");
+const defDataSourcesRoutes = require("./defDataSourcesRoutes");
 const manageAccessEntitlementsRoutes = require("../Routes/manageAccessEntitlementsRoutes");
 const accessEntitlementElementsRoutes = require("../Routes/accessEntitlementElementsRoutes");
 const accessPointsEntitlementsRoutes = require("../Routes/accessPointsEntitlementsRoutes");
 const combinedUserRoutes = require("../Routes/combinedUserRoutes");
-const manageGlobalConditionsRoutes = require("../Routes/manageGlobalConditionsRoutes");
-const manageGlobalConditionsLogicsRoutes = require("../Routes/manageGlobalConditionLogicsRoutes");
-const manageGlobalConditionsLogicAttributesRoutes = require("../Routes/manageGlobalConditionLogicAttributesRoutes");
-const manageAccessModelsRoutes = require("../Routes/manageAccessModelsRoutes");
-const manageAccessModelLogicsRoutes = require("../Routes/manageAccessModelLogicsRoutes");
-const manageAccessModelLogicAttributesRoutes = require("./manageAccessModelLogicAttributesRoutes");
+const defGlobalConditionsRoutes = require("./defGlobalConditionsRoutes");
+const defGlobalConditionsLogicsRoutes = require("./defGlobalConditionLogicsRoutes");
+const defGlobalConditionsLogicAttributesRoutes = require("./defGlobalConditionLogicAttributesRoutes");
+const defAccessModelsRoutes = require("./defAccessModelsRoutes");
+const defAccessModelLogicsRoutes = require("./defAccessModelLogicsRoutes");
+const defAccessModelLogicAttributesRoutes = require("./defAccessModelLogicAttributesRoutes");
 const controlesRoutes = require("./controlsRoutes");
 const linkedDevicesRoutes = require("./linkedDevicesRoutes");
 const armRoutes = require("./armRoutes");
@@ -50,7 +50,7 @@ routes.use("/access-profiles", accessProfileRoutes);
 routes.use("/combined-user", combinedUserRoutes);
 
 routes.use("/messages", messagesRoutes);
-routes.use("/data-sources", dataSourcesRoutes);
+routes.use("/def-data-sources", defDataSourcesRoutes);
 
 // Manage Access Entitlements
 routes.use("/manage-access-entitlements", manageAccessEntitlementsRoutes);
@@ -58,22 +58,19 @@ routes.use("/access-entitlement-elements", accessEntitlementElementsRoutes);
 routes.use("/access-points-element", accessPointsEntitlementsRoutes);
 
 // Condition section
-routes.use("/manage-global-conditions", manageGlobalConditionsRoutes);
+routes.use("/def-global-conditions", defGlobalConditionsRoutes);
+routes.use("/def-global-condition-logics", defGlobalConditionsLogicsRoutes);
 routes.use(
-  "/manage-global-condition-logics",
-  manageGlobalConditionsLogicsRoutes
-);
-routes.use(
-  "/manage-global-condition-logic-attributes",
-  manageGlobalConditionsLogicAttributesRoutes
+  "/def-global-condition-logic-attributes",
+  defGlobalConditionsLogicAttributesRoutes
 );
 
 // Access model section
-routes.use("/manage-access-models", manageAccessModelsRoutes);
-routes.use("/manage-access-model-logics", manageAccessModelLogicsRoutes);
+routes.use("/def-access-models", defAccessModelsRoutes);
+routes.use("/def-access-model-logics", defAccessModelLogicsRoutes);
 routes.use(
-  "/manage-access-model-logic-attributes",
-  manageAccessModelLogicAttributesRoutes
+  "/def-access-model-logic-attributes",
+  defAccessModelLogicAttributesRoutes
 );
 
 // Control section

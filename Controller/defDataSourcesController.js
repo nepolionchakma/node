@@ -1,3 +1,135 @@
+const { default: axios } = require("axios");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+
+const pageLimitData = (page, limit) => {
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+  let startNumber = 0;
+  const endNumber = pageNumber * limitNumber;
+  if (pageNumber > 1) {
+    const pageInto = pageNumber - 1;
+    startNumber = pageInto * limitNumber;
+  }
+  return { startNumber, endNumber };
+};
+
+exports.getDefDataSources = async (req, res) => {
+  try {
+    const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`);
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+// lazy loading
+exports.lazyLoadingDefDataSources = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { startNumber, endNumber } = pageLimitData(page, limit);
+  try {
+    const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`);
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Get Unique Datasource
+exports.getUniqueDefDataSource = async (req, res) => {
+  try {
+    const data_source_id = req.params.id;
+    const result = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${data_source_id}`
+    );
+    if (result) {
+      return res.status(200).json(result.data);
+    } else {
+      return res.status(404).json({ message: "Data Source not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Create Datasource
+exports.createDefDataSource = async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_data_sources`,
+      data
+    );
+    if (result) {
+      return res.status(201).json(result.data);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+//Update Datasource
+exports.updateDefDataSource = async (req, res) => {
+  try {
+    const data = req.body;
+    const id = req.params.id;
+
+    const result = await axios.put(
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`,
+      data
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+// Delete Datasource
+exports.deleteDefDataSource = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`
+    );
+    if (result) {
+      return res.status(200).json({ result: "Deleted Successfully" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+exports.filterAccessPointsById = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+
+  const idsParam = req.query.ids;
+  const stringArray = idsParam.split(",");
+  const ids = stringArray.map(Number);
+  try {
+    const accessPoints = await prisma.access_points_elements.findMany({
+      where: {
+        access_point_id: {
+          in: ids,
+        },
+      },
+      take: limit,
+      skip: offset,
+      orderBy: {
+        access_point_id: "desc",
+      },
+    });
+    res.status(200).json(accessPoints);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while querying the database." });
+  }
+};
+
+/*
 const prisma = require("../DB/db.config");
 // generate date
 const currentDate = new Date();
@@ -223,3 +355,4 @@ exports.filterAccessPointsById = async (req, res) => {
       .json({ error: "An error occurred while querying the database." });
   }
 };
+*/

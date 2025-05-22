@@ -1,4 +1,138 @@
-const prisma = require("../DB/db.config");
+// const prisma = require("../DB/db.config");
+
+const { default: axios } = require("axios");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+
+const pageLimitData = (page, limit) => {
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+  let startNumber = 0;
+  const endNumber = pageNumber * limitNumber;
+  if (pageNumber > 1) {
+    const pageInto = pageNumber - 1;
+    startNumber = pageInto * limitNumber;
+  }
+  return { startNumber, endNumber };
+};
+
+// fetch logics
+exports.getDefGlobalConditionLogics = async (req, res) => {
+  try {
+    const result = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics`
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// lazyLoading
+exports.lazyLoadingDefGlobalConditionLogics = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { startNumber, endNumber } = pageLimitData(page, limit);
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics`
+    );
+
+    const results = response.data.slice(startNumber, endNumber);
+    const totalPages = Math.ceil(response.data.length / limit);
+    return res.status(200).json({
+      results,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// fetch logic with id
+exports.getUniqueDefGlobalConditionLogic = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics/${id}`
+    );
+    if (result) {
+      return res.status(200).json(result.data);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "ManageGlobalConditionLogic not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// Create Logic
+exports.createDefGlobalConditionLogic = async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics`,
+      data
+    );
+    if (result) {
+      return res.status(201).json(result.data);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// Update logic
+exports.updateDefGlobalConditionLogic = async (req, res) => {
+  try {
+    const data = req.body;
+    const id = req.params.id;
+
+    const result = await axios.put(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics/${id}`,
+      data
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// Upsert logic
+exports.upsertDefGlobalConditionLogic = async (req, res) => {
+  const data = req.body;
+
+  try {
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics/upsert`,
+      data
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// delete logic
+exports.deleteDefGlobalConditionLogic = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/def_global_condition_logics/${id}`
+    );
+    if (result.data) {
+      return res.status(200).json({ result: "Deleted Successfully" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+/*
 exports.getManageGlobalConditionLogics = async (req, res) => {
   try {
     const result = await prisma.manage_global_condition_logics.findMany({
@@ -12,6 +146,7 @@ exports.getManageGlobalConditionLogics = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 //Get Unique User
 exports.getUniqueManageGlobalConditionLogic = async (req, res) => {
   try {
@@ -195,3 +330,4 @@ exports.deleteManageGlobalConditionLogic = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+*/
