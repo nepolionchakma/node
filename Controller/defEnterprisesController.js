@@ -13,8 +13,13 @@ const pageLimitData = (page, limit) => {
   return { startNumber, endNumber };
 };
 exports.getDefEnterprise = async (req, res) => {
+  console.log(req.cookies.access_token);
   try {
-    const result = await axios.get(`${FLASK_ENDPOINT_URL}/get_enterprises`);
+    const result = await axios.get(`${FLASK_ENDPOINT_URL}/get_enterprises`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    });
 
     return res.status(200).json(result.data);
   } catch (error) {

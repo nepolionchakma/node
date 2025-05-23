@@ -83,6 +83,7 @@ exports.login = async (req, res) => {
           generateAccessTokenAndRefreshToken({
             isLoggedIn: true,
             user_id: user.user_id,
+            sub: String(user.user_id),
             user_type: user.user_type,
             user_name: user.user_name,
             tenant_id: user.tenant_id,
