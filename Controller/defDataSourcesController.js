@@ -15,7 +15,12 @@ const pageLimitData = (page, limit) => {
 
 exports.getDefDataSources = async (req, res) => {
   try {
-    const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`);
+    console.log(req.cookies.access_token, "defrun");
+    const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    });
     return res.status(200).json(result.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
