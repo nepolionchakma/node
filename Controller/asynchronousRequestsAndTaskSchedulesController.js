@@ -66,7 +66,12 @@ exports.getSearchViewRequestLazyLoading = async (req, res) => {
 exports.getTaskSchedules = async (req, res) => {
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`
+      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     const sortedData = response.data.sort(
@@ -82,7 +87,12 @@ exports.getTaskSchedulesLazyLoading = async (req, res) => {
   const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`
+      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     // sort by time
     const sortedData = response.data.sort((a, b) => {
