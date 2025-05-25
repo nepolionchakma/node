@@ -16,7 +16,12 @@ exports.getTaskSchedule = async (req, res) => {
   const { task_name, def_param_id } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedule/${task_name}/${def_param_id}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskSchedule/${task_name}/${def_param_id},`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -25,7 +30,11 @@ exports.getTaskSchedule = async (req, res) => {
 };
 exports.getViewRequests = async (req, res) => {
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`);
+    const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    });
     const sortedData = response.data.sort((a, b) => {
       const dateA = new Date(a.timestamp);
       const dateB = new Date(b.timestamp);
@@ -41,8 +50,14 @@ exports.getViewRequestsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/${page}/${limit}`
+      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
+
     return res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -54,7 +69,12 @@ exports.getSearchViewRequestLazyLoading = async (req, res) => {
   const { user_schedule_name } = req.query;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/search/${page}/${limit}?user_schedule_name=${user_schedule_name}`
+      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/search/${page}/${limit}?user_schedule_name=${user_schedule_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     // console.log(response.data, "response.data");
     return res.status(200).json(response.data);
@@ -113,7 +133,12 @@ exports.createTaskSchedule = async (req, res) => {
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Create_TaskSchedule`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     return res.status(200).json(response.data);
@@ -127,7 +152,12 @@ exports.updateTaskSchedule = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Update_TaskSchedule/${task_name}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -140,7 +170,12 @@ exports.cancelTaskSchedule = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Cancel_TaskSchedule/${task_name}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {

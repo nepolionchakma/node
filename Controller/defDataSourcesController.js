@@ -15,7 +15,6 @@ const pageLimitData = (page, limit) => {
 
 exports.getDefDataSources = async (req, res) => {
   try {
-    console.log(req.cookies.access_token, "defrun");
     const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`, {
       headers: {
         Authorization: `Bearer ${req.cookies.access_token}`,
@@ -32,7 +31,11 @@ exports.lazyLoadingDefDataSources = async (req, res) => {
   const limit = Number(req.params.limit);
   const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`);
+    const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    });
     const results = response.data.slice(startNumber, endNumber);
     const totalPages = Math.ceil(response.data.length / limit);
     return res.status(200).json({
@@ -49,7 +52,12 @@ exports.getUniqueDefDataSource = async (req, res) => {
   try {
     const data_source_id = req.params.id;
     const result = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_data_sources/${data_source_id}`
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${data_source_id},`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(200).json(result.data);
@@ -66,7 +74,12 @@ exports.createDefDataSource = async (req, res) => {
     const data = req.body;
     const result = await axios.post(
       `${FLASK_ENDPOINT_URL}/def_data_sources`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(201).json(result.data);
@@ -83,7 +96,12 @@ exports.updateDefDataSource = async (req, res) => {
 
     const result = await axios.put(
       `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(result.data);
   } catch (error) {
@@ -95,7 +113,12 @@ exports.deleteDefDataSource = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await axios.delete(
-      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(200).json({ result: "Deleted Successfully" });
