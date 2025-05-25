@@ -15,7 +15,11 @@ const pageLimitData = (page, limit) => {
 };
 
 exports.getARMTasks = async (req, res) => {
-  const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_async_tasks`);
+  const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_async_tasks`, {
+    headers: {
+      Authorization: `Bearer ${req.cookies.access_token}`,
+    },
+  });
 
   return res.status(200).json(response.data);
 };
@@ -25,7 +29,12 @@ exports.getARMTasksLazyLoading = async (req, res) => {
 
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_tasks/${page}/${limit}`
+      `${FLASK_ENDPOINT_URL}/def_async_tasks/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -39,7 +48,12 @@ exports.getSearchARMTasksLazyLoading = async (req, res) => {
 
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_tasks/search/${page}/${limit}?user_task_name=${user_task_name}`
+      `${FLASK_ENDPOINT_URL}/def_async_tasks/search/${page}/${limit}?user_task_name=${user_task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -50,7 +64,12 @@ exports.getSearchARMTasksLazyLoading = async (req, res) => {
 exports.getARMTask = async (req, res) => {
   const task_name = req.params.task_name;
   const response = await axios.get(
-    `${FLASK_ENDPOINT_URL}/Show_Task/${task_name}`
+    `${FLASK_ENDPOINT_URL}/Show_Task/${task_name}`,
+    {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    }
   );
   return res.status(200).json(response.data);
 };
@@ -59,7 +78,12 @@ exports.registerARMTask = async (req, res) => {
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Create_Task`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -72,7 +96,12 @@ exports.editARMTask = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Update_Task/${task_name}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -83,7 +112,12 @@ exports.cancelARMTask = async (req, res) => {
   const task_name = req.params.task_name;
   try {
     const response = await axios.put(
-      `${FLASK_ENDPOINT_URL}/Cancel_Task/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Cancel_Task/${task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -96,7 +130,12 @@ exports.getTaskNameParams = async (req, res) => {
   const { task_name } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     const sortedData = response.data.sort(
@@ -111,7 +150,12 @@ exports.getUserTaskNameParams = async (req, res) => {
   const { task_name } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     const sortedData = response.data.sort(
@@ -127,7 +171,12 @@ exports.getTaskParamsLazyLoading = async (req, res) => {
   try {
     const { startNumber, endNumber } = pageLimitData(page, limit);
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     const results = response.data.slice(startNumber, endNumber);
@@ -143,7 +192,12 @@ exports.addTaskParams = async (req, res) => {
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Add_TaskParams/${task_name}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
 
     return res.status(200).json(response.data);
@@ -158,7 +212,12 @@ exports.updateTaskParams = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Update_TaskParams/${task_name}/${def_param_id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -170,7 +229,12 @@ exports.deleteTaskParams = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${def_param_id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -180,7 +244,12 @@ exports.deleteTaskParams = async (req, res) => {
 exports.showExecutionMethods = async (req, res) => {
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -192,7 +261,12 @@ exports.showExecutionMethodsLazyLoading = async (req, res) => {
   const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     const results = response.data.slice(startNumber, endNumber);
     return res.status(200).json(results);
@@ -205,7 +279,12 @@ exports.createExecutionMethod = async (req, res) => {
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Create_ExecutionMethod`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -218,7 +297,12 @@ exports.updateExecutionMethod = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Update_ExecutionMethod/${internal_execution_method}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(response.data);
   } catch (error) {
