@@ -49,10 +49,10 @@ exports.lazyLoadingDefDataSources = async (req, res) => {
 };
 //Get Unique Datasource
 exports.getUniqueDefDataSource = async (req, res) => {
+  const id = req.params.id;
   try {
-    const data_source_id = req.params.id;
     const result = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_data_sources/${data_source_id},`,
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
