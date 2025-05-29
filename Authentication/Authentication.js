@@ -223,3 +223,70 @@ exports.refreshToken = async (req, res) => {
     return res.status(500).json({ error: "Invalid or expired refresh token" });
   }
 };
+
+// exports.verifyToken = async (req, res) => {
+//   const { token } = req.body;
+
+//   try {
+//     const decoded = jwtDecode(token);
+//     console.log("Decoded Token:", decoded);
+//   } catch (error) {
+//     console.error("Invalid token:", error);
+//   }
+// };
+
+exports.verifyToken = async (req, res) => {
+  const { token } = req.body;
+  console.log(token);
+
+  try {
+    const decoded = jwt.decode(token);
+    const user = await prisma.def_users.findFirst({
+      where: {
+        user_id: decoded.user_id,
+        user_name: decoded.user_name,
+        tenant_id: decoded.tenant_id,
+        user_type: decoded.user_type,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid Token." });
+    } else {
+      const { accessToken, refreshToken } = generateAccessTokenAndRefreshToken({
+        isLoggedIn: true,
+        user_id: user.user_id,
+        sub: String(user.user_id),
+        user_type: user.user_type,
+        user_name: user.user_name,
+        tenant_id: user.tenant_id,
+        profile_picture: user.profile_picture,
+        issuedAt: new Date(),
+      });
+
+      return res
+        .status(200)
+        .cookie("refresh_token", refreshToken, {
+          httpOnly: true,
+          secure: true,
+        })
+        .cookie("access_token", accessToken, {
+          httpOnly: true,
+          secure: false,
+        })
+        .json({
+          isLoggedIn: true,
+          user_id: user.user_id,
+          user_type: user.user_type,
+          user_name: user.user_name,
+          tenant_id: user.tenant_id,
+          profile_picture: user.profile_picture,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          issuedAt: new Date(),
+        });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
