@@ -113,6 +113,7 @@ exports.cancelARMTask = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Cancel_Task/${task_name}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
