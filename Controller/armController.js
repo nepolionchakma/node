@@ -228,9 +228,8 @@ exports.updateTaskParams = async (req, res) => {
 exports.deleteTaskParams = async (req, res) => {
   const { task_name, def_param_id } = req.params;
   try {
-    const response = await axios.put(
+    const response = await axios.delete(
       `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${def_param_id}`,
-      data,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
