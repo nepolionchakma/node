@@ -258,18 +258,19 @@ exports.showExecutionMethods = async (req, res) => {
 };
 exports.showExecutionMethodsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
+  // const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`,
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods/${page}/${limit}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
         },
       }
     );
-    const results = response.data.slice(startNumber, endNumber);
-    return res.status(200).json(results);
+    // console.log(response.data, "response.data");
+    // const results = response.data.slice(startNumber, endNumber);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -304,6 +305,24 @@ exports.updateExecutionMethod = async (req, res) => {
         },
       }
     );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+exports.deleteExecutionMethod = async (req, res) => {
+  const { internal_execution_method } = req.params;
+  console.log(internal_execution_method, "internal_execution_method");
+  try {
+    const response = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/Delete_ExecutionMethod/${internal_execution_method}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response.data, "response.data");
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });

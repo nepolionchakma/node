@@ -13,6 +13,10 @@ router.put(
   "/update-execution-method/:internal_execution_method",
   armControllers.updateExecutionMethod
 );
+router.delete(
+  "/delete-execution-method/:internal_execution_method",
+  armControllers.deleteExecutionMethod
+);
 
 // Register/Edit Asynchronous Tasks
 router.get("/def_async_tasks", armControllers.getARMTasks);
