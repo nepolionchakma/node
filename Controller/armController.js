@@ -125,6 +125,26 @@ exports.cancelARMTask = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+// exports.rescheduleARMTask = async (req, res) => {
+//   // const task_name = req.params.task_name;
+//   const { redbeat_schedule_name } = req.body;
+//   try {
+//     const response = await axios.put(
+//       `${FLASK_ENDPOINT_URL}/Reschedule_TaskSchedule/add_values`,
+//       {
+//         redbeat_schedule_name,
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${req.cookies.access_token}`,
+//         },
+//       }
+//     );
+//     return res.status(200).json(response.data);
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Task Params
 exports.getTaskNameParams = async (req, res) => {
