@@ -42,5 +42,9 @@ router.put(
   "/cancel-task-schedule/:task_name",
   asynchronousRequestsAndTaskSchedulesController.cancelTaskSchedule
 );
+router.put(
+  "/reschedule-task/:task_name",
+  asynchronousRequestsAndTaskSchedulesController.rescheduleTaskSchedule
+);
 
 module.exports = router;
