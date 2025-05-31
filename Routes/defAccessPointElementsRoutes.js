@@ -8,20 +8,13 @@ router.get(
   "/:page/:limit",
   defAccessPointsElementsController.lazyLoadingDefAccessPointElements
 );
-
+router.get(
+  "/def_access_point_elements/search/:page/:limit",
+  defAccessPointsElementsController.getSearchAccessPointElementsLazyLoading
+);
 router.get(
   "/:id",
   defAccessPointsElementsController.getUniqueDefAccessPointElement
-);
-
-router.get(
-  "/:ids/:page/:limit",
-  defAccessPointsElementsController.filterAccessPointsById
-);
-
-router.get(
-  "/:ids",
-  defAccessPointsElementsController.filterAccessPointsForDelete
 );
 router.post("/", defAccessPointsElementsController.createDefAccessPointElement);
 router.put(
@@ -33,6 +26,15 @@ router.delete(
   defAccessPointsElementsController.deleteDefAccessPointElement
 );
 
+router.get(
+  "/:ids/:page/:limit",
+  defAccessPointsElementsController.filterAccessPointsById
+);
+
+router.get(
+  "/:ids",
+  defAccessPointsElementsController.filterAccessPointsForDelete
+);
 // router.put(
 //   "/:id",
 //   accessPointsEntitlementController.updateAccessPointsEntitlement

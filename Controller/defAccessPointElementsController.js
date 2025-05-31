@@ -51,6 +51,26 @@ exports.lazyLoadingDefAccessPointElements = async (req, res) => {
   }
 };
 
+// Search
+exports.getSearchAccessPointElementsLazyLoading = async (req, res) => {
+  const { page, limit } = req.params;
+  const { element_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_access_point_elements/search/${page}/${limit}?element_name=${element_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // get Unique
 exports.getUniqueDefAccessPointElement = async (req, res) => {
   const id = req.params.id;
@@ -67,6 +87,69 @@ exports.getUniqueDefAccessPointElement = async (req, res) => {
       return res.status(200).json(result.data);
     } else {
       return res.status(404).json({ message: "Data Source not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// create Data
+exports.createDefAccessPointElement = async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await axios.post(
+      `${FLASK_ENDPOINT_URL}/def_access_point_elements`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    if (result.data) {
+      return res.status(201).json(result.data);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// update
+exports.updateDefAccessPointElement = async (req, res) => {
+  try {
+    const data = req.body;
+    const id = req.params.id;
+
+    const result = await axios.put(
+      `${FLASK_ENDPOINT_URL}/def_access_point_elements/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(result.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Delete AccessPointsEntitlement
+exports.deleteDefAccessPointElement = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/def_access_point_elements/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    if (result) {
+      return res.status(200).json({ result: "Deleted Successfully" });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -151,69 +234,6 @@ exports.filterAccessPointsForDelete = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while querying the database." });
-  }
-};
-
-// create Data
-exports.createDefAccessPointElement = async (req, res) => {
-  try {
-    const data = req.body;
-    const result = await axios.post(
-      `${FLASK_ENDPOINT_URL}/def_access_point_elements`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${req.cookies.access_token}`,
-        },
-      }
-    );
-    if (result.data) {
-      return res.status(201).json(result.data);
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-// update
-exports.updateDefAccessPointElement = async (req, res) => {
-  try {
-    const data = req.body;
-    const id = req.params.id;
-
-    const result = await axios.put(
-      `${FLASK_ENDPOINT_URL}/def_access_point_elements/${id}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${req.cookies.access_token}`,
-        },
-      }
-    );
-    return res.status(200).json(result.data);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-//Delete AccessPointsEntitlement
-exports.deleteDefAccessPointElement = async (req, res) => {
-  try {
-    const id = req.params.id;
-
-    const result = await axios.delete(
-      `${FLASK_ENDPOINT_URL}/def_access_point_elements/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${req.cookies.access_token}`,
-        },
-      }
-    );
-    if (result) {
-      return res.status(200).json({ result: "Deleted Successfully" });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
   }
 };
 
