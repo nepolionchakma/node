@@ -14,7 +14,7 @@ const messagesRoutes = require("../Routes/messagesRoutes");
 const defDataSourcesRoutes = require("./defDataSourcesRoutes");
 const defAccessEntitlementsRoutes = require("./defAccessEntitlementsRoutes");
 const accessEntitlementElementsRoutes = require("../Routes/accessEntitlementElementsRoutes");
-const accessPointsEntitlementsRoutes = require("../Routes/accessPointsEntitlementsRoutes");
+const defAccessPointsElementsRoutes = require("./defAccessPointElementsRoutes");
 const combinedUserRoutes = require("../Routes/combinedUserRoutes");
 const defGlobalConditionsRoutes = require("./defGlobalConditionsRoutes");
 const defGlobalConditionsLogicsRoutes = require("./defGlobalConditionLogicsRoutes");
@@ -55,7 +55,7 @@ routes.use("/def-data-sources", defDataSourcesRoutes);
 // Manage Access Entitlements
 routes.use("/def-access-entitlements", defAccessEntitlementsRoutes);
 routes.use("/access-entitlement-elements", accessEntitlementElementsRoutes);
-routes.use("/access-points-element", accessPointsEntitlementsRoutes);
+routes.use("/def-access-point-elements", defAccessPointsElementsRoutes);
 
 // Condition section
 routes.use("/def-global-conditions", defGlobalConditionsRoutes);
