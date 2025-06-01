@@ -28,6 +28,7 @@ exports.getTaskSchedule = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 exports.getViewRequests = async (req, res) => {
   try {
     const response = await axios.get(`${FLASK_ENDPOINT_URL}/view_requests`, {
@@ -102,12 +103,13 @@ exports.getTaskSchedules = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// lazy loading Task Schedule
 exports.getTaskSchedulesLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`,
+      `${FLASK_ENDPOINT_URL}/def_async_task_schedules/${page}/${limit}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -115,16 +117,34 @@ exports.getTaskSchedulesLazyLoading = async (req, res) => {
       }
     );
     // sort by time
-    const sortedData = response.data.sort((a, b) => {
-      const dateA = new Date(a.creation_date);
-      const dateB = new Date(b.creation_date);
-      return dateB - dateA;
-    });
+    // const sortedData = response.data.sort((a, b) => {
+    //   const dateA = new Date(a.creation_date);
+    //   const dateB = new Date(b.creation_date);
+    //   return dateB - dateA;
+    // });
 
-    const results = sortedData.slice(startNumber, endNumber);
-    return res.status(200).json(results);
+    return res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+//lazy loading search task schedule name
+exports.lazyLoadingDefSearchTaskSchedules = async (req, res) => {
+  const { page, limit } = req.params;
+  const { task_name } = req.query;
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_async_task_schedules/search/${page}/${limit}?task_name=${task_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
 
