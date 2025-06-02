@@ -1,5 +1,7 @@
+const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
 const currentDate = new Date();
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
 // get Data
 exports.getAccessPointsEntitlement = async (req, res) => {
@@ -57,6 +59,30 @@ exports.filterAccessPointsById = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while querying the database." });
+  }
+};
+
+//Get Accesspoint by element_name and lazyloading
+exports.searchLazyLoadingAccessPointsElement = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { element_name } = req.query;
+  console.log(
+    `${FLASK_ENDPOINT_URL}/def_access_point_elements/search/${page}/${limit}?element_name=${element_name}`
+  );
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_access_point_elements/search/${page}/${limit}?element_name=${element_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
 

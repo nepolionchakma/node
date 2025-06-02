@@ -12,6 +12,10 @@ router.get(
   "/:page/:limit",
   defTenantEnterpriseSetupController.lazyLoadingDefEnterprise
 );
+router.get(
+  "/search/:page/:limit",
+  defTenantEnterpriseSetupController.searchLazyLoadingDefEnterprise
+);
 router.post(
   "/:tenant_id",
   defTenantEnterpriseSetupController.createDefEnterprise

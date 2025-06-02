@@ -44,18 +44,39 @@ exports.uniqueDefEnterprise = async (req, res) => {
 exports.lazyLoadingDefEnterprise = async (req, res) => {
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
-  const { startNumber, endNumber } = pageLimitData(page, limit);
 
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/enterprises`);
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_tenant_enterprise_setup/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
 
-    const results = response.data.slice(startNumber, endNumber);
-    const totalPages = Math.ceil(response.data.length / limit);
-    return res.status(200).json({
-      results,
-      totalPages,
-      currentPage: page,
-    });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.searchLazyLoadingDefEnterprise = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { enterprise_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_tenant_enterprise_setup/search/${page}/${limit}?enterprise_name=${enterprise_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
