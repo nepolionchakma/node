@@ -12,6 +12,10 @@ router.get(
   "/:ids",
   accessPointsEntitlementController.filterAccessPointsForDelete
 );
+router.get(
+  "/search/element-name/:page/:limit",
+  accessPointsEntitlementController.searchLazyLoadingAccessPointsElement
+);
 router.post(
   "/",
   accessPointsEntitlementController.createAccessPointsEntitlement

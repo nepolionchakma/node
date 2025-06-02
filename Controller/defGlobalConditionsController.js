@@ -47,6 +47,28 @@ exports.lazyLoadingDefGlobalConditions = async (req, res) => {
   }
 };
 
+//SearchLazyLoading
+exports.searchLazyLoadingDefGlobalConditions = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_global_conditions/search/${page}/${limit}?name=${name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //Get Unique
 exports.getUniqueDefGlobalCondition = async (req, res) => {
   try {

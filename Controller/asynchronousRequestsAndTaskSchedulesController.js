@@ -102,31 +102,6 @@ exports.getTaskSchedules = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-exports.getTaskSchedulesLazyLoading = async (req, res) => {
-  const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
-  try {
-    const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskSchedules`,
-      {
-        headers: {
-          Authorization: `Bearer ${req.cookies.access_token}`,
-        },
-      }
-    );
-    // sort by time
-    const sortedData = response.data.sort((a, b) => {
-      const dateA = new Date(a.creation_date);
-      const dateB = new Date(b.creation_date);
-      return dateB - dateA;
-    });
-
-    const results = sortedData.slice(startNumber, endNumber);
-    return res.status(200).json(results);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 exports.createTaskSchedule = async (req, res) => {
   const data = req.body;

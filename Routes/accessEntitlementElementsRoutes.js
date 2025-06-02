@@ -12,6 +12,10 @@ router.get(
   accessEntitlementElementsController.getPerPageAccessEntitlementElement
 );
 router.get(
+  "/search/:page/:limit",
+  accessEntitlementElementsController.searchLazyLoadingAccessEntitilementElement
+);
+router.get(
   "/:id",
   accessEntitlementElementsController.getUniqueAccessEntitlementElement
 );

@@ -4,6 +4,10 @@ const defAccessModelsControllers = require("../Controller/defAccessModelsControl
 const router = Router();
 
 router.get("/", defAccessModelsControllers.getDefAccessModels);
+router.get(
+  "/search/:page/:limit",
+  defAccessModelsControllers.searchLazyLoadingDefAccessModels
+);
 router.get("/:id", defAccessModelsControllers.uniqueDefAccessModel);
 router.post("/", defAccessModelsControllers.createDefAccessModel);
 router.put("/:id", defAccessModelsControllers.updateDefAccessModel);

@@ -45,19 +45,39 @@ exports.uniqueDefTenant = async (req, res) => {
 exports.defTenantWithLazyLoading = async (req, res) => {
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
-  const { startNumber, endNumber } = pageLimitData(page, limit);
 
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`);
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_tenants/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
 
-    const results = response.data.slice(startNumber, endNumber);
-    const totalPages = Math.ceil(response.data.length / limit);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
-    return res.status(200).json({
-      results,
-      totalPages,
-      currentPage: page,
-    });
+exports.defTenantSearchWithLazyLoading = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { tenant_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_tenants/search/${page}/${limit}?tenant_name=${tenant_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
