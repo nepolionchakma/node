@@ -113,6 +113,7 @@ exports.cancelARMTask = async (req, res) => {
   try {
     const response = await axios.put(
       `${FLASK_ENDPOINT_URL}/Cancel_Task/${task_name}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -124,6 +125,26 @@ exports.cancelARMTask = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+// exports.rescheduleARMTask = async (req, res) => {
+//   // const task_name = req.params.task_name;
+//   const { redbeat_schedule_name } = req.body;
+//   try {
+//     const response = await axios.put(
+//       `${FLASK_ENDPOINT_URL}/Reschedule_TaskSchedule/add_values`,
+//       {
+//         redbeat_schedule_name,
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${req.cookies.access_token}`,
+//         },
+//       }
+//     );
+//     return res.status(200).json(response.data);
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Task Params
 exports.getTaskNameParams = async (req, res) => {
@@ -227,9 +248,8 @@ exports.updateTaskParams = async (req, res) => {
 exports.deleteTaskParams = async (req, res) => {
   const { task_name, def_param_id } = req.params;
   try {
-    const response = await axios.put(
+    const response = await axios.delete(
       `${FLASK_ENDPOINT_URL}/Delete_TaskParams/${task_name}/${def_param_id}`,
-      data,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -258,18 +278,19 @@ exports.showExecutionMethods = async (req, res) => {
 };
 exports.showExecutionMethodsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
-  const { startNumber, endNumber } = pageLimitData(page, limit);
+  // const { startNumber, endNumber } = pageLimitData(page, limit);
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods`,
+      `${FLASK_ENDPOINT_URL}/Show_ExecutionMethods/${page}/${limit}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
         },
       }
     );
-    const results = response.data.slice(startNumber, endNumber);
-    return res.status(200).json(results);
+    // console.log(response.data, "response.data");
+    // const results = response.data.slice(startNumber, endNumber);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -304,6 +325,24 @@ exports.updateExecutionMethod = async (req, res) => {
         },
       }
     );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+exports.deleteExecutionMethod = async (req, res) => {
+  const { internal_execution_method } = req.params;
+  console.log(internal_execution_method, "internal_execution_method");
+  try {
+    const response = await axios.delete(
+      `${FLASK_ENDPOINT_URL}/Delete_ExecutionMethod/${internal_execution_method}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response.data, "response.data");
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });

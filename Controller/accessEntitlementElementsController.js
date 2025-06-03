@@ -1,4 +1,6 @@
+const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 //get Data
 exports.getAccessEntitlementElement = async (req, res) => {
   try {
@@ -9,6 +11,28 @@ exports.getAccessEntitlementElement = async (req, res) => {
       },
     });
     return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Search LazyLoading
+exports.searchLazyLoadingAccessEntitilementElement = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { entitlement_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_access_entitlements/search/${page}/${limit}?entitlement_name= ${entitlement_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

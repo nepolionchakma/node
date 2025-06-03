@@ -202,3 +202,21 @@ exports.cancelTaskSchedule = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.rescheduleTaskSchedule = async (req, res) => {
+  const { task_name } = req.params;
+  const data = req.body;
+  try {
+    const response = await axios.put(
+      `${FLASK_ENDPOINT_URL}/Reschedule_Task/${task_name}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

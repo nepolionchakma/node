@@ -1,5 +1,7 @@
+const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
 const currentDate = new Date().toLocaleString();
+const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
 exports.getDefUsers = async (req, res) => {
   try {
@@ -14,6 +16,50 @@ exports.getDefUsers = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+//Lazy Loading
+exports.lazyLoadingDefUsers = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/defusers/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//Search Lazy Loading
+exports.searchLazyLoadingDefUsers = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { user_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/defusers/search/${page}/${limit}?user_name=${user_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //Get Unique User
 exports.getUniqueDefUser = async (req, res) => {
   try {

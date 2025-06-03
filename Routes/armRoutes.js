@@ -13,6 +13,10 @@ router.put(
   "/update-execution-method/:internal_execution_method",
   armControllers.updateExecutionMethod
 );
+router.delete(
+  "/delete-execution-method/:internal_execution_method",
+  armControllers.deleteExecutionMethod
+);
 
 // Register/Edit Asynchronous Tasks
 router.get("/def_async_tasks", armControllers.getARMTasks);
@@ -28,6 +32,7 @@ router.get("/show-task/:task_name", armControllers.getARMTask);
 router.post("/register-task", armControllers.registerARMTask);
 router.put("/edit-task/:task_name", armControllers.editARMTask);
 router.put("/cancel-task/:task_name", armControllers.cancelARMTask);
+// router.put("/reschedule-task/add-values", armControllers.rescheduleARMTask);
 
 // Task Params
 router.get("/task-params/:task_name", armControllers.getUserTaskNameParams);

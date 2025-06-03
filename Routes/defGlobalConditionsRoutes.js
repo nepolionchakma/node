@@ -8,6 +8,10 @@ router.get(
   "/:page/:limit",
   defGlobalConditionsController.lazyLoadingDefGlobalConditions
 );
+router.get(
+  "/search/:page/:limit",
+  defGlobalConditionsController.searchLazyLoadingDefGlobalConditions
+);
 router.get("/:id", defGlobalConditionsController.getUniqueDefGlobalCondition);
 router.post("/", defGlobalConditionsController.createDefGlobalCondition);
 

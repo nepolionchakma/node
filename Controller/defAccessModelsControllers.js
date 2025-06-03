@@ -10,6 +10,28 @@ exports.getDefAccessModels = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+//Search Lazy Loading
+exports.searchLazyLoadingDefAccessModels = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const { model_name } = req.query;
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_access_models/search/${page}/${limit}?model_name=${model_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    console.log(response);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 //Get Unique Model
 exports.uniqueDefAccessModel = async (req, res) => {
   try {
