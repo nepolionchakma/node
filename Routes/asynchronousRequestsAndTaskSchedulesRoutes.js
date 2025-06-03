@@ -26,7 +26,14 @@ router.get(
   "/task-schedules",
   asynchronousRequestsAndTaskSchedulesController.getTaskSchedules
 );
-
+router.get(
+  "/task-schedules/:page/:limit",
+  asynchronousRequestsAndTaskSchedulesController.getTaskSchedulesLazyLoading
+);
+router.get(
+  "/task-schedules/search/:page/:limit",
+  asynchronousRequestsAndTaskSchedulesController.lazyLoadingDefSearchTaskSchedules
+);
 router.post(
   "/create-task-schedule",
   asynchronousRequestsAndTaskSchedulesController.createTaskSchedule

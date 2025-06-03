@@ -47,12 +47,32 @@ exports.lazyLoadingDefDataSources = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+//lazy loading search datasource name
+exports.lazyLoadingDefSearchDataSources = async (req, res) => {
+  const { page, limit } = req.params;
+  const { datasource_name } = req.query;
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_data_sources/search/${page}/${limit}?datasource_name=${datasource_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //Get Unique Datasource
 exports.getUniqueDefDataSource = async (req, res) => {
+  const id = req.params.id;
   try {
-    const data_source_id = req.params.id;
     const result = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_data_sources/${data_source_id},`,
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${id}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -68,6 +88,7 @@ exports.getUniqueDefDataSource = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 //Create Datasource
 exports.createDefDataSource = async (req, res) => {
   try {
