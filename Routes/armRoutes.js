@@ -8,6 +8,10 @@ router.get(
   "/show-execution-methods/:page/:limit",
   armControllers.showExecutionMethodsLazyLoading
 );
+router.get(
+  "/def_async_execution_methods/search/:page/:limit",
+  armControllers.searchExecutionMethodsLazyLoading
+);
 router.post("/create-execution-method", armControllers.createExecutionMethod);
 router.put(
   "/update-execution-method/:internal_execution_method",
