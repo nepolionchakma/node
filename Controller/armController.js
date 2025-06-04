@@ -190,9 +190,9 @@ exports.getUserTaskNameParams = async (req, res) => {
 exports.getTaskParamsLazyLoading = async (req, res) => {
   const { task_name, page, limit } = req.params;
   try {
-    const { startNumber, endNumber } = pageLimitData(page, limit);
+    // const { startNumber, endNumber } = pageLimitData(page, limit);
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}`,
+      `${FLASK_ENDPOINT_URL}/Show_TaskParams/${task_name}/${page}/${limit}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -200,9 +200,9 @@ exports.getTaskParamsLazyLoading = async (req, res) => {
       }
     );
 
-    const results = response.data.slice(startNumber, endNumber);
+    // const results = response.data.slice(startNumber, endNumber);
 
-    return res.status(200).json(results);
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -290,6 +290,24 @@ exports.showExecutionMethodsLazyLoading = async (req, res) => {
     );
     // console.log(response.data, "response.data");
     // const results = response.data.slice(startNumber, endNumber);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+exports.searchExecutionMethodsLazyLoading = async (req, res) => {
+  const { page, limit } = req.params;
+  const { internal_execution_method } = req.query;
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_async_execution_methods/search/${page}/${limit}?internal_execution_method=${internal_execution_method}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
