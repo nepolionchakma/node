@@ -11,6 +11,26 @@ exports.getDefAccessModels = async (req, res) => {
   }
 };
 
+// lazy loading
+exports.lazyLoadingDefAccessModels = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+
+  try {
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_access_models/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //Search Lazy Loading
 exports.searchLazyLoadingDefAccessModels = async (req, res) => {
   const page = Number(req.params.page);
