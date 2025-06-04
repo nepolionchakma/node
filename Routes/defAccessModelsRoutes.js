@@ -5,6 +5,10 @@ const router = Router();
 
 router.get("/", defAccessModelsControllers.getDefAccessModels);
 router.get(
+  "/:page/:limit",
+  defAccessModelsControllers.lazyLoadingDefAccessModels
+);
+router.get(
   "/search/:page/:limit",
   defAccessModelsControllers.searchLazyLoadingDefAccessModels
 );
