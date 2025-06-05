@@ -1,22 +1,15 @@
 const { default: axios } = require("axios");
 const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
-const pageLimitData = (page, limit) => {
-  const pageNumber = parseInt(page);
-  const limitNumber = parseInt(limit);
-  let startNumber = 0;
-  const endNumber = pageNumber * limitNumber;
-  if (pageNumber > 1) {
-    const pageInto = pageNumber - 1;
-    startNumber = pageInto * limitNumber;
-  }
-  return { startNumber, endNumber };
-};
-
 exports.getDefGlobalConditions = async (req, res) => {
   try {
     const result = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_global_conditions`
+      `${FLASK_ENDPOINT_URL}/def_global_conditions`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(result.data);
   } catch (error) {
@@ -26,22 +19,18 @@ exports.getDefGlobalConditions = async (req, res) => {
 
 // lazy loading
 exports.lazyLoadingDefGlobalConditions = async (req, res) => {
-  const page = Number(req.params.page);
-  const limit = Number(req.params.limit);
-  const { startNumber, endNumber } = pageLimitData(page, limit);
+  const { page, limit } = req.params;
 
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_global_conditions`
+      `${FLASK_ENDPOINT_URL}/def_global_conditions/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
-
-    const results = response.data.slice(startNumber, endNumber);
-    const totalPages = Math.ceil(response.data.length / limit);
-    return res.status(200).json({
-      results,
-      totalPages,
-      currentPage: page,
-    });
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -62,7 +51,6 @@ exports.searchLazyLoadingDefGlobalConditions = async (req, res) => {
         },
       }
     );
-    console.log(response);
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -74,7 +62,12 @@ exports.getUniqueDefGlobalCondition = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_global_conditions/${id}`
+      `${FLASK_ENDPOINT_URL}/def_global_conditions/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(200).json(result.data);
@@ -93,7 +86,12 @@ exports.createDefGlobalCondition = async (req, res) => {
     const data = req.body;
     const result = await axios.post(
       `${FLASK_ENDPOINT_URL}/def_global_conditions`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(201).json(result.data);
@@ -110,7 +108,12 @@ exports.updateDefGlobalCondition = async (req, res) => {
 
     const result = await axios.put(
       `${FLASK_ENDPOINT_URL}/def_global_conditions/${id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     return res.status(200).json(result.data);
   } catch (error) {
@@ -123,7 +126,12 @@ exports.deleteDefGlobalCondition = async (req, res) => {
     const id = req.params.id;
 
     const result = await axios.delete(
-      `${FLASK_ENDPOINT_URL}/def_global_conditions/${id}`
+      `${FLASK_ENDPOINT_URL}/def_global_conditions/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
     );
     if (result) {
       return res.status(200).json({ result: "Deleted Successfully" });
