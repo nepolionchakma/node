@@ -157,7 +157,7 @@ exports.filterAccessPointsById = async (req, res) => {
   const stringArray = idsParam.split(",");
   const ids = stringArray.map(Number);
   try {
-    const accessPoints = await prisma.access_points_elements.findMany({
+    const accessPoints = await prisma.def_access_point_elements.findMany({
       where: {
         access_point_id: {
           in: ids,
