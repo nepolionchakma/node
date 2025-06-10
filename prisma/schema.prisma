@@ -136,44 +136,6 @@ model def_users {
   @@schema("apps")
 }
 
-model def_users_v {
-  user_id         Int     @id
-  user_name       String?
-  first_name      String?
-  middle_name     String?
-  last_name       String?
-  email_addresses Json?
-  job_title       String?
-  created_by      Int?
-  created_on      String?
-  last_updated_by Int?
-  last_updated_on String?
-  tenant_id       Int?
-  profile_picture Json?
-
-  @@map("def_users_v")
-  @@schema("apps")
-}
-
-model data_sources {
-  data_source_id                          Int       @id
-  datasource_name                         String?   @db.VarChar(50)
-  description                             String?   @db.VarChar(250)
-  application_type                        String?   @db.VarChar(50)
-  application_type_version                String?   @db.VarChar(50)
-  last_access_synchronization_date        DateTime? @db.Timestamp(6)
-  last_access_synchronization_status      String?   @db.VarChar(50)
-  last_transaction_synchronization_date   DateTime? @db.Timestamp(6)
-  last_transaction_synchronization_status String?   @db.VarChar(50)
-  default_datasource                      String?   @db.VarChar(50)
-  created_by                              String?   @db.VarChar(50)
-  created_on                              DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by                         String?   @db.VarChar(50)
-  last_updated_on                         DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
 model messages {
   id            String    @id
   sender        Json?
@@ -187,111 +149,6 @@ model messages {
   readers       Json?
   holders       Json?
   recyclebin    Json?
-
-  @@schema("apps")
-}
-
-model manage_access_entitlements {
-  entitlement_id              Int                           @id
-  entitlement_name            String                        @db.VarChar(150)
-  description                 String?                       @db.VarChar(250)
-  comments                    String?                       @db.VarChar(200)
-  status                      String                        @db.VarChar(50)
-  effective_date              DateTime                      @db.Date
-  revison                     String?                       @db.VarChar(10)
-  revision_date               DateTime?                     @db.Date
-  created_by                  String?                       @db.VarChar(50)
-  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             String?                       @db.VarChar(50)
-  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
-  access_entitlement_elements access_entitlement_elements[]
-
-  @@schema("apps")
-}
-
-model access_points_elements {
-  access_point_id             Int                           @id
-  data_source_id              Int
-  element_name                String?                       @db.VarChar(150)
-  description                 String?                       @db.VarChar(250)
-  platform                    String?                       @db.VarChar(50)
-  element_type                String?                       @db.VarChar(50)
-  access_control              String?                       @db.VarChar(10)
-  change_control              String?                       @db.VarChar(10)
-  audit                       String?                       @db.VarChar(50)
-  created_by                  String?                       @db.VarChar(50)
-  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             String?                       @db.VarChar(50)
-  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
-  access_entitlement_elements access_entitlement_elements[]
-
-  @@schema("apps")
-}
-
-model manage_global_condition_logic_attributes {
-  id                               Int  @id
-  manage_global_condition_logic_id Int
-  widget_position                  Int?
-  widget_state                     Int?
-
-  @@schema("apps")
-}
-
-model manage_global_condition_logics {
-  manage_global_condition_logic_id Int     @id
-  manage_global_condition_id       Int
-  object                           String?
-  attribute                        String?
-  condition                        String?
-  value                            String?
-
-  @@schema("apps")
-}
-
-model manage_global_conditions {
-  manage_global_condition_id Int     @id
-  name                       String?
-  datasource                 String?
-  description                String?
-  status                     String?
-
-  @@schema("apps")
-}
-
-model manage_access_models {
-  manage_access_model_id Int     @id
-  model_name             String?
-  description            String?
-  type                   String?
-  run_status             String?
-  state                  String?
-  last_run_date          String?
-  created_by             String?
-  last_updated_by        String?
-  last_updated_date      String?
-  revision               Int?
-  revision_date          String?
-
-  @@schema("apps")
-}
-
-model manage_access_model_logics {
-  manage_access_model_logic_id Int     @id
-  manage_access_model_id       Int
-  filter                       String?
-  object                       String?
-  attribute                    String?
-  condition                    String?
-  value                        String?
-
-  @@schema("apps")
-}
-
-model manage_access_model_logic_attributes {
-  id                           Int  @id
-  manage_access_model_logic_id Int
-  widget_position              Int?
-  widget_state                 Int?
 
   @@schema("apps")
 }
@@ -321,12 +178,12 @@ model controls {
 model access_entitlement_elements {
   entitlement_id             Int
   access_point_id            Int
-  created_by                 String?                    @db.VarChar(50)
-  created_on                 DateTime?                  @default(now()) @db.Timestamp(6)
-  last_updated_by            String?                    @db.VarChar(50)
-  last_updated_on            DateTime?                  @default(now()) @db.Timestamp(6)
-  access_points_elements     access_points_elements     @relation(fields: [access_point_id], references: [access_point_id], onDelete: NoAction, onUpdate: NoAction)
-  manage_access_entitlements manage_access_entitlements @relation(fields: [entitlement_id], references: [entitlement_id], onDelete: NoAction, onUpdate: NoAction)
+  created_by                 String?                   @db.VarChar(50)
+  created_on                 DateTime?                 @default(now()) @db.Timestamp(6)
+  last_updated_by            String?                   @db.VarChar(50)
+  last_updated_on            DateTime?                 @default(now()) @db.Timestamp(6)
+  access_points_elements     def_access_point_elements @relation(fields: [access_point_id], references: [def_access_point_id], onDelete: NoAction, onUpdate: NoAction)
+  manage_access_entitlements def_access_entitlements   @relation(fields: [entitlement_id], references: [def_entitlement_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([entitlement_id, access_point_id])
   @@schema("apps")
@@ -357,7 +214,7 @@ model def_processes {
 }
 
 model def_access_profiles {
-  serial_number Int        @id
+  serial_number Int        @id @default(autoincrement())
   user_id       Int?
   profile_type  String     @db.VarChar(50)
   profile_id    String     @db.VarChar(100)
@@ -393,4 +250,147 @@ model employees {
   departments   departments? @relation(fields: [department], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("test")
+}
+
+model def_access_entitlements {
+  def_entitlement_id          Int                           @id(map: "manage_access_entitlements_pkey") @default(autoincrement())
+  entitlement_name            String                        @db.VarChar(150)
+  description                 String?                       @db.VarChar(250)
+  comments                    String?                       @db.VarChar(200)
+  status                      String                        @db.VarChar(50)
+  effective_date              DateTime                      @db.Date
+  revision                    Int?
+  revision_date               DateTime?                     @db.Date
+  created_by                  String?                       @db.VarChar(50)
+  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
+  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
+  access_entitlement_elements access_entitlement_elements[]
+
+  @@schema("apps")
+}
+
+model def_access_model_logic_attributes {
+  id                        Int  @id(map: "manage_access_model_logic_attributes_pkey")
+  def_access_model_logic_id Int
+  widget_position           Int?
+  widget_state              Int?
+
+  @@schema("apps")
+}
+
+model def_access_model_logics {
+  def_access_model_logic_id Int     @id(map: "manage_access_model_logics_pkey")
+  def_access_model_id       Int
+  filter                    String?
+  object                    String?
+  attribute                 String?
+  condition                 String?
+  value                     String?
+
+  @@schema("apps")
+}
+
+model def_access_models {
+  def_access_model_id Int     @id(map: "manage_access_models_pkey") @default(autoincrement())
+  model_name          String?
+  description         String?
+  type                String?
+  run_status          String?
+  state               String?
+  last_run_date       String?
+  created_by          String?
+  last_updated_by     String?
+  last_updated_date   String?
+  revision            Int?
+  revision_date       String?
+
+  @@schema("apps")
+}
+
+model def_access_point_elements {
+  def_access_point_id         Int                           @id(map: "access_points_elements_pkey") @default(autoincrement())
+  def_data_source_id          Int
+  element_name                String?                       @db.VarChar(150)
+  description                 String?                       @db.VarChar(250)
+  platform                    String?                       @db.VarChar(50)
+  element_type                String?                       @db.VarChar(50)
+  access_control              String?                       @db.VarChar(10)
+  change_control              String?                       @db.VarChar(10)
+  audit                       String?                       @db.VarChar(50)
+  created_by                  String?                       @db.VarChar(50)
+  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
+  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
+  access_entitlement_elements access_entitlement_elements[]
+
+  @@schema("apps")
+}
+
+model def_data_sources {
+  def_data_source_id                      Int       @id(map: "data_sources_pkey") @default(autoincrement())
+  datasource_name                         String?   @db.VarChar(50)
+  description                             String?   @db.VarChar(250)
+  application_type                        String?   @db.VarChar(50)
+  application_type_version                String?   @db.VarChar(50)
+  last_access_synchronization_date        DateTime? @db.Timestamp(6)
+  last_access_synchronization_status      String?   @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime? @db.Timestamp(6)
+  last_transaction_synchronization_status String?   @db.VarChar(50)
+  default_datasource                      String?   @db.VarChar(50)
+  created_by                              String?   @db.VarChar(50)
+  created_on                              DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by                         String?   @db.VarChar(50)
+  last_updated_on                         DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_global_condition_logic_attributes {
+  id                            Int  @id(map: "manage_global_condition_logic_attributes_pkey")
+  def_global_condition_logic_id Int
+  widget_position               Int?
+  widget_state                  Int?
+
+  @@schema("apps")
+}
+
+model def_global_condition_logics {
+  def_global_condition_logic_id Int     @id(map: "manage_global_condition_logics_pkey")
+  def_global_condition_id       Int
+  object                        String?
+  attribute                     String?
+  condition                     String?
+  value                         String?
+
+  @@schema("apps")
+}
+
+model def_global_conditions {
+  def_global_condition_id Int     @id(map: "manage_global_conditions_pkey") @default(autoincrement())
+  name                    String?
+  datasource              String?
+  description             String?
+  status                  String?
+
+  @@schema("apps")
+}
+
+model def_users_v {
+  user_id         Int     @id
+  user_name       String?
+  first_name      String?
+  middle_name     String?
+  last_name       String?
+  email_addresses Json?
+  job_title       String?
+  created_by      Int?
+  created_on      String?
+  last_updated_by Int?
+  last_updated_on String?
+  tenant_id       Int?
+  profile_picture Json?
+
+  @@map("def_users_v")
+  @@schema("apps")
 }

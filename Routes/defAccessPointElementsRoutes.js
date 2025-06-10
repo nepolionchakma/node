@@ -2,6 +2,10 @@ const Router = require("express");
 const defAccessPointsElementsController = require("../Controller/defAccessPointElementsController");
 
 const router = Router();
+router.get(
+  "/access-points/id-delete",
+  defAccessPointsElementsController.filterAccessPointsByIdDelete
+);
 
 router.get("/", defAccessPointsElementsController.getDefAccessPointsElements);
 router.get(
@@ -22,19 +26,15 @@ router.put(
   defAccessPointsElementsController.updateDefAccessPointElement
 );
 router.delete(
-  "/:id",
+  "/delete/:id",
   defAccessPointsElementsController.deleteDefAccessPointElement
 );
 
 router.get(
-  "/:ids/:page/:limit",
+  "/accesspoints-id/:page/:limit",
   defAccessPointsElementsController.filterAccessPointsById
 );
 
-router.get(
-  "/:ids",
-  defAccessPointsElementsController.filterAccessPointsForDelete
-);
 // router.put(
 //   "/:id",
 //   accessPointsEntitlementController.updateAccessPointsEntitlement
