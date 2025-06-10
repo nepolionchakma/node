@@ -210,6 +210,7 @@ exports.getTaskParamsLazyLoading = async (req, res) => {
 exports.addTaskParams = async (req, res) => {
   const { task_name } = req.params;
   const data = req.body;
+  console.log(data, "data");
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Add_TaskParams/${task_name}`,

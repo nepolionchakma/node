@@ -6,6 +6,10 @@ const router = Router();
 
 // combined users get with page and limit
 router.get("/:page/:limit", combinedUserController.getUsersWithPageAndLimit);
+router.get(
+  "/search/:page/:limit",
+  combinedUserController.searchUsersWithPageAndLimit
+);
 // combined users get without page and limit
 router.get("/", combinedUserController.getUsersView);
 router.get("/:user_id", combinedUserController.getUser);
