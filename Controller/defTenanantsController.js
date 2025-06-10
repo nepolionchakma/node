@@ -16,9 +16,13 @@ const pageLimitData = (page, limit) => {
 
 exports.getDefTenants = async (req, res) => {
   try {
-    const defTenants = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`);
+    const defTenants = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`, {
+      headers: {
+        Authorization: `Bearer ${req.cookies.access_token}`,
+      },
+    });
 
-    return res.status(200).json(defTenants);
+    return res.status(200).json(defTenants.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

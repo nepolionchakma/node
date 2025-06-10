@@ -34,6 +34,7 @@ const hashPassword = (password) => {
 exports.createCombinedUser = async (req, res) => {
   try {
     const combinedUserData = req.body;
+    console.log(combinedUserData, "combinedUserData");
     const currentTime = new Date();
     const profile_picture = {
       original: "uploads/profiles/default/profile.jpg",
@@ -48,40 +49,110 @@ exports.createCombinedUser = async (req, res) => {
     const maxID = maxUserIDResult._max.user_id + 1;
 
     if (combinedUserData.user_type === "person") {
-      await prisma.def_users.create({
-        data: {
-          user_id: maxID,
-          user_name: combinedUserData.user_name,
-          user_type: combinedUserData.user_type,
-          email_addresses: combinedUserData.email_addresses,
-          created_by: combinedUserData.created_by,
-          created_on: currentTime.toLocaleString(),
-          last_updated_by: combinedUserData.last_updated_by,
-          last_updated_on: currentTime.toLocaleString(),
-          tenant_id: combinedUserData.tenant_id,
-          profile_picture: profile_picture,
-        },
-      });
+      // defuser
+      // const result = await axios.post(`${FLASK_ENDPOINT_URL}/defuser`, {
+      //   // user_id: maxID,
+      //   user_name: combinedUserData.user_name,
+      //   user_type: combinedUserData.user_type,
+      //   email_addresses: combinedUserData.email_addresses,
+      //   created_by: combinedUserData.created_by,
+      //   // created_on: currentTime.toLocaleString(),
+      //   last_updated_by: combinedUserData.last_updated_by,
+      //   // last_updated_on: currentTime.toLocaleString(),
+      //   tenant_id: combinedUserData.tenant_id,
+      //   profile_picture: profile_picture,
+      // });
+      // // defpersons
+      // const result2 = await axios.post(`${FLASK_ENDPOINT_URL}/defpersons`, {
+      //   user_id: maxID,
+      //   first_name: combinedUserData.first_name,
+      //   middle_name: combinedUserData.middle_name,
+      //   last_name: combinedUserData.last_name,
+      //   job_title: combinedUserData.job_title,
+      // });
+      // // defcredentials
+      // const result3 = await axios.post(
+      //   `${FLASK_ENDPOINT_URL}/def_user_credentials`,
+      //   {
+      //     user_id: maxID,
+      //     password: await hashPassword(combinedUserData.password),
+      //   }
+      // );
+      // console.log(result, result2, result3, "result");
+      const [user, person, credentials] = await Promise.all([
+        prisma.def_users.create({
+          data: {
+            // user_id: maxID,
+            user_name: combinedUserData.user_name,
+            user_type: combinedUserData.user_type,
+            email_addresses: combinedUserData.email_addresses,
+            created_by: combinedUserData.created_by,
+            // created_on: currentTime.toLocaleString(),
+            last_updated_by: combinedUserData.last_updated_by,
+            // last_updated_on: currentTime.toLocaleString(),
+            tenant_id: combinedUserData.tenant_id,
+            // profile_picture: profile_picture,
+          },
+        }),
+        prisma.def_persons.create({
+          data: {
+            user_id: maxID,
+            first_name: combinedUserData.first_name,
+            middle_name: combinedUserData.middle_name,
+            last_name: combinedUserData.last_name,
+            job_title: combinedUserData.job_title,
+          },
+        }),
+        prisma.def_user_credentials.create({
+          data: {
+            user_id: maxID,
+            password: await hashPassword(combinedUserData.password),
+          },
+        }),
+      ]);
+      console.log(user, person, credentials, "user, person, credentials");
+      // const result = await prisma.def_users.create({
+      //   data: {
+      //     user_id: maxID,
+      //     user_name: combinedUserData.user_name,
+      //     user_type: combinedUserData.user_type,
+      //     email_addresses: combinedUserData.email_addresses,
+      //     created_by: combinedUserData.created_by,
+      //     created_on: currentTime.toLocaleString(),
+      //     last_updated_by: combinedUserData.last_updated_by,
+      //     last_updated_on: currentTime.toLocaleString(),
+      //     tenant_id: combinedUserData.tenant_id,
+      //     profile_picture: profile_picture,
+      //   },
+      // });
 
-      await prisma.def_persons.create({
-        data: {
-          user_id: maxID,
-          first_name: combinedUserData.first_name,
-          middle_name: combinedUserData.middle_name,
-          last_name: combinedUserData.last_name,
-          job_title: combinedUserData.job_title,
-        },
-      });
+      // const result2 = await prisma.def_persons.create({
+      //   data: {
+      //     user_id: maxID,
+      //     first_name: combinedUserData.first_name,
+      //     middle_name: combinedUserData.middle_name,
+      //     last_name: combinedUserData.last_name,
+      //     job_title: combinedUserData.job_title,
+      //   },
+      // });
 
-      await prisma.def_user_credentials.create({
-        data: {
-          user_id: maxID,
-          password: await hashPassword(combinedUserData.password),
-        },
-      });
+      // const result3 = await prisma.def_user_credentials.create({
+      //   data: {
+      //     user_id: maxID,
+      //     password: await hashPassword(combinedUserData.password),
+      //   },
+      // });
+      // console.log(result, result2, result3, "result");
     }
 
     if (combinedUserData.user_type !== "person") {
+      // defuser
+      // await axios.post(`${FLASK_ENDPOINT_URL}/defuser`, combinedUserData);
+      // //  defcredentials
+      // await axios.post(
+      //   `${FLASK_ENDPOINT_URL}/def_user_credentials`,
+      //   combinedUserData
+      // );
       await prisma.def_users.create({
         data: {
           user_id: maxID,
@@ -110,10 +181,11 @@ exports.createCombinedUser = async (req, res) => {
       });
     } else {
       return res.status(201).json({
-        message: "User Recod Created",
+        message: "User Recrod Created",
       });
     }
   } catch (error) {
+    console.log(error, "error");
     return res.status(500).json({ error: error.message });
   }
 };
@@ -187,22 +259,61 @@ exports.getUser = async (req, res) => {
 exports.getUsersWithPageAndLimit = async (req, res) => {
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
-  const offset = (page - 1) * limit;
   try {
-    const users = await prisma.def_users_v.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: {
-        user_id: "desc",
-      },
-    });
+    const users = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_combined_user/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
 
-    return res.status(200).json(users);
+    return res.status(200).json(users.data);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
+exports.searchUsersWithPageAndLimit = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const user_name = req.query.user_name;
+  try {
+    const users = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_combined_user/search/${page}/${limit}?user_name=${user_name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+
+    return res.status(200).json(users.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+// exports.getUsersWithPageAndLimit = async (req, res) => {
+//   const page = Number(req.params.page);
+//   const limit = Number(req.params.limit);
+//   const offset = (page - 1) * limit;
+//   try {
+//     const users = await prisma.def_users_v.findMany({
+//       take: limit,
+//       skip: offset,
+//       orderBy: {
+//         user_id: "desc",
+//       },
+//     });
+
+//     return res.status(200).json(users);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
 
 exports.updateUser = async (req, res) => {
   try {
