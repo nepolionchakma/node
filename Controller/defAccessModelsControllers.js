@@ -108,8 +108,8 @@ exports.deleteDefAccessModel = async (req, res) => {
     const result =
       await axios.delete(`${FLASK_ENDPOINT_URL}/def_access_models/${model_id}
 `);
-    console.log(result.data);
-    return res.status(200).json({ result: "Deleted Successfully" });
+
+    return res.status(200).json(result.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
