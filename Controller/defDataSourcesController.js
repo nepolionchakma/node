@@ -1,18 +1,6 @@
 const { default: axios } = require("axios");
 const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 
-const pageLimitData = (page, limit) => {
-  const pageNumber = parseInt(page);
-  const limitNumber = parseInt(limit);
-  let startNumber = 0;
-  const endNumber = pageNumber * limitNumber;
-  if (pageNumber > 1) {
-    const pageInto = pageNumber - 1;
-    startNumber = pageInto * limitNumber;
-  }
-  return { startNumber, endNumber };
-};
-
 exports.getDefDataSources = async (req, res) => {
   try {
     const result = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`, {
@@ -27,22 +15,18 @@ exports.getDefDataSources = async (req, res) => {
 };
 // lazy loading
 exports.lazyLoadingDefDataSources = async (req, res) => {
-  const page = Number(req.params.page);
-  const limit = Number(req.params.limit);
-  const { startNumber, endNumber } = pageLimitData(page, limit);
+  const { page, limit } = req.params;
+
   try {
-    const response = await axios.get(`${FLASK_ENDPOINT_URL}/def_data_sources`, {
-      headers: {
-        Authorization: `Bearer ${req.cookies.access_token}`,
-      },
-    });
-    const results = response.data.slice(startNumber, endNumber);
-    const totalPages = Math.ceil(response.data.length / limit);
-    return res.status(200).json({
-      results,
-      totalPages,
-      currentPage: page,
-    });
+    const response = await axios.get(
+      `${FLASK_ENDPOINT_URL}/def_data_sources/${page}/${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${req.cookies.access_token}`,
+        },
+      }
+    );
+    return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
