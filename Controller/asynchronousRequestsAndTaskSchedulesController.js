@@ -51,7 +51,7 @@ exports.getViewRequestsLazyLoading = async (req, res) => {
   const { page, limit } = req.params;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/${page}/${limit}`,
+      `${FLASK_ENDPOINT_URL}/view_requests/${page}/${limit}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
@@ -70,7 +70,7 @@ exports.getSearchViewRequestLazyLoading = async (req, res) => {
   const { task_name } = req.query;
   try {
     const response = await axios.get(
-      `${FLASK_ENDPOINT_URL}/def_async_task_requests/view_requests/search/${page}/${limit}?task_name=${task_name}`,
+      `${FLASK_ENDPOINT_URL}/view_requests/search/${page}/${limit}?task_name=${task_name}`,
       {
         headers: {
           Authorization: `Bearer ${req.cookies.access_token}`,
