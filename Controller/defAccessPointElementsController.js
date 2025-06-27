@@ -14,6 +14,48 @@ const pageLimitData = (page, limit) => {
   return { startNumber, endNumber };
 };
 
+exports.filterAccessPointsById = async (req, res) => {
+  const { accessPointsId } = req.query;
+
+  const stringArray = accessPointsId.split(",");
+  const ids = stringArray.map(Number);
+
+  // const page = parseInt(req.params.page) || 1;
+  // const limit = parseInt(req.params.limit) || 5;
+  // const offset = (page - 1) * limit;
+
+  try {
+    const datasources = await prisma.def_data_sources.findMany();
+    const accessPoints = await prisma.def_access_point_elements.findMany({
+      where: {
+        def_access_point_id: {
+          in: ids,
+        },
+      },
+      // take: limit,
+      // skip: offset,
+      orderBy: {
+        def_access_point_id: "desc",
+      },
+    });
+    //merge accessPoints and datasources
+    const combainedData = accessPoints.map((accessPoint) => {
+      const dataSource = datasources.find(
+        (dataSource) =>
+          dataSource.def_data_source_id === accessPoint.def_data_source_id
+      );
+      return {
+        ...accessPoint,
+        dataSource,
+      };
+    });
+    // console.log(combainedData, "combainedData");
+    res.status(200).json(combainedData);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 // get Data
 exports.getDefAccessPointsElements = async (req, res) => {
   try {
@@ -159,52 +201,47 @@ exports.deleteDefAccessPointElement = async (req, res) => {
 };
 
 // get Data AccessPointsById
-exports.filterAccessPointsById = async (req, res) => {
-  const { accessPointsId } = req.query;
 
-  const stringArray = accessPointsId.split(",");
-  const ids = stringArray.map(Number);
+// exports.filterAccessPointsByIdWithoutPagination = async (req, res) => {
+//   const { accessPointsId } = req.query;
 
-  const page = parseInt(req.params.page) || 1;
-  const limit = parseInt(req.params.limit) || 5;
-  const offset = (page - 1) * limit;
+//   const stringArray = accessPointsId.split(",");
+//   const ids = stringArray.map(Number);
 
-  try {
-    const datasources = await prisma.def_data_sources.findMany();
-    const accessPoints = await prisma.def_access_point_elements.findMany({
-      where: {
-        def_access_point_id: {
-          in: ids,
-        },
-      },
-      take: limit,
-      skip: offset,
-      orderBy: {
-        def_access_point_id: "desc",
-      },
-    });
-    //merge accessPoints and datasources
-    const combainedData = accessPoints.map((accessPoint) => {
-      const dataSource = datasources.find(
-        (dataSource) =>
-          dataSource.def_data_source_id === accessPoint.def_data_source_id
-      );
-      return {
-        ...accessPoint,
-        dataSource,
-      };
-    });
-    // console.log(combainedData, "combainedData");
-    res.status(200).json(combainedData);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+//   try {
+//     const datasources = await prisma.def_data_sources.findMany();
+//     const accessPoints = await prisma.def_access_point_elements.findMany({
+//       where: {
+//         def_access_point_id: {
+//           in: ids,
+//         },
+//       },
+//       orderBy: {
+//         def_access_point_id: "desc",
+//       },
+//     });
+//     //merge accessPoints and datasources
+//     const combainedData = accessPoints.map((accessPoint) => {
+//       const dataSource = datasources.find(
+//         (dataSource) =>
+//           dataSource.def_data_source_id === accessPoint.def_data_source_id
+//       );
+//       return {
+//         ...accessPoint,
+//         dataSource,
+//       };
+//     });
+//     // console.log(combainedData, "combainedData");
+//     res.status(200).json(combainedData);
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// };
 
 //get Data Access points for delete
 exports.filterAccessPointsByIdDelete = async (req, res) => {
   const { accessPoint } = req.query;
-  console.log("207");
+
   const stringArray = accessPoint.split(",");
   const ids = stringArray.map(Number);
 
