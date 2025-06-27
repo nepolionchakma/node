@@ -7,6 +7,11 @@ router.get(
   defAccessPointsElementsController.filterAccessPointsByIdDelete
 );
 
+router.get(
+  "/accesspoints",
+  defAccessPointsElementsController.filterAccessPointsById
+);
+
 router.get("/", defAccessPointsElementsController.getDefAccessPointsElements);
 router.get(
   "/:page/:limit",
@@ -30,10 +35,10 @@ router.delete(
   defAccessPointsElementsController.deleteDefAccessPointElement
 );
 
-router.get(
-  "/accesspoints-id/:page/:limit",
-  defAccessPointsElementsController.filterAccessPointsById
-);
+// router.get(
+//   "/accesspoints-not-pagination",
+//   defAccessPointsElementsController.filterAccessPointsByIdWithoutPagination
+// );
 
 // router.put(
 //   "/:id",
