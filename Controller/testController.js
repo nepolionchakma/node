@@ -139,7 +139,7 @@ exports.getUniqueEmployee = async (req, res) => {
 };
 
 exports.createEmployee = async (req, res) => {
-  const { job_title, department, employee_name } = req.body;
+  const { job_title, department, employee_name, position } = req.body;
 
   try {
     if (!job_title || !department || !employee_name) {
@@ -153,6 +153,7 @@ exports.createEmployee = async (req, res) => {
         job_title: job_title,
         department: department,
         employee_name: employee_name,
+        position: position,
       },
     });
 
@@ -164,7 +165,7 @@ exports.createEmployee = async (req, res) => {
 
 exports.updateEmployee = async (req, res) => {
   const employeeID = Number(req.params.id);
-  const { job_title, department, employee_name } = req.body;
+  const { job_title, department, employee_name, position } = req.body;
 
   try {
     const employee = await prisma.employees.findUnique({
@@ -191,11 +192,51 @@ exports.updateEmployee = async (req, res) => {
         job_title: job_title,
         department: department,
         employee_name: employee_name,
+        position: position,
       },
     });
 
     return res.status(200).json(updatedEmployee);
   } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.upsertEmployee = async (req, res) => {
+  const data = req.body.upsertAttributes || req.body;
+
+  if (!Array.isArray(data)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid input: 'Data' should be an array" });
+  }
+
+  const upsertResults = [];
+
+  try {
+    for (const item of data) {
+      const result = await prisma.employees.upsert({
+        where: { employee_id: item.employee_id },
+        update: {
+          employee_id: data.employee_id,
+          job_title: item.job_title,
+          department: item.department,
+          employee_name: item.employee_name,
+          position: item.position,
+        },
+        create: {
+          job_title: item.job_title,
+          department: item.department,
+          employee_name: item.employee_name,
+          position: item.position,
+        },
+      });
+      upsertResults.push(result);
+    }
+
+    return res.status(200).json(upsertResults);
+  } catch (error) {
+    console.error("Error in upsert operation:", error);
     return res.status(500).json({ error: error.message });
   }
 };
