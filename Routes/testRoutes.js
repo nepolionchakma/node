@@ -14,7 +14,7 @@ router.get("/employees", testController.getEmployess);
 router.get("/employees/:id", testController.getUniqueEmployee);
 router.post("/employees", testController.createEmployee);
 router.put("/employees/:id", testController.updateEmployee);
-router.post("/upsert/employees", testController.upsertEmployees);
+router.post("/upsert/employees", testController.upsertEmployee);
 router.post("/upsert/employee/:id", testController.upsertEmployeeById);
 router.delete("/employees/:id", testController.deleteEmployee);
 
