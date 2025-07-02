@@ -247,6 +247,7 @@ model employees {
   job_title     String?      @db.VarChar(255)
   department    Int?
   employee_name String       @db.VarChar(255)
+  position      Int?
   departments   departments? @relation(fields: [department], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("test")
