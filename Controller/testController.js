@@ -202,6 +202,33 @@ exports.updateEmployee = async (req, res) => {
   }
 };
 
+exports.upsertEmployeeById = async (req, res) => {
+  const employee_id = Number(req.params.id);
+  const { job_title, department, employee_name, position } = req.body;
+
+  try {
+    const result = await prisma.employees.upsert({
+      where: { employee_id },
+      update: {
+        job_title,
+        department,
+        employee_name,
+        position,
+      },
+      create: {
+        job_title,
+        department,
+        employee_name,
+        position,
+      },
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in upsert operation:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
 exports.upsertEmployee = async (req, res) => {
   const data = req.body.upsertAttributes || req.body;
 
