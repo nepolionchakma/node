@@ -229,7 +229,7 @@ exports.upsertEmployeeById = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-exports.upsertEmployee = async (req, res) => {
+exports.upsertEmployees = async (req, res) => {
   const data = req.body.upsertAttributes || req.body;
 
   if (!Array.isArray(data)) {
