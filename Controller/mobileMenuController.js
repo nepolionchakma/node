@@ -25,7 +25,7 @@ exports.createMobileMenu = async (req, res) => {
       });
     }
 
-    const newMobileMenu = await prisma.mobile_menu.create({
+    await prisma.mobile_menu.create({
       data: {
         menu_id: maxID,
         menu_code: menu_code,
@@ -35,7 +35,9 @@ exports.createMobileMenu = async (req, res) => {
       },
     });
 
-    return res.status(201).json(newMobileMenu);
+    return res
+      .status(201)
+      .json({ message: "The mobile menu added successfully." });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -55,7 +57,7 @@ exports.updateMobileMenu = async (req, res) => {
       return res.status(404).json({ message: "Mobile Menu not found" });
     }
 
-    const updatedMobileMenu = await prisma.mobile_menu.update({
+    await prisma.mobile_menu.update({
       where: {
         menu_id: id,
       },
@@ -67,7 +69,9 @@ exports.updateMobileMenu = async (req, res) => {
       },
     });
 
-    return res.status(201).json(updatedMobileMenu);
+    return res
+      .status(200)
+      .json({ message: "The mobile menu edited successfully." });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
