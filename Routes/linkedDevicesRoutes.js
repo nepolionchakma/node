@@ -9,5 +9,6 @@ router.put(
   "/inactive-device/:user_id/:id",
   linkedDevicesController.inactiveDevice
 );
+router.put("/:user_id", linkedDevicesController.logoutFromDevices);
 
 module.exports = router;
