@@ -183,14 +183,10 @@ const socket = (io) => {
       }
     );
 
-    socket.on("inactiveDevice", ({ data, user }) => {
-      console.log(data, user, "inactiveDevice");
-      if (Array.isArray(data)) {
-        for (const device of data) {
-          io.to(user).emit("inactiveDevice", device);
-        }
-      } else {
-        console.error("Expected an array, but got:", data);
+    socket.on("inactiveDevice", (data) => {
+      console.log(data, "inactiveDevice");
+      for (const device of data.data) {
+        io.to(data.user).emit("inactiveDevice", device);
       }
     });
 
