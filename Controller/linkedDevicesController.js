@@ -109,3 +109,38 @@ exports.inactiveDevice = async (req, res) => {
       .json({ error: "Something went wrong deleting device" });
   }
 };
+
+//logout from all devices
+exports.logoutFromDevices = async (req, res) => {
+  const { user_id } = req.params;
+  const { is_active } = req.body;
+
+  try {
+    const devices = await prisma.linked_devices.findMany({
+      where: {
+        user_id: Number(user_id),
+      },
+    });
+
+    if (devices.length > 0) {
+      const result = await prisma.linked_devices.updateMany({
+        where: {
+          user_id: Number(user_id),
+        },
+        data: {
+          is_active,
+        },
+      });
+      if (result.count > 0) {
+        return res
+          .status(200)
+          .json({ message: "Sign out from all devices successfully" });
+      }
+    }
+    return res.status(200).json({ message: "Device not found" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Something went wrong deleting device" });
+  }
+};

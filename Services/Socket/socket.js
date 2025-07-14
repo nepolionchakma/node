@@ -138,7 +138,9 @@ const socket = (io) => {
     });
 
     socket.on("inactiveDevice", (data) => {
-      io.to(data.user).emit("inactiveDevice", data);
+      for (const device of data.data) {
+        io.to(data.user).emit("inactiveDevice", device);
+      }
     });
 
     socket.on("disconnect", () => {
