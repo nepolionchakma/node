@@ -133,13 +133,60 @@ const socket = (io) => {
     });
 
     // Device Action
-    socket.on("addDevice", (data) => {
-      io.to(data.user).emit("addDevice", data);
-    });
+    socket.on(
+      "addDevice",
+      ({
+        id,
+        user_id,
+        device_type,
+        browser_name,
+        browser_version,
+        os,
+        user_agent,
+        added_at,
+        is_active,
+        ip_address,
+        location,
+        user,
+      }) => {
+        console.log(
+          {
+            id,
+            user_id,
+            device_type,
+            browser_name,
+            browser_version,
+            os,
+            user_agent,
+            added_at,
+            is_active,
+            ip_address,
+            location,
+            user,
+          },
+          "addDevice"
+        );
+        io.to(user).emit("addDevice", {
+          id,
+          user_id,
+          device_type,
+          browser_name,
+          browser_version,
+          os,
+          user_agent,
+          added_at,
+          is_active,
+          ip_address,
+          location,
+          user,
+        });
+      }
+    );
 
-    socket.on("inactiveDevice", (data) => {
-      for (const device of data.data) {
-        io.to(data.user).emit("inactiveDevice", device);
+    socket.on("inactiveDevice", ({ data, user }) => {
+      console.log(data, user, "inactiveDevice");
+      for (const device of data) {
+        io.to(user).emit("inactiveDevice", device);
       }
     });
 
