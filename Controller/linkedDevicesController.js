@@ -20,7 +20,8 @@ exports.getDevices = async (req, res) => {
 
 // add device
 exports.addDevice = async (req, res) => {
-  const { user_id, deviceInfo } = req.body;
+  const { user_id, deviceInfo, signon_audit } = req.body;
+  console.log(signon_audit);
   // console.log(deviceInfo, "deviceInfo");
   try {
     const device = await prisma.linked_devices.findFirst({
@@ -45,16 +46,23 @@ exports.addDevice = async (req, res) => {
           is_active: deviceInfo.is_active,
           ip_address: deviceInfo.ip_address,
           location: deviceInfo.location,
+          signon_audit: [signon_audit],
         },
       });
       return res.status(201).json(result);
     }
 
-    const result = await prisma.linked_devices.update({
+    const deviceToUpdate = await prisma.linked_devices.findUnique({
       where: {
         id: device.id,
         user_id: Number(user_id),
         ip_address: deviceInfo.ip_address,
+      },
+    });
+
+    const result = await prisma.linked_devices.update({
+      where: {
+        id: deviceToUpdate.id,
       },
       data: {
         user_id: Number(user_id),
@@ -66,8 +74,10 @@ exports.addDevice = async (req, res) => {
         is_active: deviceInfo.is_active,
         ip_address: deviceInfo.ip_address,
         location: deviceInfo.location,
+        signon_audit: [...deviceToUpdate.signon_audit, signon_audit],
       },
     });
+
     // console.log(result, "result");
     return res.status(200).json(result);
   } catch (error) {
@@ -80,33 +90,49 @@ exports.addDevice = async (req, res) => {
 // inactivate device
 exports.inactiveDevice = async (req, res) => {
   const { user_id, id } = req.params;
-  const { is_active } = req.body;
+  const { is_active, signon_id } = req.body;
 
   try {
-    // first check if device exists
+    // Find the existing device
     const device = await prisma.linked_devices.findFirst({
       where: {
         id: Number(id),
         user_id: Number(user_id),
       },
     });
-    if (device) {
-      const result = await prisma.linked_devices.update({
-        where: {
-          id: Number(id),
-          user_id: Number(user_id),
-        },
-        data: {
-          is_active,
-        },
-      });
-      return res.status(200).json(result);
+
+    if (!device) {
+      return res.status(404).json({ message: "Device not found" });
     }
-    return res.status(200).json({ message: "Device not found" });
+
+    // Update the signon_audit entry
+    const updatedAudit = device.signon_audit.map((audit) => {
+      if (audit.signon_id === signon_id) {
+        return {
+          ...audit,
+          logout: new Date(), // update logout
+        };
+      }
+      return audit;
+    });
+
+    // Update device in DB
+    const result = await prisma.linked_devices.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        is_active,
+        signon_audit: updatedAudit,
+      },
+    });
+
+    return res.status(200).json(result);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "Something went wrong deleting device" });
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went wrong updating the device",
+    });
   }
 };
 
@@ -142,5 +168,22 @@ exports.logoutFromDevices = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Something went wrong deleting device" });
+  }
+};
+
+exports.getUniqueDevice = async (req, res) => {
+  const { deviceId } = req.params;
+
+  try {
+    const device = await prisma.linked_devices.findUnique({
+      where: {
+        id: deviceId,
+      },
+    });
+    if (device) {
+      return res.status(200).json(device);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
