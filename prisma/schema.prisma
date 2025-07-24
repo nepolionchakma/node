@@ -153,28 +153,6 @@ model messages {
   @@schema("apps")
 }
 
-model controls {
-  control_id            Int     @id
-  control_name          String?
-  description           String?
-  pending_results_count Int?
-  control_type          String?
-  priority              Int?
-  datasources           String?
-  control_last_run      String?
-  control_last_updated  String?
-  status                String?
-  state                 String?
-  result_investigator   String?
-  authorized_data       String?
-  revision              Int?
-  revision_date         String?
-  created_by            String?
-  created_date          String?
-
-  @@schema("apps")
-}
-
 model access_entitlement_elements {
   entitlement_id             Int
   access_point_id            Int
@@ -201,6 +179,7 @@ model linked_devices {
   is_active       Int?
   ip_address      String?
   location        String?
+  signon_audit    Json?
 
   @@schema("apps")
 }
@@ -262,9 +241,9 @@ model def_access_entitlements {
   effective_date              DateTime                      @db.Date
   revision                    Int?
   revision_date               DateTime?                     @db.Date
-  created_by                  String?                       @db.VarChar(50)
+  created_by                  Int?
   created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_by             Int?
   last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
   access_entitlement_elements access_entitlement_elements[]
 
@@ -293,18 +272,20 @@ model def_access_model_logics {
 }
 
 model def_access_models {
-  def_access_model_id Int     @id(map: "manage_access_models_pkey") @default(autoincrement())
+  def_access_model_id Int               @id(map: "manage_access_models_pkey") @default(autoincrement())
   model_name          String?
   description         String?
   type                String?
   run_status          String?
   state               String?
-  last_run_date       String?
-  created_by          String?
-  last_updated_by     String?
-  last_updated_date   String?
+  last_run_date       DateTime?         @db.Timestamptz(6)
+  created_by          Int?
+  last_updated_by     Int?
+  last_updated_date   DateTime?         @db.Timestamptz(6)
   revision            Int?
-  revision_date       String?
+  revision_date       DateTime?         @db.Timestamptz(6)
+  datasource_name     String?           @db.VarChar(50)
+  def_data_sources    def_data_sources? @relation(fields: [datasource_name], references: [datasource_name], onDelete: NoAction, onUpdate: NoAction, map: "datasource_name")
 
   @@schema("apps")
 }
@@ -319,9 +300,9 @@ model def_access_point_elements {
   access_control              String?                       @db.VarChar(10)
   change_control              String?                       @db.VarChar(10)
   audit                       String?                       @db.VarChar(50)
-  created_by                  String?                       @db.VarChar(50)
+  created_by                  Int?
   created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             String?                       @db.VarChar(50)
+  last_updated_by             Int?
   last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
   access_entitlement_elements access_entitlement_elements[]
 
@@ -329,20 +310,21 @@ model def_access_point_elements {
 }
 
 model def_data_sources {
-  def_data_source_id                      Int       @id(map: "data_sources_pkey") @default(autoincrement())
-  datasource_name                         String?   @db.VarChar(50)
-  description                             String?   @db.VarChar(250)
-  application_type                        String?   @db.VarChar(50)
-  application_type_version                String?   @db.VarChar(50)
-  last_access_synchronization_date        DateTime? @db.Timestamp(6)
-  last_access_synchronization_status      String?   @db.VarChar(50)
-  last_transaction_synchronization_date   DateTime? @db.Timestamp(6)
-  last_transaction_synchronization_status String?   @db.VarChar(50)
-  default_datasource                      String?   @db.VarChar(50)
-  created_by                              String?   @db.VarChar(50)
-  created_on                              DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by                         String?   @db.VarChar(50)
-  last_updated_on                         DateTime? @default(now()) @db.Timestamp(6)
+  def_data_source_id                      Int                 @id(map: "data_sources_pkey") @default(autoincrement())
+  datasource_name                         String?             @unique(map: "unique_datasource_name") @db.VarChar(50)
+  description                             String?             @db.VarChar(250)
+  application_type                        String?             @db.VarChar(50)
+  application_type_version                String?             @db.VarChar(50)
+  last_access_synchronization_date        DateTime?           @db.Timestamp(6)
+  last_access_synchronization_status      String?             @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime?           @db.Timestamp(6)
+  last_transaction_synchronization_status String?             @db.VarChar(50)
+  default_datasource                      String?             @db.VarChar(50)
+  created_by                              Int?
+  created_on                              DateTime?           @default(now()) @db.Timestamp(6)
+  last_updated_by                         Int?
+  last_updated_on                         DateTime?           @default(now()) @db.Timestamp(6)
+  def_access_models                       def_access_models[]
 
   @@schema("apps")
 }
@@ -375,6 +357,36 @@ model def_global_conditions {
   status                  String?
 
   @@schema("apps")
+}
+
+model def_controls {
+  def_control_id        Int     @id(map: "controls_pkey") @default(autoincrement())
+  control_name          String?
+  description           String?
+  pending_results_count Int?
+  control_type          String?
+  priority              Int?
+  datasources           String?
+  last_run_date         String?
+  last_updated_date     String?
+  status                String?
+  state                 String?
+  result_investigator   String?
+  authorized_data       String?
+  revision              Int?
+  revision_date         String?
+  created_by            Int?
+  created_date          String?
+
+  @@schema("apps")
+}
+
+model users {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(50)
+  email    String @db.VarChar(100)
+
+  @@schema("test")
 }
 
 model def_users_v {
