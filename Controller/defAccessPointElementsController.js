@@ -49,7 +49,7 @@ exports.filterAccessPointsById = async (req, res) => {
         dataSource,
       };
     });
-    // console.log(combainedData, "combainedData");
+
     res.status(200).json(combainedData);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -140,7 +140,7 @@ exports.getUniqueDefAccessPointElement = async (req, res) => {
 exports.createDefAccessPointElement = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const result = await axios.post(
       `${FLASK_ENDPOINT_URL}/def_access_point_elements`,
       data,
@@ -231,7 +231,7 @@ exports.deleteDefAccessPointElement = async (req, res) => {
 //         dataSource,
 //       };
 //     });
-//     // console.log(combainedData, "combainedData");
+
 //     res.status(200).json(combainedData);
 //   } catch (error) {
 //     return res.status(500).json({ error: error.message });
@@ -268,7 +268,7 @@ exports.filterAccessPointsByIdDelete = async (req, res) => {
         dataSource,
       };
     });
-    // console.log(combainedData, "combainedData");
+
     res.status(200).json(combainedData);
   } catch (error) {
     return res.status(500).json({ error: error.message });

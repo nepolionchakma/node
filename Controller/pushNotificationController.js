@@ -13,7 +13,6 @@ admin.initializeApp({
 
 //To store the tokens
 const userTokens = {};
-console.log(userTokens);
 
 // Register device tokens with usernames
 exports.registerToken = (req, res) => {
@@ -29,7 +28,6 @@ exports.registerToken = (req, res) => {
   }
   userTokens[username].add(token);
 
-  console.log(`Registered token: ${token} for user: ${username}`);
   res.send("Token registered successfully");
 };
 
@@ -44,7 +42,6 @@ exports.unregisterToken = (req, res) => {
   // Check if the user and token exist
   if (userTokens[username] && userTokens[username].has(token)) {
     userTokens[username].delete(token);
-    console.log(`Unregistered token: ${token} for user: ${username}`);
 
     // If no more tokens are registered for the user, clean up the entry
     if (userTokens[username].size === 0) {

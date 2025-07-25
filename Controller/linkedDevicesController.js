@@ -21,8 +21,7 @@ exports.getDevices = async (req, res) => {
 // add device
 exports.addDevice = async (req, res) => {
   const { user_id, deviceInfo, signon_audit } = req.body;
-  console.log(signon_audit);
-  // console.log(deviceInfo, "deviceInfo");
+
   try {
     const device = await prisma.linked_devices.findFirst({
       where: {
@@ -33,7 +32,7 @@ exports.addDevice = async (req, res) => {
         ip_address: deviceInfo.ip_address,
       },
     });
-    // console.log(device, "device");
+
     if (!device) {
       const result = await prisma.linked_devices.create({
         data: {
@@ -78,7 +77,6 @@ exports.addDevice = async (req, res) => {
       },
     });
 
-    // console.log(result, "result");
     return res.status(200).json(result);
   } catch (error) {
     return res

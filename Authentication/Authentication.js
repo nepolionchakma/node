@@ -75,7 +75,7 @@ exports.login = async (req, res) => {
       if (!passwordResult) {
         return res.status(401).json({ message: "Invalid password." });
       }
-      console.log({ passwordResult });
+
       // const encryptedPassword = hashPassword(password);
       if (userCredential && passwordResult) {
         // if (userCredential && userCredential.password === encryptedPassword) {
@@ -230,7 +230,7 @@ exports.refreshToken = async (req, res) => {
 
 //   try {
 //     const decoded = jwtDecode(token);
-//     console.log("Decoded Token:", decoded);
+
 //   } catch (error) {
 //     console.error("Invalid token:", error);
 //   }
@@ -238,7 +238,6 @@ exports.refreshToken = async (req, res) => {
 
 exports.verifyToken = async (req, res) => {
   const { token } = req.body;
-  console.log(token);
 
   try {
     const decoded = jwt.decode(token);

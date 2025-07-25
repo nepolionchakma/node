@@ -13,7 +13,6 @@ const pageLimitData = (page, limit) => {
   return { startNumber, endNumber };
 };
 exports.getDefEnterprise = async (req, res) => {
-  console.log(req.cookies.access_token);
   try {
     const result = await axios.get(`${FLASK_ENDPOINT_URL}/get_enterprises`, {
       headers: {
@@ -29,7 +28,6 @@ exports.getDefEnterprise = async (req, res) => {
 exports.uniqueDefEnterprise = async (req, res) => {
   const tenant_id = Number(req.params.tenant_id);
 
-  console.log(tenant_id, "result.data");
   try {
     const response = await axios.get(
       `${FLASK_ENDPOINT_URL}/get_enterprise/${tenant_id}`
@@ -75,7 +73,7 @@ exports.searchLazyLoadingDefEnterprise = async (req, res) => {
         },
       }
     );
-    console.log(response);
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -97,7 +95,7 @@ exports.createDefEnterprise = async (req, res) => {
       return res.status(404).json({ message: "Tenancy not found." });
     }
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -107,14 +105,14 @@ exports.deleteDefEnterprise = async (req, res) => {
     const response = await axios.delete(
       `${FLASK_ENDPOINT_URL}/delete_enterprise/${tenant_id}`
     );
-    console.log(response.data, response.status, "response.data");
+
     if (response.status === 200) {
       return res.status(200).json({ message: "Deleted Successfully." });
     } else {
       return res.status(404).json({ message: "Enterprise not found." });
     }
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -133,6 +131,6 @@ exports.deleteDefEnterprise = async (req, res) => {
 //       return res.status(404).json({ message: "Enterprise not found." });
 //     }
 //   } catch (error) {
-//     console.log(error);
+
 //   }
 // };
