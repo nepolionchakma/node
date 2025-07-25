@@ -1,7 +1,7 @@
 const { Redis } = require("ioredis");
 
 let users = {};
-console.log(users);
+
 const url = process.env.VALKEY_HOST;
 
 const pub = new Redis(url);
@@ -122,7 +122,6 @@ const socket = (io) => {
     });
 
     socket.on("restoreMessage", ({ id, user }) => {
-      console.log(id, user, "restoreMessage");
       io.to(user).emit("restoreMessage", id);
     });
 
@@ -148,24 +147,8 @@ const socket = (io) => {
         ip_address,
         location,
         user,
+        signon_audit,
       }) => {
-        console.log(
-          {
-            id,
-            user_id,
-            device_type,
-            browser_name,
-            browser_version,
-            os,
-            user_agent,
-            added_at,
-            is_active,
-            ip_address,
-            location,
-            user,
-          },
-          "addDevice"
-        );
         io.to(user).emit("addDevice", {
           id,
           user_id,
@@ -179,12 +162,12 @@ const socket = (io) => {
           ip_address,
           location,
           user,
+          signon_audit,
         });
       }
     );
 
     socket.on("inactiveDevice", ({ data, user }) => {
-      console.log(data, user, "inactiveDevice");
       if (Array.isArray(data)) {
         for (const device of data) {
           io.to(user).emit("inactiveDevice", device);

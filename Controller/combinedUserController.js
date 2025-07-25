@@ -34,7 +34,7 @@ const hashPassword = (password) => {
 exports.createCombinedUser = async (req, res) => {
   try {
     const combinedUserData = req.body;
-    console.log(combinedUserData, "combinedUserData");
+
     const currentTime = new Date();
     const profile_picture = {
       original: "uploads/profiles/default/profile.jpg",
@@ -78,7 +78,7 @@ exports.createCombinedUser = async (req, res) => {
       //     password: await hashPassword(combinedUserData.password),
       //   }
       // );
-      // console.log(result, result2, result3, "result");
+
       const [user, person, credentials] = await Promise.all([
         prisma.def_users.create({
           data: {
@@ -110,7 +110,7 @@ exports.createCombinedUser = async (req, res) => {
           },
         }),
       ]);
-      console.log(user, person, credentials, "user, person, credentials");
+
       // const result = await prisma.def_users.create({
       //   data: {
       //     user_id: maxID,
@@ -142,7 +142,6 @@ exports.createCombinedUser = async (req, res) => {
       //     password: await hashPassword(combinedUserData.password),
       //   },
       // });
-      // console.log(result, result2, result3, "result");
     }
 
     if (combinedUserData.user_type !== "person") {
@@ -185,7 +184,6 @@ exports.createCombinedUser = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error, "error");
     return res.status(500).json({ error: error.message });
   }
 };
@@ -236,7 +234,6 @@ exports.getUsersView = async (req, res) => {
 
     return res.status(200).json(users);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -251,7 +248,6 @@ exports.getUser = async (req, res) => {
 
     return res.status(200).json(users);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -271,7 +267,6 @@ exports.getUsersWithPageAndLimit = async (req, res) => {
 
     return res.status(200).json(users.data);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -291,7 +286,6 @@ exports.searchUsersWithPageAndLimit = async (req, res) => {
 
     return res.status(200).json(users.data);
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };

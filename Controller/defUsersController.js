@@ -31,7 +31,7 @@ exports.lazyLoadingDefUsers = async (req, res) => {
         },
       }
     );
-    console.log(response);
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -53,7 +53,7 @@ exports.searchLazyLoadingDefUsers = async (req, res) => {
         },
       }
     );
-    console.log(response);
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });

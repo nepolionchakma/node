@@ -295,7 +295,7 @@ exports.upsertManageGlobalConditionLogic = async (req, res) => {
         },
       });
       upsertResults.push(result);
-      // console.log(result);
+
     }
     return res.status(200).json(upsertResults);
   } catch (error) {
