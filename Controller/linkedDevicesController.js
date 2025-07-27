@@ -46,6 +46,7 @@ exports.addDevice = async (req, res) => {
           ip_address: deviceInfo.ip_address,
           location: deviceInfo.location,
           signon_audit: [signon_audit],
+          signon_id: signon_audit.signon_id,
         },
       });
       return res.status(201).json(result);
@@ -74,6 +75,7 @@ exports.addDevice = async (req, res) => {
         ip_address: deviceInfo.ip_address,
         location: deviceInfo.location,
         signon_audit: [...deviceToUpdate.signon_audit, signon_audit],
+        signon_id: signon_audit.signon_id,
       },
     });
 
@@ -88,11 +90,11 @@ exports.addDevice = async (req, res) => {
 // inactivate device
 exports.inactiveDevice = async (req, res) => {
   const { user_id, id } = req.params;
-  const { is_active, signon_id } = req.body;
+  const { is_active } = req.body;
 
   try {
     // Find the existing device
-    const device = await prisma.linked_devices.findFirst({
+    const device = await prisma.linked_devices.findUnique({
       where: {
         id: Number(id),
         user_id: Number(user_id),
@@ -105,7 +107,7 @@ exports.inactiveDevice = async (req, res) => {
 
     // Update the signon_audit entry
     const updatedAudit = device.signon_audit.map((audit) => {
-      if (audit.signon_id === signon_id) {
+      if (audit.signon_id === device.signon_id) {
         return {
           ...audit,
           logout: new Date(), // update logout
@@ -124,7 +126,7 @@ exports.inactiveDevice = async (req, res) => {
         signon_audit: updatedAudit,
       },
     });
-
+    console.log(result);
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -140,32 +142,52 @@ exports.logoutFromDevices = async (req, res) => {
   const { is_active } = req.body;
 
   try {
+    const logoutTime = new Date();
+
     const devices = await prisma.linked_devices.findMany({
       where: {
         user_id: Number(user_id),
       },
     });
 
-    if (devices.length > 0) {
-      const result = await prisma.linked_devices.updateMany({
-        where: {
-          user_id: Number(user_id),
-        },
-        data: {
-          is_active,
-        },
-      });
-      if (result.count > 0) {
-        return res
-          .status(200)
-          .json({ message: "Sign out from all devices successfully" });
-      }
+    if (devices.length === 0) {
+      return res.status(200).json({ message: "Device not found" });
     }
-    return res.status(200).json({ message: "Device not found" });
+
+    const updatedDevices = await Promise.all(
+      devices.map(async (device) => {
+        if (!device.signon_audit || !Array.isArray(device.signon_audit)) return;
+
+        // Update only the matching audit object
+        const updatedAudit = device.signon_audit.map((entry) => {
+          if (entry.signon_id === device.signon_id) {
+            return {
+              ...entry,
+              logout: logoutTime,
+            };
+          }
+          return entry;
+        });
+
+        return prisma.linked_devices.update({
+          where: { id: device.id },
+          data: {
+            is_active: is_active,
+            signon_audit: updatedAudit,
+          },
+        });
+      })
+    );
+
+    return res.status(200).json({
+      message: "Sign out from all devices successfully",
+      updatedCount: updatedDevices.filter(Boolean).length,
+    });
   } catch (error) {
+    console.error("Logout error:", error);
     return res
       .status(500)
-      .json({ error: "Something went wrong deleting device" });
+      .json({ error: "Something went wrong signing out devices" });
   }
 };
 

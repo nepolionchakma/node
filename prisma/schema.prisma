@@ -180,6 +180,7 @@ model linked_devices {
   ip_address      String?
   location        String?
   signon_audit    Json?
+  signon_id       String?
 
   @@schema("apps")
 }
