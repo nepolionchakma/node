@@ -210,7 +210,7 @@ exports.getTaskParamsLazyLoading = async (req, res) => {
 exports.addTaskParams = async (req, res) => {
   const { task_name } = req.params;
   const data = req.body;
-  console.log(data, "data");
+
   try {
     const response = await axios.post(
       `${FLASK_ENDPOINT_URL}/Add_TaskParams/${task_name}`,
@@ -289,8 +289,7 @@ exports.showExecutionMethodsLazyLoading = async (req, res) => {
         },
       }
     );
-    // console.log(response.data, "response.data");
-    // const results = response.data.slice(startNumber, endNumber);
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -351,7 +350,7 @@ exports.updateExecutionMethod = async (req, res) => {
 };
 exports.deleteExecutionMethod = async (req, res) => {
   const { internal_execution_method } = req.params;
-  console.log(internal_execution_method, "internal_execution_method");
+
   try {
     const response = await axios.delete(
       `${FLASK_ENDPOINT_URL}/Delete_ExecutionMethod/${internal_execution_method}`,
@@ -361,7 +360,7 @@ exports.deleteExecutionMethod = async (req, res) => {
         },
       }
     );
-    console.log(response.data, "response.data");
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });

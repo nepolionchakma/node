@@ -17,7 +17,7 @@ router.post("/", combinedUserController.createCombinedUser);
 router.put(
   "/update-profile-image/:user_id",
   // (req, res, next) => {
-  //   console.log("Route reached before upload middleware.");
+
   //   next();
   // },
   upload.single("profileImage"), // The actual file upload middleware
@@ -29,7 +29,7 @@ router.put(
   //   next(); // Proceed to the next middleware
   // },
   // (req, res, next) => {
-  //   console.log("File uploaded:", req.file); // Log file here
+
   //   next(); // Proceed to the next middleware
   // },
   generateThumbnail,

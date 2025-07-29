@@ -31,7 +31,7 @@ exports.searchLazyLoadingAccessEntitilementElement = async (req, res) => {
         },
       }
     );
-    console.log(response);
+
     return res.status(200).json(response.data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -40,7 +40,6 @@ exports.searchLazyLoadingAccessEntitilementElement = async (req, res) => {
 
 // create Data
 exports.createAccessEntitlementElement = async (req, res) => {
-  console.log(req.body);
   try {
     const result = await prisma.access_entitlement_elements.create({
       data: req.body,

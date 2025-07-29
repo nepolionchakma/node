@@ -330,7 +330,7 @@ exports.updateReaders = async (req, res) => {
 
 exports.setToRecycleBin = async (req, res) => {
   const { id, user } = req.params;
-  console.log(id, user);
+
   try {
     const messagesToUpdate = await prisma.messages.findUnique({
       where: {
@@ -394,7 +394,7 @@ exports.restoreMessage = async (req, res) => {
 
 exports.removeUserFromRecycleBin = async (req, res) => {
   const { id, user } = req.params;
-  console.log(id, user);
+
   try {
     const uniqueDeleteMsg = await prisma.messages.findUnique({
       where: {
@@ -529,7 +529,7 @@ exports.getTotalRecycleBinMessages = async (req, res) => {
 exports.moveMultipleToRecycleBin = async (req, res) => {
   const { ids } = req.body;
   const { user } = req.params;
-  console.log(ids, "ids", user, "user");
+
   try {
     const messagesToUpdate = await prisma.messages.findMany({
       where: {
@@ -563,7 +563,7 @@ exports.moveMultipleToRecycleBin = async (req, res) => {
 exports.moveMultipleFromRecycleBin = async (req, res) => {
   const { ids } = req.body;
   const { user } = req.params;
-  console.log(ids, "ids", user, "user");
+
   try {
     const messagesToUpdate = await prisma.messages.findMany({
       where: {
