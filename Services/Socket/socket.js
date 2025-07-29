@@ -168,7 +168,6 @@ const socket = (io) => {
     );
 
     socket.on("inactiveDevice", ({ data, user }) => {
-      console.log(data, user, "inactiveDevice event received");
       if (Array.isArray(data)) {
         for (const device of data) {
           io.to(user).emit("inactiveDevice", device);
