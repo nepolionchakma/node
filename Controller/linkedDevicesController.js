@@ -197,7 +197,7 @@ exports.getUniqueDevice = async (req, res) => {
   try {
     const device = await prisma.linked_devices.findUnique({
       where: {
-        id: deviceId,
+        id: parseInt(deviceId),
       },
     });
     if (device) {

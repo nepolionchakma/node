@@ -1,5 +1,5 @@
 const { Redis } = require("ioredis");
-
+const prisma = require("../../DB/db.config");
 let users = {};
 
 const url = process.env.VALKEY_HOST;
@@ -22,8 +22,9 @@ const socket = (io) => {
   // Middleware
   io.use((socket, next) => {
     const key = socket.handshake.query.key;
+    const device_id = socket.handshake.query.device_id;
 
-    if (!key || key === "undefined") {
+    if (!key || key === "undefined" || !device_id || device_id === 0) {
       return;
     } else {
       socket.join(key);
@@ -37,7 +38,7 @@ const socket = (io) => {
   });
 
   // Event Handlers
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     socket.on(
       "sendMessage",
       async ({
@@ -164,6 +165,25 @@ const socket = (io) => {
           user,
           signon_audit,
         });
+
+        console.log(
+          {
+            id,
+            user_id,
+            device_type,
+            browser_name,
+            browser_version,
+            os,
+            user_agent,
+            added_at,
+            is_active,
+            ip_address,
+            location,
+            user,
+            signon_audit,
+          },
+          "addDevice"
+        );
       }
     );
 
@@ -173,6 +193,25 @@ const socket = (io) => {
         io.to(data.user).emit("inactiveDevice", device);
       }
     });
+
+    // manage offline devices
+
+    const device_id = socket.handshake.query.device_id;
+    const user = socket.handshake.query.key;
+    try {
+      if (!device_id || device_id === 0) return;
+      const device = await prisma.linked_devices.findUnique({
+        where: {
+          id: parseInt(device_id),
+        },
+      });
+
+      if (device.is_active === 0) {
+        io.to(user).emit("inactiveDevice", device);
+      }
+    } catch (error) {
+      console.log("Error finding device", device_id);
+    }
 
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.id);
