@@ -24,7 +24,13 @@ const socket = (io) => {
     const key = socket.handshake.query.key;
     const device_id = socket.handshake.query.device_id;
 
-    if (!key || key === "undefined" || !device_id || device_id === 0) {
+    if (
+      !key ||
+      key === "undefined" ||
+      !device_id ||
+      device_id === 0 ||
+      device_id === "0"
+    ) {
       return;
     } else {
       socket.join(key);
