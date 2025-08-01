@@ -165,30 +165,10 @@ const socket = (io) => {
           user,
           signon_audit,
         });
-
-        console.log(
-          {
-            id,
-            user_id,
-            device_type,
-            browser_name,
-            browser_version,
-            os,
-            user_agent,
-            added_at,
-            is_active,
-            ip_address,
-            location,
-            user,
-            signon_audit,
-          },
-          "addDevice"
-        );
       }
     );
 
     socket.on("inactiveDevice", (data) => {
-      console.log(data, "inactiveDevice");
       for (const device of data.data) {
         io.to(data.user).emit("inactiveDevice", device);
       }
@@ -199,6 +179,7 @@ const socket = (io) => {
     const device_id = socket.handshake.query.device_id;
     const user = socket.handshake.query.key;
     try {
+      console.log(device_id, "found device_id");
       if (!device_id || device_id === 0) return;
       const device = await prisma.linked_devices.findUnique({
         where: {
