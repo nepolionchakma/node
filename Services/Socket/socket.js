@@ -173,14 +173,20 @@ const socket = (io) => {
         io.to(data.user).emit("inactiveDevice", device);
       }
     });
-
+    socket.on("disconnect", () => {
+      console.log("user disconnected", socket.id);
+      for (const key in users) {
+        users[key] = users[key].filter((id) => id !== socket.id);
+        if (users[key].length === 0) {
+          delete users[key];
+        }
+      }
+    });
     // manage offline devices
-
     const device_id = socket.handshake.query.device_id;
     const user = socket.handshake.query.key;
     try {
-      console.log(device_id, "found device_id");
-      if (!device_id || device_id === 0) return;
+      if (!device_id || device_id === 0 || device_id === "0") return;
       const device = await prisma.linked_devices.findUnique({
         where: {
           id: parseInt(device_id),
@@ -193,16 +199,6 @@ const socket = (io) => {
     } catch (error) {
       console.log("Error finding device", device_id);
     }
-
-    socket.on("disconnect", () => {
-      console.log("user disconnected", socket.id);
-      for (const key in users) {
-        users[key] = users[key].filter((id) => id !== socket.id);
-        if (users[key].length === 0) {
-          delete users[key];
-        }
-      }
-    });
   });
 };
 module.exports = socket;
