@@ -126,7 +126,7 @@ exports.inactiveDevice = async (req, res) => {
         signon_audit: updatedAudit,
       },
     });
-    console.log(result);
+
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -197,7 +197,7 @@ exports.getUniqueDevice = async (req, res) => {
   try {
     const device = await prisma.linked_devices.findUnique({
       where: {
-        id: deviceId,
+        id: parseInt(deviceId),
       },
     });
     if (device) {
