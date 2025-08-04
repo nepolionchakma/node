@@ -189,13 +189,13 @@ const socket = (io) => {
       }
     });
     // manage offline devices
-    const device_id = socket.handshake.query.device_id;
+    const device_id = Number(socket.handshake.query.device_id);
     const user = socket.handshake.query.key;
     try {
-      if (!device_id || device_id === 0 || device_id === "0") return;
+      if (!device_id || device_id === 0) return;
       const device = await prisma.linked_devices.findUnique({
         where: {
-          id: parseInt(device_id),
+          id: device_id,
         },
       });
 
