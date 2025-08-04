@@ -11,5 +11,9 @@ router.put(
   linkedDevicesController.inactiveDevice
 );
 router.put("/:user_id", linkedDevicesController.logoutFromDevices);
+router.put(
+  "/update-device-location/:deviceId",
+  linkedDevicesController.updateDeviceLocation
+);
 
 module.exports = router;

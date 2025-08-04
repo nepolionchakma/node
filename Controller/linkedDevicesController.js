@@ -22,6 +22,8 @@ exports.getDevices = async (req, res) => {
 exports.addDevice = async (req, res) => {
   const { user_id, deviceInfo, signon_audit } = req.body;
 
+  console.log(user_id, deviceInfo, signon_audit, "Device Info");
+
   try {
     const device = await prisma.linked_devices.findFirst({
       where: {
@@ -72,6 +74,8 @@ exports.addDevice = async (req, res) => {
         signon_id: signon_audit.signon_id,
       },
     });
+
+    console.log(result, "Device updated successfully");
 
     return res.status(200).json(result);
   } catch (error) {
@@ -199,5 +203,24 @@ exports.getUniqueDevice = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateDeviceLocation = async (req, res) => {
+  const { deviceId } = req.params;
+  const { location } = req.body;
+
+  try {
+    const result = await prisma.linked_devices.update({
+      where: {
+        id: parseInt(deviceId),
+      },
+      data: {
+        location: location,
+      },
+    });
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to update device location" });
   }
 };
