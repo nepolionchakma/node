@@ -52,17 +52,9 @@ exports.addDevice = async (req, res) => {
       return res.status(201).json(result);
     }
 
-    const deviceToUpdate = await prisma.linked_devices.findUnique({
-      where: {
-        id: device.id,
-        user_id: Number(user_id),
-        ip_address: deviceInfo.ip_address,
-      },
-    });
-
     const result = await prisma.linked_devices.update({
       where: {
-        id: deviceToUpdate.id,
+        id: device.id,
       },
       data: {
         user_id: Number(user_id),
@@ -74,7 +66,9 @@ exports.addDevice = async (req, res) => {
         is_active: deviceInfo.is_active,
         ip_address: deviceInfo.ip_address,
         location: deviceInfo.location,
-        signon_audit: [...deviceToUpdate.signon_audit, signon_audit],
+        signon_audit: Array.isArray(device.signon_audit)
+          ? [...device.signon_audit, signon_audit] // Append the new object
+          : [signon_audit], // If not an array, create a new array with the new object
         signon_id: signon_audit.signon_id,
       },
     });
