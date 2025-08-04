@@ -75,8 +75,6 @@ exports.addDevice = async (req, res) => {
       },
     });
 
-    console.log(result, "Device updated successfully");
-
     return res.status(200).json(result);
   } catch (error) {
     return res
