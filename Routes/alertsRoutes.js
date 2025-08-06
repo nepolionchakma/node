@@ -6,5 +6,5 @@ router.post("/", alertsController.createAlert);
 router.get("/", alertsController.alerts);
 router.get("/:alert_id", alertsController.getUniqueAlert);
 router.put("/:alert_id", alertsController.updateAlert);
-
+router.delete("/:alert_id", alertsController.removeAlert);
 module.exports = router;
