@@ -422,7 +422,6 @@ model def_alerts {
 model def_notifications {
   notification_id                                                      String             @id(map: "notification_pk")
   notification_type                                                    String
-  sender                                                               Json?
   recipients                                                           Json?
   subject                                                              String?
   notification_body                                                    String?
@@ -435,6 +434,7 @@ model def_notifications {
   recycle_bin                                                          Json?
   action_item_id                                                       Int?
   alert_id                                                             Int?
+  sender                                                               Int?
   def_action_items_def_action_items_notification_idTodef_notifications def_action_items[] @relation("def_action_items_notification_idTodef_notifications")
   def_action_items_def_notifications_action_item_idTodef_action_items  def_action_items?  @relation("def_notifications_action_item_idTodef_action_items", fields: [action_item_id], references: [action_item_id], onDelete: NoAction, onUpdate: NoAction, map: "action_item_id_fk")
   def_alerts                                                           def_alerts?        @relation(fields: [alert_id], references: [alert_id], onDelete: NoAction, onUpdate: NoAction, map: "alert_id_fk")

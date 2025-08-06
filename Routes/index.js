@@ -11,6 +11,7 @@ const defTenantsRoutes = require("../Routes/defTenantsRoutes");
 const defUserCredentialsRoutes = require("../Routes/defUserCredentialsRoutes");
 const authentication = require("../Routes/authenticationRoutes");
 const messagesRoutes = require("../Routes/messagesRoutes");
+const notificationsRoutes = require("../Routes/notificationRoutes");
 const defDataSourcesRoutes = require("./defDataSourcesRoutes");
 const defAccessEntitlementsRoutes = require("./defAccessEntitlementsRoutes");
 const accessEntitlementElementsRoutes = require("../Routes/accessEntitlementElementsRoutes");
@@ -51,6 +52,7 @@ routes.use("/access-profiles", accessProfileRoutes);
 routes.use("/combined-user", combinedUserRoutes);
 
 routes.use("/messages", messagesRoutes);
+routes.use("/notifications", notificationsRoutes);
 routes.use("/def-data-sources", defDataSourcesRoutes);
 
 // Manage Access Entitlements
