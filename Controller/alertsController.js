@@ -79,3 +79,15 @@ exports.updateAlert = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+/** delete alert */
+exports.removeAlert = async (req, res) => {
+  const id = +req.params.alert_id;
+  try {
+    const alertItem = await prisma.def_alerts.delete({
+      where: {
+        alert_id: id,
+      },
+    });
+  } catch (error) {}
+};
