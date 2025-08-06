@@ -32,6 +32,7 @@ const accessProfileRoutes = require("./accessProfileRoutes");
 const mobileMenuRoutes = require("./mobileMenuRoutes");
 const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
+const alertsRoutes = require("./alertsRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -97,5 +98,8 @@ routes.use("/def-tenant-enterprise-setup", defTenantEnterpriseSetupRoutes);
 
 //Test
 routes.use("/test", testRoutes);
+
+// alerts
+routes.use("/alerts", alertsRoutes);
 
 module.exports = routes;
