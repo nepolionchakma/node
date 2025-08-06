@@ -390,6 +390,70 @@ model users {
   @@schema("test")
 }
 
+model def_action_items {
+  action_item_id                                                        Int                 @id @default(autoincrement())
+  action_item_name                                                      String              @db.VarChar(150)
+  description                                                           String?
+  status                                                                String?             @db.VarChar(50)
+  created_by                                                            Int
+  creation_date                                                         DateTime?           @default(now()) @db.Timestamptz(6)
+  last_updated_by                                                       Int?
+  last_update_date                                                      DateTime?           @default(now()) @db.Timestamptz(6)
+  notification_id                                                       String
+  def_notifications_def_action_items_notification_idTodef_notifications def_notifications   @relation("def_action_items_notification_idTodef_notifications", fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
+  def_notifications_def_notifications_action_item_idTodef_action_items  def_notifications[] @relation("def_notifications_action_item_idTodef_action_items")
+
+  @@schema("apps")
+}
+
+model def_alerts {
+  alert_id          Int                 @id @default(autoincrement())
+  alert_name        String              @db.VarChar(100)
+  description       String?
+  created_by        Int
+  creation_date     DateTime?           @default(now()) @db.Timestamptz(6)
+  last_updated_by   Int?
+  last_update_date  DateTime?           @default(now()) @db.Timestamptz(6)
+  def_notifications def_notifications[]
+
+  @@schema("apps")
+}
+
+model def_notifications {
+  notification_id                                                      String             @id(map: "notification_pk")
+  notification_type                                                    String
+  sender                                                               Json?
+  recipients                                                           Json?
+  subject                                                              String?
+  notification_body                                                    String?
+  creation_date                                                        DateTime?          @default(now()) @db.Timestamp(6)
+  status                                                               String?
+  parent_notification_id                                               String?
+  involved_users                                                       Json?
+  readers                                                              Json?
+  holders                                                              Json?
+  recycle_bin                                                          Json?
+  action_item_id                                                       Int?
+  alert_id                                                             Int?
+  def_action_items_def_action_items_notification_idTodef_notifications def_action_items[] @relation("def_action_items_notification_idTodef_notifications")
+  def_action_items_def_notifications_action_item_idTodef_action_items  def_action_items?  @relation("def_notifications_action_item_idTodef_action_items", fields: [action_item_id], references: [action_item_id], onDelete: NoAction, onUpdate: NoAction, map: "action_item_id_fk")
+  def_alerts                                                           def_alerts?        @relation(fields: [alert_id], references: [alert_id], onDelete: NoAction, onUpdate: NoAction, map: "alert_id_fk")
+
+  @@schema("apps")
+}
+
+model def_recepients {
+  alert_id         Int
+  user_id          Int
+  created_by       Int
+  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@id([alert_id, user_id])
+  @@schema("apps")
+}
+
 model def_users_v {
   user_id         Int     @id
   user_name       String?
