@@ -25,9 +25,9 @@ exports.createAlert = async (req, res) => {
     await prisma.def_alert_recepients.create({
       data: {
         alert_id: result.alert_id,
-        user_id: result.created_by,
+        user_id: result.user_id,
         created_by: result.created_by,
-        last_updated_by: result.created_by,
+        last_updated_by: result.last_updated_by,
       },
     });
     if (result) {
@@ -69,6 +69,7 @@ exports.getAlertsFromView = async (req, res) => {
 };
 /** get alerts from view pagination*/
 exports.getAlertsFromViewPagination = async (req, res) => {
+  const user_id = Number(req.params.user_id);
   const page = Number(req.params.page);
   const limit = Number(req.params.limit);
   const offset = (page - 1) * limit;
@@ -76,6 +77,9 @@ exports.getAlertsFromViewPagination = async (req, res) => {
     const alerts = await prisma.def_alerts_v.findMany({
       take: limit,
       skip: offset,
+      where: {
+        user_id,
+      },
       orderBy: {
         creation_date: "desc",
       },
