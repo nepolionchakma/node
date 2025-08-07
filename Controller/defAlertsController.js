@@ -3,14 +3,31 @@ const prisma = require("../DB/db.config");
 /** create alerts */
 exports.createAlert = async (req, res) => {
   try {
-    const alertData = req.body;
-    const { alert_name, description, created_by, last_updated_by } = alertData;
+    const {
+      alert_name,
+      description,
+      readers,
+      notification_id,
+      created_by,
+      last_updated_by,
+    } = req.body;
     const result = await prisma.def_alerts.create({
       data: {
         alert_name,
         description,
+        readers,
+        notification_id,
         created_by,
         last_updated_by,
+      },
+    });
+    // add recepients
+    await prisma.def_alert_recepients.create({
+      data: {
+        alert_id: result.alert_id,
+        user_id: result.created_by,
+        created_by: result.created_by,
+        last_updated_by: result.created_by,
       },
     });
     if (result) {
@@ -36,11 +53,63 @@ exports.alerts = async (req, res) => {
   }
 };
 
+/** get alerts from view */
+exports.getAlertsFromView = async (req, res) => {
+  try {
+    const alerts = await prisma.def_alerts_v.findMany({
+      orderBy: {
+        creation_date: "desc",
+      },
+    });
+
+    return res.status(200).json(alerts);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+/** get alerts from view pagination*/
+exports.getAlertsFromViewPagination = async (req, res) => {
+  const page = Number(req.params.page);
+  const limit = Number(req.params.limit);
+  const offset = (page - 1) * limit;
+  try {
+    const alerts = await prisma.def_alerts_v.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        creation_date: "desc",
+      },
+    });
+
+    return res.status(200).json(alerts);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 /** get Unique alert */
 exports.getUniqueAlert = async (req, res) => {
   try {
-    const id = +req.params.alert_id;
+    const id = req.params.alert_id;
     const result = await prisma.def_alerts.findUnique({
+      where: {
+        alert_id: id,
+      },
+    });
+    if (result) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(404).json({ message: "Alert not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+/** get Unique alert from view */
+exports.getUniqueAlertFromView = async (req, res) => {
+  try {
+    const id = req.params.alert_id;
+    const result = await prisma.def_alerts_v.findUnique({
       where: {
         alert_id: id,
       },
@@ -60,7 +129,13 @@ exports.updateAlert = async (req, res) => {
   try {
     const id = +req.params.alert_id;
     const alertData = req.body;
-    const { alert_name, description, last_updated_by } = alertData;
+    const {
+      alert_name,
+      description,
+      readers,
+      notification_id,
+      last_updated_by,
+    } = alertData;
     const result = await prisma.def_alerts.update({
       where: {
         alert_id: id,
@@ -68,6 +143,8 @@ exports.updateAlert = async (req, res) => {
       data: {
         alert_name,
         description,
+        readers,
+        notification_id,
         last_updated_by,
         last_update_date: new Date(),
       },

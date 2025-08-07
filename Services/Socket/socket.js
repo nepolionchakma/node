@@ -174,11 +174,14 @@ const socket = (io) => {
       }
     );
 
-    socket.on("inactiveDevice", (data) => {
-      for (const device of data.data) {
-        io.to(data.user).emit("inactiveDevice", device);
+    socket.on("inactiveDevice", ({ data, user }) => {
+      // data= [id,user_id,device_type,browser_name,browser_version,os,user_agent,added_at,is_active,ip_address,location,signon_audit,signon_id]
+
+      for (const device of data) {
+        io.to(user).emit("inactiveDevice", device);
       }
     });
+
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.id);
       for (const key in users) {

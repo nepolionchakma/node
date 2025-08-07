@@ -5,7 +5,7 @@ exports.createRecepients = async (req, res) => {
   try {
     const data = req.body;
     const { alert_id, user_id, created_by, last_updated_by } = data;
-    const result = await prisma.def_recepients.create({
+    const result = await prisma.def_alert_recepients.create({
       data: {
         alert_id,
         user_id,
@@ -24,7 +24,7 @@ exports.createRecepients = async (req, res) => {
 /** get recepients */
 exports.recepients = async (req, res) => {
   try {
-    const result = await prisma.def_recepients.findMany({
+    const result = await prisma.def_alert_recepients.findMany({
       orderBy: {
         creation_date: "desc",
       },
@@ -41,7 +41,7 @@ exports.getUniqueRecepient = async (req, res) => {
   try {
     const { alert_id, user_id } = req.params;
 
-    const result = await prisma.def_recepients.findUnique({
+    const result = await prisma.def_alert_recepients.findUnique({
       where: {
         alert_id_user_id: {
           alert_id: +alert_id,
@@ -65,7 +65,7 @@ exports.updateRecepient = async (req, res) => {
     const { alert_id, user_id } = req.params;
     const data = req.body;
     const { last_updated_by } = data;
-    const result = await prisma.def_recepients.update({
+    const result = await prisma.def_alert_recepients.update({
       where: {
         alert_id_user_id: {
           alert_id: +alert_id,
@@ -89,7 +89,7 @@ exports.updateRecepient = async (req, res) => {
 exports.removeRecepient = async (req, res) => {
   const { alert_id, user_id } = req.params;
   try {
-    const result = await prisma.def_recepients.delete({
+    const result = await prisma.def_alert_recepients.delete({
       where: {
         alert_id_user_id: {
           alert_id: +alert_id,
