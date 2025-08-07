@@ -80,9 +80,9 @@ exports.getAlertsFromViewPagination = async (req, res) => {
       where: {
         user_id,
       },
-      // orderBy: {
-      //   creation_date: "desc",
-      // },
+      orderBy: {
+        creation_date: "desc",
+      },
     });
 
     return res.status(200).json(alerts);
