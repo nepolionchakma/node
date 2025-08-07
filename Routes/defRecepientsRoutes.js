@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const recepientsController = require("../Controller/recepientsController");
+const recepientsController = require("../Controller/defRecepientsController");
 
 router.post("/", recepientsController.createRecepients);
 router.get("/", recepientsController.recepients);
