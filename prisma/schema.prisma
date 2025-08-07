@@ -495,9 +495,9 @@ model def_alerts_v {
   readers            Json
   status             String
   created_by         Int
-  creation_date      String
+  creation_date      DateTime?
   last_updated_by    Int
-  last_update_date   String
+  last_update_date   DateTime?
 
   @@map("def_alerts_v")
   @@schema("apps")
@@ -512,9 +512,9 @@ model def_action_items_v {
   description        String
   status             String
   created_by         Int
-  creation_date      String
+  creation_date      DateTime?
   last_updated_by    Int
-  last_update_date   String
+  last_update_date   DateTime?
 
   @@map("def_action_items_v")
   @@schema("apps")
