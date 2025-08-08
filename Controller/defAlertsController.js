@@ -154,18 +154,15 @@ exports.getUniqueAlertFromView = async (req, res) => {
 exports.updateAlert = async (req, res) => {
   try {
     const id = Number(req.params.alert_id);
-    const {
-      alert_name,
-      description,
-      readers,
-      notification_id,
-      last_updated_by,
-    } = req.body;
+    const user_id = Number(req.params.user_id);
+    const { alert_name, description, notification_id, last_updated_by } =
+      req.body;
     const isAvailable = await prisma.def_alerts.findUnique({
       where: {
         alert_id: id,
       },
     });
+    const removedReader = isAvailable.readers.filter((id) => id !== user_id);
     const result = await prisma.def_alerts.update({
       where: {
         alert_id: id,
@@ -173,7 +170,7 @@ exports.updateAlert = async (req, res) => {
       data: {
         alert_name,
         description,
-        readers: [...isAvailable.readers, readers],
+        readers: removedReader,
         notification_id,
         last_updated_by,
         last_update_date: new Date(),
