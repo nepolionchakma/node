@@ -10,7 +10,9 @@ router.get(
   "/view/:user_id/:page/:limit",
   alertsController.getAlertsFromViewPagination
 );
+router.get("/view/total/:user_id", alertsController.getTotalAlerts);
 router.get("/:alert_id", alertsController.getUniqueAlert);
 router.put("/:alert_id", alertsController.updateAlert);
 router.delete("/:alert_id", alertsController.removeAlert);
+
 module.exports = router;

@@ -67,6 +67,28 @@ exports.getAlertsFromView = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+/**get Total alerts from view */
+exports.getTotalAlerts = async (req, res) => {
+  const id = +req.params.user_id;
+
+  try {
+    const result = await prisma.def_alerts_v.findMany({
+      where: {
+        readers: {
+          array_contains: id,
+        },
+      },
+    });
+
+    if (result) {
+      return res.status(200).json(result);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 /** get alerts from view pagination*/
 exports.getAlertsFromViewPagination = async (req, res) => {
   const user_id = Number(req.params.user_id);
@@ -94,7 +116,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
 /** get Unique alert */
 exports.getUniqueAlert = async (req, res) => {
   try {
-    const id = req.params.alert_id;
+    const id = +req.params.alert_id;
     const result = await prisma.def_alerts.findUnique({
       where: {
         alert_id: id,
