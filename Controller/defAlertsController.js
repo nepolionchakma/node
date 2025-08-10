@@ -111,7 +111,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
         creation_date: "desc",
       },
     });
-    console.log(alerts, "alerts===");
+
     const totalCount = alerts.length;
     const totalPages = Math.ceil(totalCount / limit);
     return res.status(200).json({
