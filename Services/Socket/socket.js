@@ -13,24 +13,18 @@ const socket = (io) => {
   sub.on("message", (channel, message) => {
     if (channel === "NOTIFICATION-MESSAGES") {
       const newMessage = JSON.parse(message);
-      newMessage.recivers.forEach((reciver) => {
-        io.to(reciver.name).emit("receivedMessage", newMessage);
+      newMessage.recipients.forEach((reciver) => {
+        io.to(Number(reciver)).emit("receivedMessage", newMessage);
       });
     }
   });
 
   // Middleware
   io.use((socket, next) => {
-    const key = socket.handshake.query.key;
-    const device_id = socket.handshake.query.device_id;
+    const key = Number(socket.handshake.query.key);
+    const device_id = Number(socket.handshake.query.device_id);
 
-    if (
-      !key ||
-      key === "undefined" ||
-      !device_id ||
-      device_id === 0 ||
-      device_id === "0"
-    ) {
+    if (!key || key === 0 || !device_id || device_id === 0) {
       return;
     } else {
       socket.join(key);
@@ -48,37 +42,56 @@ const socket = (io) => {
     socket.on(
       "sendMessage",
       async ({
-        id,
+        notification_id,
+        notification_type,
         sender,
-        recivers,
+        recipients,
         subject,
-        body,
-        date,
+        notification_body,
         status,
-        parentid,
-        involvedusers,
+        creation_date,
+        parent_notification_id,
+        involved_users,
         readers,
         holders,
-        recyclebin,
+        recycle_bin,
+        action_item_id,
+        alert_id,
       }) => {
+        console.log(
+          "recieving event sendMessage in server",
+          notification_id,
+          sender
+        );
         await pub.publish(
           "NOTIFICATION-MESSAGES",
-          JSON.stringify({ id, sender, subject, date, parentid, recivers })
+
+          JSON.stringify({
+            notification_id,
+            sender,
+            subject,
+            creation_date,
+            parent_notification_id,
+            recipients,
+          })
         );
 
-        io.to(sender.name).emit("sentMessage", {
-          id,
+        io.to(Number(sender)).emit("sentMessage", {
+          notification_id,
+          notification_type,
           sender,
-          recivers,
+          recipients,
           subject,
-          body,
-          date,
+          notification_body,
           status,
-          parentid,
-          involvedusers,
+          creation_date,
+          parent_notification_id,
+          involved_users,
           readers,
           holders,
-          recyclebin,
+          recycle_bin,
+          action_item_id,
+          alert_id,
         });
       }
     );
@@ -86,55 +99,61 @@ const socket = (io) => {
     socket.on(
       "sendDraft",
       ({
-        id,
+        notification_id,
+        notification_type,
         sender,
-        recivers,
+        recipients,
         subject,
-        body,
-        date,
+        notification_body,
         status,
-        parentid,
-        involvedusers,
+        creation_date,
+        parent_notification_id,
+        involved_users,
         readers,
         holders,
-        recyclebin,
+        recycle_bin,
+        action_item_id,
+        alert_id,
       }) => {
-        io.to(sender.name).emit("draftMessage", {
-          id,
+        io.to(Number(sender)).emit("draftMessage", {
+          notification_id,
+          notification_type,
           sender,
-          recivers,
+          recipients,
           subject,
-          body,
-          date,
+          notification_body,
           status,
-          parentid,
-          involvedusers,
+          creation_date,
+          parent_notification_id,
+          involved_users,
           readers,
           holders,
-          recyclebin,
+          recycle_bin,
+          action_item_id,
+          alert_id,
         });
       }
     );
 
     socket.on("draftMsgId", ({ id, user }) => {
-      io.to(user).emit("draftMessageId", id);
+      io.to(Number(user)).emit("draftMessageId", id);
     });
 
     socket.on("read", ({ id, user }) => {
-      io.to(user).emit("sync", id);
+      io.to(Number(user)).emit("sync", id);
     });
 
     socket.on("deleteMessage", ({ id, user }) => {
-      io.to(user).emit("deletedMessage", id);
+      io.to(Number(user)).emit("deletedMessage", id);
     });
 
     socket.on("restoreMessage", ({ id, user }) => {
-      io.to(user).emit("restoreMessage", id);
+      io.to(Number(user)).emit("restoreMessage", id);
     });
 
     socket.on("multipleDelete", ({ ids, user }) => {
       for (const id of ids) {
-        io.to(user).emit("deletedMessage", id);
+        io.to(Number(user)).emit("deletedMessage", id);
       }
     });
 
@@ -156,7 +175,7 @@ const socket = (io) => {
         user,
         signon_audit,
       }) => {
-        io.to(user).emit("addDevice", {
+        io.to(Number(user)).emit("addDevice", {
           id,
           user_id,
           device_type,
@@ -175,13 +194,10 @@ const socket = (io) => {
     );
 
     socket.on("inactiveDevice", ({ data, user }) => {
-      // data= [id,user_id,device_type,browser_name,browser_version,os,user_agent,added_at,is_active,ip_address,location,signon_audit,signon_id]
-
       for (const device of data) {
-        io.to(user).emit("inactiveDevice", device);
+        io.to(Number(user)).emit("inactiveDevice", device);
       }
     });
-
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.id);
       for (const key in users) {
@@ -193,7 +209,7 @@ const socket = (io) => {
     });
     // manage offline devices
     const device_id = Number(socket.handshake.query.device_id);
-    const user = socket.handshake.query.key;
+    const user = Number(socket.handshake.query.key);
     try {
       if (!device_id || device_id === 0) return;
       const device = await prisma.linked_devices.findUnique({
