@@ -22,8 +22,6 @@ exports.getDevices = async (req, res) => {
 exports.addDevice = async (req, res) => {
   const { user_id, deviceInfo, signon_audit } = req.body;
 
-  console.log(user_id, deviceInfo, signon_audit, "Device Info");
-
   try {
     const device = await prisma.linked_devices.findFirst({
       where: {

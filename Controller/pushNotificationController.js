@@ -16,58 +16,69 @@ const userTokens = {};
 
 // Register device tokens with usernames
 exports.registerToken = (req, res) => {
-  const { token, username } = req.body;
+  const { token, userId } = req.body;
+  const user = Number(userId);
 
-  if (!username || !token) {
-    return res.status(400).send("Username and token are required");
+  if (!user || !token) {
+    return res.status(400).send("User and token are required");
   }
 
   // Add the token to the user's list of tokens
-  if (!userTokens[username]) {
-    userTokens[username] = new Set();
+  if (!userTokens[user]) {
+    userTokens[user] = new Set();
   }
-  userTokens[username].add(token);
+  userTokens[user].add(token);
 
   res.send("Token registered successfully");
 };
 
 // Unregister device tokens
 exports.unregisterToken = (req, res) => {
-  const { token, username } = req.body;
+  const { token, userId } = req.body;
+  const user = Number(userId);
 
-  if (!username || !token) {
-    return res.status(400).send("Username and token are required");
+  if (!user || !token) {
+    return res.status(400).send("User and token are required");
   }
 
   // Check if the user and token exist
-  if (userTokens[username] && userTokens[username].has(token)) {
-    userTokens[username].delete(token);
+  if (userTokens[user] && userTokens[user].has(token)) {
+    userTokens[user].delete(token);
 
     // If no more tokens are registered for the user, clean up the entry
-    if (userTokens[username].size === 0) {
-      delete userTokens[username];
+    if (userTokens[user].size === 0) {
+      delete userTokens[user];
     }
 
     res.send("Token unregistered successfully");
   } else {
-    res.status(404).send("Token or username not found");
+    res.status(404).send("Token or user not found");
   }
 };
 
 //To send notification to every individual fcm token
 exports.sendNotification = async (req, res) => {
-  const { id, parentid, date, sender, recivers, subject, body } = req.body;
+  const { notificationID, parentId, date, sender, recipients, subject, body } =
+    req.body;
 
-  if (!sender || !recivers || !subject || !body || !id || !date || !parentid) {
+  if (
+    !sender ||
+    !recipients ||
+    !subject ||
+    !body ||
+    !notificationID ||
+    !date ||
+    !parentId
+  ) {
     return res
       .status(400)
-      .send("sender, recivers, subject, and body are required");
+      .send("sender, recipients, subject, and body are required");
   }
 
   let allTokens = new Set();
-  recivers.forEach((user) => {
-    if (userTokens[user.name]) {
-      userTokens[user.name].forEach((token) => allTokens.add(token));
+  recipients.forEach((user) => {
+    if (userTokens[Number(user)]) {
+      userTokens[Number(user)].forEach((token) => allTokens.add(token));
     }
   });
 
@@ -81,7 +92,7 @@ exports.sendNotification = async (req, res) => {
     try {
       await admin.messaging().send({
         notification: {
-          title: `${sender.name}: ${subject}`,
+          title: `${sender}: ${subject}`,
           body: body,
         },
         token: token,
