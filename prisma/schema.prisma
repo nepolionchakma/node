@@ -391,30 +391,31 @@ model users {
 }
 
 model def_action_items {
-  action_item_id                                                        Int                 @id @default(autoincrement())
-  action_item_name                                                      String              @db.VarChar(150)
+  action_item_id                                                        Int                @id @default(autoincrement())
+  action_item_name                                                      String             @db.VarChar(150)
   description                                                           String?
-  status                                                                String?             @db.VarChar(50)
+  status                                                                String?            @db.VarChar(50)
   created_by                                                            Int
-  creation_date                                                         DateTime?           @default(now()) @db.Timestamptz(6)
+  creation_date                                                         DateTime?          @default(now()) @db.Timestamptz(6)
   last_updated_by                                                       Int?
-  last_update_date                                                      DateTime?           @default(now()) @db.Timestamptz(6)
-  notification_id                                                       String
-  def_notifications_def_action_items_notification_idTodef_notifications def_notifications   @relation("def_action_items_notification_idTodef_notifications", fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
-  def_notifications_def_notifications_action_item_idTodef_action_items  def_notifications[] @relation("def_notifications_action_item_idTodef_action_items")
+  last_update_date                                                      DateTime?          @default(now()) @db.Timestamptz(6)
+  notification_id                                                       String?
+  def_notifications_def_action_items_notification_idTodef_notifications def_notifications? @relation("def_action_items_notification_idTodef_notifications", fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("apps")
 }
 
 model def_alerts {
-  alert_id          Int                 @id @default(autoincrement())
-  alert_name        String              @db.VarChar(100)
+  alert_id          Int                @id @default(autoincrement())
+  alert_name        String             @db.VarChar(100)
   description       String?
+  readers           Json?
   created_by        Int
-  creation_date     DateTime?           @default(now()) @db.Timestamptz(6)
+  creation_date     DateTime?          @default(now()) @db.Timestamptz(6)
   last_updated_by   Int?
-  last_update_date  DateTime?           @default(now()) @db.Timestamptz(6)
-  def_notifications def_notifications[]
+  last_update_date  DateTime?          @default(now()) @db.Timestamptz(6)
+  notification_id   String?
+  def_notifications def_notifications? @relation(fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("apps")
 }
@@ -436,13 +437,12 @@ model def_notifications {
   alert_id                                                             Int?
   sender                                                               Int?
   def_action_items_def_action_items_notification_idTodef_notifications def_action_items[] @relation("def_action_items_notification_idTodef_notifications")
-  def_action_items_def_notifications_action_item_idTodef_action_items  def_action_items?  @relation("def_notifications_action_item_idTodef_action_items", fields: [action_item_id], references: [action_item_id], onDelete: NoAction, onUpdate: NoAction, map: "action_item_id_fk")
-  def_alerts                                                           def_alerts?        @relation(fields: [alert_id], references: [alert_id], onDelete: NoAction, onUpdate: NoAction, map: "alert_id_fk")
+  def_alerts                                                           def_alerts[]
 
   @@schema("apps")
 }
 
-model def_recepients {
+model def_alert_recepients {
   alert_id         Int
   user_id          Int
   created_by       Int
@@ -454,21 +454,68 @@ model def_recepients {
   @@schema("apps")
 }
 
+model def_action_item_assignments {
+  action_item_id   Int
+  user_id          Int
+  created_by       Int
+  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@id([action_item_id, user_id])
+  @@schema("apps")
+}
+
 model def_users_v {
   user_id         Int     @id
-  user_name       String?
-  first_name      String?
-  middle_name     String?
-  last_name       String?
-  email_addresses Json?
-  job_title       String?
-  created_by      Int?
-  created_on      String?
-  last_updated_by Int?
-  last_updated_on String?
-  tenant_id       Int?
-  profile_picture Json?
+  user_name       String
+  first_name      String
+  middle_name     String
+  last_name       String
+  email_addresses Json
+  job_title       String
+  created_by      Int
+  created_on      String
+  last_updated_by Int
+  last_updated_on String
+  tenant_id       Int
+  profile_picture Json
 
   @@map("def_users_v")
+  @@schema("apps")
+}
+
+model def_alerts_v {
+  user_id            Int     @id
+  user_name          String
+  notification_id    String?
+  alert_id           Int
+  alert_name         String
+  description        String
+  readers            Json
+  status             String
+  created_by         Int
+  creation_date      DateTime?
+  last_updated_by    Int
+  last_update_date   DateTime?
+
+  @@map("def_alerts_v")
+  @@schema("apps")
+}
+
+model def_action_items_v {
+  user_id            Int     @id
+  user_name          String
+  notification_id    String?
+  action_item_id     Int
+  action_item_name   String
+  description        String
+  status             String
+  created_by         Int
+  creation_date      DateTime?
+  last_updated_by    Int
+  last_update_date   DateTime?
+
+  @@map("def_action_items_v")
   @@schema("apps")
 }
