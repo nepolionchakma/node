@@ -97,6 +97,11 @@ exports.getAlertsFromViewPagination = async (req, res) => {
   const offset = (page - 1) * limit;
   try {
     const alerts = await prisma.def_alerts_v.findMany({
+      where: {
+        user_id,
+      },
+    });
+    const pageAndLimitAlerts = await prisma.def_alerts_v.findMany({
       take: limit,
       skip: offset,
       where: {
@@ -107,7 +112,14 @@ exports.getAlertsFromViewPagination = async (req, res) => {
       },
     });
 
-    return res.status(200).json(alerts);
+    const totalCount = alerts.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    return res.status(200).json({
+      items: pageAndLimitAlerts,
+      page,
+      pages: totalPages,
+      total: totalCount,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
