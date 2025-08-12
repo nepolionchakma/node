@@ -3,14 +3,14 @@ const prisma = require("../DB/db.config");
 /** create recepients */
 exports.createRecepients = async (req, res) => {
   try {
-    const data = req.body;
-    const { alert_id, user_id, created_by, last_updated_by } = data;
+    const { alert_id, user_id, created_by, last_updated_by } = req.body;
     const result = await prisma.def_alert_recepients.create({
       data: {
         alert_id,
         user_id,
         created_by,
         last_updated_by,
+        acknowledge: false,
       },
     });
     if (result) {
@@ -63,18 +63,17 @@ exports.getUniqueRecepient = async (req, res) => {
 exports.updateRecepient = async (req, res) => {
   try {
     const { alert_id, user_id } = req.params;
-    const data = req.body;
-    const { last_updated_by } = data;
+    const { acknowledge } = req.body;
     const result = await prisma.def_alert_recepients.update({
       where: {
         alert_id_user_id: {
-          alert_id: +alert_id,
-          user_id: +user_id,
+          alert_id: Number(alert_id),
+          user_id: Number(user_id),
         },
       },
       data: {
-        last_updated_by,
-        last_update_date: new Date(),
+        last_updated_by: Number(user_id),
+        acknowledge,
       },
     });
     if (result) {
@@ -92,8 +91,8 @@ exports.removeRecepient = async (req, res) => {
     const result = await prisma.def_alert_recepients.delete({
       where: {
         alert_id_user_id: {
-          alert_id: +alert_id,
-          user_id: +user_id,
+          alert_id,
+          user_id,
         },
       },
     });

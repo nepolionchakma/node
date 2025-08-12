@@ -6,32 +6,37 @@ exports.createAlert = async (req, res) => {
     const {
       alert_name,
       description,
-      readers,
+      recepients,
       notification_id,
       created_by,
       last_updated_by,
     } = req.body;
+
     const result = await prisma.def_alerts.create({
       data: {
         alert_name,
         description,
-        readers,
         notification_id,
         created_by,
         last_updated_by,
       },
     });
+
     // add recepients
-    await prisma.def_alert_recepients.create({
-      data: {
-        alert_id: result.alert_id,
-        user_id: result.user_id,
-        created_by: result.created_by,
-        last_updated_by: result.last_updated_by,
-      },
-    });
+    for (const recepient of recepients) {
+      await prisma.def_alert_recepients.create({
+        data: {
+          alert_id: result.alert_id,
+          user_id: recepient,
+          acknowledge: false,
+          created_by: result.created_by,
+          last_updated_by: result.last_updated_by,
+        },
+      });
+    }
+
     if (result) {
-      return res.status(201).json({ result });
+      return res.status(201).json({ result, message: "Alert Sent." });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -166,15 +171,9 @@ exports.getUniqueAlertFromView = async (req, res) => {
 exports.updateAlert = async (req, res) => {
   try {
     const id = Number(req.params.alert_id);
-    const user_id = Number(req.params.user_id);
-    const { alert_name, description, notification_id, last_updated_by } =
+    const { alert_name, description, last_updated_by, notification_id } =
       req.body;
-    const isAvailable = await prisma.def_alerts.findUnique({
-      where: {
-        alert_id: id,
-      },
-    });
-    const removedReader = isAvailable.readers.filter((id) => id !== user_id);
+
     const result = await prisma.def_alerts.update({
       where: {
         alert_id: id,
@@ -182,10 +181,8 @@ exports.updateAlert = async (req, res) => {
       data: {
         alert_name,
         description,
-        readers: removedReader,
-        notification_id,
         last_updated_by,
-        last_update_date: new Date(),
+        notification_id,
       },
     });
     if (result) {
