@@ -394,7 +394,6 @@ model def_action_items {
   action_item_id                                                        Int                @id @default(autoincrement())
   action_item_name                                                      String             @db.VarChar(150)
   description                                                           String?
-  status                                                                String?            @db.VarChar(50)
   created_by                                                            Int
   creation_date                                                         DateTime?          @default(now()) @db.Timestamptz(6)
   last_updated_by                                                       Int?
@@ -409,7 +408,6 @@ model def_alerts {
   alert_id          Int                @id @default(autoincrement())
   alert_name        String             @db.VarChar(100)
   description       String?
-  readers           Json?
   created_by        Int
   creation_date     DateTime?          @default(now()) @db.Timestamptz(6)
   last_updated_by   Int?
@@ -449,8 +447,9 @@ model def_alert_recepients {
   creation_date    DateTime? @default(now()) @db.Timestamptz(6)
   last_updated_by  Int?
   last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+  acknowledge      Boolean?
 
-  @@id([alert_id, user_id])
+  @@id([alert_id, user_id], map: "def_recepients_pkey")
   @@schema("apps")
 }
 
@@ -461,6 +460,7 @@ model def_action_item_assignments {
   creation_date    DateTime? @default(now()) @db.Timestamptz(6)
   last_updated_by  Int?
   last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+  status           String?   @db.VarChar(50)
 
   @@id([action_item_id, user_id])
   @@schema("apps")
@@ -492,7 +492,7 @@ model def_alerts_v {
   alert_id           Int
   alert_name         String
   description        String
-  readers            Json
+  acknowledge        Boolean?
   status             String
   created_by         Int
   creation_date      DateTime?
@@ -510,7 +510,7 @@ model def_action_items_v {
   action_item_id     Int
   action_item_name   String
   description        String
-  status             String
+  status             String?
   created_by         Int
   creation_date      DateTime?
   last_updated_by    Int

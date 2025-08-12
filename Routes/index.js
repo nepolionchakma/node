@@ -34,7 +34,7 @@ const mobileMenuRoutes = require("./mobileMenuRoutes");
 const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
 const alertsRoutes = require("./defAlertsRoutes");
-const recepientsRoutes = require("./defRecepientsRoutes");
+const recepientsRoutes = require("./defAlertRecepientsRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
