@@ -80,9 +80,8 @@ exports.getTotalAlerts = async (req, res) => {
   try {
     const result = await prisma.def_alerts_v.findMany({
       where: {
-        readers: {
-          array_contains: id,
-        },
+        user_id: id,
+        acknowledge: false,
       },
     });
 
