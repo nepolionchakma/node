@@ -198,6 +198,18 @@ const socket = (io) => {
         io.to(Number(user)).emit("inactiveDevice", device);
       }
     });
+
+    socket.on("SendAlert", async ({ alertId, recipients }) => {
+      for (const recipient of recipients) {
+        const alert = await prisma.def_alerts_v.findUnique({
+          where: {
+            alert_id: alertId,
+            user_id: Number(recipient),
+          },
+        });
+        io.to(Number(recipient)).emit("SentAlert", alert);
+      }
+    });
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.id);
       for (const key in users) {
