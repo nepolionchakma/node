@@ -36,28 +36,39 @@ exports.createNotification = async (req, res) => {
   let message = "";
 
   try {
-    const notificationData = req.body;
-    if (notificationData.status === "SENT") {
+    const {
+      notification_id,
+      notification_type,
+      sender,
+      recipients,
+      subject,
+      notification_body,
+      status,
+      parent_notification_id,
+      involved_users,
+      readers,
+      holders,
+      recycle_bin,
+    } = req.body;
+    if (status === "SENT") {
       message = "Notification Sent";
-    } else if (notificationData.status === "DRAFT") {
+    } else if (status === "DRAFT") {
       message = "Notification saved to Drafts";
     }
     const result = await prisma.def_notifications.create({
       data: {
-        notification_id: notificationData.notification_id,
-        notification_type: notificationData.notification_type,
-        sender: notificationData.sender,
-        recipients: notificationData.recipients,
-        subject: notificationData.subject,
-        notification_body: notificationData.notification_body,
-        status: notificationData.status,
-        parent_notification_id: notificationData.parent_notification_id,
-        involved_users: notificationData.involved_users,
-        readers: notificationData.readers,
-        holders: notificationData.holders,
-        recycle_bin: notificationData.recycle_bin,
-        action_item_id: notificationData.action_item_id,
-        alert_id: notificationData.alert_id,
+        notification_id: notification_id,
+        notification_type: notification_type,
+        sender: sender,
+        recipients: recipients,
+        subject: subject,
+        notification_body: notification_body,
+        status: status,
+        parent_notification_id: parent_notification_id,
+        involved_users: involved_users,
+        readers: readers,
+        holders: holders,
+        recycle_bin: recycle_bin,
       },
     });
     if (result) {
@@ -70,7 +81,15 @@ exports.createNotification = async (req, res) => {
 
 exports.updateNotification = async (req, res) => {
   try {
-    const notificationData = req.body;
+    const {
+      status,
+      involved_users,
+      readers,
+      holders,
+      recycle_bin,
+      action_item_id,
+      alert_id,
+    } = req.body;
     const { notificationId } = req.params;
 
     const result = await prisma.def_notifications.update({
@@ -79,19 +98,13 @@ exports.updateNotification = async (req, res) => {
       },
 
       data: {
-        notification_type: notificationData.notification_type,
-        sender: notificationData.sender,
-        recipients: notificationData.recipients,
-        subject: notificationData.subject,
-        notification_body: notificationData.notification_body,
-        status: notificationData.status,
-        parent_notification_id: notificationData.parent_notification_id,
-        involved_users: notificationData.involved_users,
-        readers: notificationData.readers,
-        holders: notificationData.holders,
-        recycle_bin: notificationData.recycle_bin,
-        action_item_id: notificationData.action_item_id,
-        alert_id: notificationData.alert_id,
+        status: status,
+        involved_users: involved_users,
+        readers: readers,
+        holders: holders,
+        recycle_bin: recycle_bin,
+        action_item_id: action_item_id,
+        alert_id: alert_id,
       },
     });
     if (result) {
