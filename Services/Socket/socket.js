@@ -199,7 +199,7 @@ const socket = (io) => {
       }
     });
 
-    socket.on("SendAlert", async ({ alertId, recipients }) => {
+    socket.on("SendAlert", async ({ alertId, recipients, isAcknowledge }) => {
       try {
         for (const recipient of recipients) {
           const alert = await prisma.def_alerts_v.findUnique({
@@ -212,7 +212,10 @@ const socket = (io) => {
           });
 
           if (alert) {
-            io.to(Number(recipient)).emit("SentAlert", alert);
+            io.to(Number(recipient)).emit("SentAlert", {
+              alert,
+              isAcknowledge,
+            });
           }
         }
       } catch (error) {
