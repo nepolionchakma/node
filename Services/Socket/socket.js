@@ -201,7 +201,6 @@ const socket = (io) => {
 
     socket.on("SendAlert", async ({ alertId, recipients }) => {
       try {
-        console.log(alertId, recipients, "  alertId and recipients ");
         for (const recipient of recipients) {
           const alert = await prisma.def_alerts_v.findUnique({
             where: {
@@ -211,7 +210,7 @@ const socket = (io) => {
               },
             },
           });
-          console.log(alert, "SendAlert socket event.");
+
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", alert);
           }
