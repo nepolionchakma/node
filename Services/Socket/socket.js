@@ -210,7 +210,7 @@ const socket = (io) => {
               },
             },
           });
-          console.log(alert, "'SendAlert' socket event.");
+          console.log(alert, "SendAlert socket event.");
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", alert);
           }
