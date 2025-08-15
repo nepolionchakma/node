@@ -134,17 +134,30 @@ const socket = (io) => {
       }
     });
 
-    socket.on("SendAlert", async ({ alertId, recipients }) => {
-      for (const recipient of recipients) {
-        const alert = await prisma.def_alerts_v.findUnique({
-          where: {
-            alert_id: alertId,
-            user_id: Number(recipient),
-          },
-        });
-        io.to(Number(recipient)).emit("SentAlert", alert);
+    socket.on("SendAlert", async ({ alertId, recipients, isAcknowledge }) => {
+      try {
+        for (const recipient of recipients) {
+          const alert = await prisma.def_alerts_v.findUnique({
+            where: {
+              user_id_alert_id: {
+                user_id: recipient,
+                alert_id: alertId,
+              },
+            },
+          });
+
+          if (alert) {
+            io.to(Number(recipient)).emit("SentAlert", {
+              alert,
+              isAcknowledge,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error sending alert:", error);
       }
     });
+
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.id);
       for (const key in users) {

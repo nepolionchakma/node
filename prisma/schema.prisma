@@ -486,10 +486,10 @@ model def_users_v {
 }
 
 model def_alerts_v {
-  user_id            Int     @id
+  user_id            Int
+  alert_id           Int
   user_name          String
   notification_id    String?
-  alert_id           Int
   alert_name         String
   description        String
   acknowledge        Boolean?
@@ -499,6 +499,7 @@ model def_alerts_v {
   last_updated_by    Int
   last_update_date   DateTime?
 
+  @@id([user_id,alert_id])
   @@map("def_alerts_v")
   @@schema("apps")
 }
