@@ -49,14 +49,7 @@ const socket = (io) => {
         io.to(Number(sender)).emit("sentMessage", notification);
         await pub.publish(
           "NOTIFICATION-MESSAGES",
-          JSON.stringify({
-            notification_id: notification.notification_id,
-            sender: notification.sender,
-            subject: notification.subject,
-            creation_date: notification.creation_date,
-            parent_notification_id: notification.parent_notification_id,
-            recipients: notification.recipients,
-          })
+          JSON.stringify(notification)
         );
       }
     });
@@ -93,44 +86,21 @@ const socket = (io) => {
     });
 
     // Device Action
-    socket.on(
-      "addDevice",
-      ({
-        id,
-        user_id,
-        device_type,
-        browser_name,
-        browser_version,
-        os,
-        user_agent,
-        added_at,
-        is_active,
-        ip_address,
-        location,
-        user,
-        signon_audit,
-      }) => {
-        io.to(Number(user)).emit("addDevice", {
-          id,
-          user_id,
-          device_type,
-          browser_name,
-          browser_version,
-          os,
-          user_agent,
-          added_at,
-          is_active,
-          ip_address,
-          location,
-          user,
-          signon_audit,
-        });
+    socket.on("addDevice", async ({ deviceId, userId }) => {
+      const device = await prisma.linked_devices.findUnique({
+        where: {
+          id: deviceId,
+          user_id: userId,
+        },
+      });
+      if (device) {
+        io.to(Number(user)).emit("addDevice", device);
       }
-    );
+    });
 
-    socket.on("inactiveDevice", ({ data, user }) => {
-      for (const device of data) {
-        io.to(Number(user)).emit("inactiveDevice", device);
+    socket.on("inactiveDevice", ({ inactiveDevices, userId }) => {
+      for (const device of inactiveDevices) {
+        io.to(Number(userId)).emit("inactiveDevice", device);
       }
     });
 
