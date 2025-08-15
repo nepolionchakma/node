@@ -82,7 +82,14 @@ exports.createNotification = async (req, res) => {
 exports.updateNotification = async (req, res) => {
   try {
     const {
+      notification_type,
+      sender,
+      recipients,
+      subject,
+      notification_body,
       status,
+      creation_date,
+      parent_notification_id,
       involved_users,
       readers,
       holders,
@@ -98,13 +105,21 @@ exports.updateNotification = async (req, res) => {
       },
 
       data: {
+        notification_id: notificationId,
+        notification_type: notification_type,
+        sender: sender,
+        recipients: recipients,
+        subject: subject,
+        notification_body: notification_body,
         status: status,
+        parent_notification_id: parent_notification_id,
         involved_users: involved_users,
         readers: readers,
         holders: holders,
         recycle_bin: recycle_bin,
         action_item_id: action_item_id,
         alert_id: alert_id,
+        creation_date,
       },
     });
     if (result) {
