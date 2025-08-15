@@ -39,116 +39,51 @@ const socket = (io) => {
 
   // Event Handlers
   io.on("connection", async (socket) => {
-    socket.on(
-      "sendMessage",
-      async ({
-        notification_id,
-        notification_type,
-        sender,
-        recipients,
-        subject,
-        notification_body,
-        status,
-        creation_date,
-        parent_notification_id,
-        involved_users,
-        readers,
-        holders,
-        recycle_bin,
-        action_item_id,
-        alert_id,
-      }) => {
-        console.log(
-          "recieving event sendMessage in server",
-          notification_id,
-          sender
-        );
+    socket.on("sendMessage", async ({ notificationId, sender }) => {
+      const notification = await prisma.def_notifications.findUnique({
+        where: {
+          notification_id: notificationId,
+        },
+      });
+      if (notification) {
+        io.to(Number(sender)).emit("sentMessage", notification);
         await pub.publish(
           "NOTIFICATION-MESSAGES",
-
           JSON.stringify({
-            notification_id,
-            sender,
-            subject,
-            creation_date,
-            parent_notification_id,
-            recipients,
+            notification_id: notification.notification_id,
+            sender: notification.sender,
+            subject: notification.subject,
+            creation_date: notification.creation_date,
+            parent_notification_id: notification.parent_notification_id,
+            recipients: notification.recipients,
           })
         );
-
-        io.to(Number(sender)).emit("sentMessage", {
-          notification_id,
-          notification_type,
-          sender,
-          recipients,
-          subject,
-          notification_body,
-          status,
-          creation_date,
-          parent_notification_id,
-          involved_users,
-          readers,
-          holders,
-          recycle_bin,
-          action_item_id,
-          alert_id,
-        });
       }
-    );
-
-    socket.on(
-      "sendDraft",
-      ({
-        notification_id,
-        notification_type,
-        sender,
-        recipients,
-        subject,
-        notification_body,
-        status,
-        creation_date,
-        parent_notification_id,
-        involved_users,
-        readers,
-        holders,
-        recycle_bin,
-        action_item_id,
-        alert_id,
-      }) => {
-        io.to(Number(sender)).emit("draftMessage", {
-          notification_id,
-          notification_type,
-          sender,
-          recipients,
-          subject,
-          notification_body,
-          status,
-          creation_date,
-          parent_notification_id,
-          involved_users,
-          readers,
-          holders,
-          recycle_bin,
-          action_item_id,
-          alert_id,
-        });
-      }
-    );
-
-    socket.on("draftMsgId", ({ id, user }) => {
-      io.to(Number(user)).emit("draftMessageId", id);
     });
 
-    socket.on("read", ({ id, user }) => {
-      io.to(Number(user)).emit("sync", id);
+    socket.on("sendDraft", async ({ notificationId, sender }) => {
+      const notification = await prisma.def_notifications.findUnique({
+        where: {
+          notification_id: notificationId,
+        },
+      });
+      io.to(Number(sender)).emit("draftMessage", notification);
     });
 
-    socket.on("deleteMessage", ({ id, user }) => {
-      io.to(Number(user)).emit("deletedMessage", id);
+    socket.on("draftMsgId", ({ notificationId, sender }) => {
+      io.to(Number(sender)).emit("draftMessageId", notificationId);
     });
 
-    socket.on("restoreMessage", ({ id, user }) => {
-      io.to(Number(user)).emit("restoreMessage", id);
+    socket.on("read", ({ parentID, sender }) => {
+      io.to(Number(sender)).emit("sync", parentID);
+    });
+
+    socket.on("deleteMessage", ({ notificationId, sender }) => {
+      io.to(Number(sender)).emit("deletedMessage", notificationId);
+    });
+
+    socket.on("restoreMessage", ({ notificationId, sender }) => {
+      io.to(Number(sender)).emit("restoreMessage", notificationId);
     });
 
     socket.on("multipleDelete", ({ ids, user }) => {
