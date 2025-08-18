@@ -80,6 +80,7 @@ exports.createNotification = async (req, res) => {
 };
 
 exports.updateNotification = async (req, res) => {
+  let message = "";
   try {
     const {
       notification_type,
@@ -98,6 +99,11 @@ exports.updateNotification = async (req, res) => {
       alert_id,
     } = req.body;
     const { notificationId } = req.params;
+    if (status === "SENT") {
+      message = "Notification Sent";
+    } else if (status === "DRAFT") {
+      message = "Notification saved to Drafts";
+    }
 
     const result = await prisma.def_notifications.update({
       where: {
@@ -123,7 +129,7 @@ exports.updateNotification = async (req, res) => {
       },
     });
     if (result) {
-      return res.status(200).json({ result });
+      return res.status(200).json({ result, message });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
