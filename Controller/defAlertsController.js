@@ -103,6 +103,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
     const alerts = await prisma.def_alerts_v.findMany({
       where: {
         user_id,
+        notification_status: "SENT",
       },
     });
     const pageAndLimitAlerts = await prisma.def_alerts_v.findMany({
@@ -110,7 +111,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
       skip: offset,
       where: {
         user_id,
-        status: "SENT",
+        notification_status: "SENT",
       },
       orderBy: {
         creation_date: "desc",
