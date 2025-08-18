@@ -493,7 +493,7 @@ model def_alerts_v {
   alert_name         String
   description        String
   acknowledge        Boolean?
-  status             String
+  notification_status             String
   created_by         Int
   creation_date      DateTime?
   last_updated_by    Int
@@ -512,6 +512,7 @@ model def_action_items_v {
   action_item_name   String
   description        String
   status             String?
+  notification_status             String?
   created_by         Int
   creation_date      DateTime?
   last_updated_by    Int
