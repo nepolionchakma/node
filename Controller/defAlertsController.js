@@ -103,6 +103,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
     const alerts = await prisma.def_alerts_v.findMany({
       where: {
         user_id,
+        notification_status: "SENT",
       },
     });
     const pageAndLimitAlerts = await prisma.def_alerts_v.findMany({
@@ -110,6 +111,7 @@ exports.getAlertsFromViewPagination = async (req, res) => {
       skip: offset,
       where: {
         user_id,
+        notification_status: "SENT",
       },
       orderBy: {
         creation_date: "desc",
@@ -170,13 +172,17 @@ exports.getUniqueAlertFromView = async (req, res) => {
 exports.updateAlert = async (req, res) => {
   try {
     const id = Number(req.params.alert_id);
-    const { alert_name, description, last_updated_by, notification_id } =
-      req.body;
+    const {
+      alert_name,
+      description,
+      last_updated_by,
+      notification_id,
+      recipients,
+    } = req.body;
 
+    // Update alert info
     const result = await prisma.def_alerts.update({
-      where: {
-        alert_id: id,
-      },
+      where: { alert_id: id },
       data: {
         alert_name,
         description,
@@ -184,10 +190,48 @@ exports.updateAlert = async (req, res) => {
         notification_id,
       },
     });
-    if (result) {
-      return res.status(200).json(result);
+
+    // Get existing recipients for this alert
+    const existingRecipients = await prisma.def_alert_recepients.findMany({
+      where: { alert_id: id },
+    });
+
+    const existingUserIds = existingRecipients.map((r) => r.user_id);
+
+    // 1. Find recipients to delete
+    const toDelete = existingUserIds.filter(
+      (userId) => !recipients.includes(userId)
+    );
+
+    if (toDelete.length > 0) {
+      await prisma.def_alert_recepients.deleteMany({
+        where: {
+          alert_id: id,
+          user_id: { in: toDelete },
+        },
+      });
     }
+
+    // 2. Find recipients to add
+    const toAdd = recipients.filter(
+      (userId) => !existingUserIds.includes(userId)
+    );
+
+    if (toAdd.length > 0) {
+      await prisma.def_alert_recepients.createMany({
+        data: toAdd.map((userId) => ({
+          alert_id: id,
+          user_id: userId,
+          created_by: last_updated_by, // or whoever creates
+          creation_date: new Date(),
+        })),
+        skipDuplicates: true, // avoid conflicts just in case
+      });
+    }
+
+    return res.status(200).json(result);
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: error.message });
   }
 };
