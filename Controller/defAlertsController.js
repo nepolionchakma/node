@@ -178,6 +178,7 @@ exports.updateAlert = async (req, res) => {
       last_updated_by,
       notification_id,
       recipients,
+      isAcknowledge,
     } = req.body;
 
     // Update alert info
@@ -224,6 +225,7 @@ exports.updateAlert = async (req, res) => {
           user_id: userId,
           created_by: last_updated_by, // or whoever creates
           creation_date: new Date(),
+          acknowledge: false,
         })),
         skipDuplicates: true, // avoid conflicts just in case
       });
