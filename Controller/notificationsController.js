@@ -49,6 +49,8 @@ exports.createNotification = async (req, res) => {
       readers,
       holders,
       recycle_bin,
+      action_item_id,
+      alert_id,
     } = req.body;
     if (status === "SENT") {
       message = "Notification Sent";
@@ -69,6 +71,8 @@ exports.createNotification = async (req, res) => {
         readers: readers,
         holders: holders,
         recycle_bin: recycle_bin,
+        action_item_id: action_item_id,
+        alert_id: alert_id,
       },
     });
     if (result) {
