@@ -392,7 +392,7 @@ model users {
 
 model def_action_items {
   action_item_id                                                        Int                @id @default(autoincrement())
-  action_item_name                                                      String             @db.VarChar(150)
+  action_item_name                                                      String             @db.VarChar(100)
   description                                                           String?
   created_by                                                            Int
   creation_date                                                         DateTime?          @default(now()) @db.Timestamptz(6)
@@ -422,7 +422,7 @@ model def_notifications {
   notification_id                                                      String             @id(map: "notification_pk")
   notification_type                                                    String
   recipients                                                           Json?
-  subject                                                              String?
+  subject                                                              String?            @db.VarChar(100)
   notification_body                                                    String?
   creation_date                                                        DateTime?          @default(now()) @db.Timestamp(6)
   status                                                               String?
