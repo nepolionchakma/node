@@ -1,6 +1,7 @@
 const { Redis } = require("ioredis");
 const prisma = require("../../DB/db.config");
 let users = {};
+let devices = {};
 
 const url = process.env.VALKEY_HOST;
 
@@ -20,7 +21,7 @@ const socket = (io) => {
   });
 
   // Middleware
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     const key = Number(socket.handshake.query.key);
     const device_id = Number(socket.handshake.query.device_id);
 
@@ -28,17 +29,59 @@ const socket = (io) => {
       return;
     } else {
       socket.join(key);
-      console.log(`User ${socket.id} joined room ${key}`);
+
       if (!users[key]) {
         users[key] = [];
       }
+      if (!devices[device_id]) {
+        devices[device_id] = [];
+      }
       users[key].push(socket.id);
+      devices[device_id].push(socket.id);
       next();
+      const device = await prisma.linked_devices.findUnique({
+        where: {
+          id: device_id,
+          user_id: key,
+        },
+      });
+
+      if (device) {
+        const currentSignon = device.signon_audit.find(
+          (item) => item.signon_id === device.signon_id
+        );
+        console.log(currentSignon, "current sigin on");
+
+        const session = currentSignon.session_log;
+        const updatedAudit = device.signon_audit.map((entry) => {
+          if (entry.signon_id === device.signon_id) {
+            return {
+              ...entry,
+              session_log: [
+                ...session,
+                {
+                  connect_time: new Date(),
+                  session_id: socket.id,
+                },
+              ],
+            };
+          }
+          return entry;
+        });
+
+        await prisma.linked_devices.update({
+          where: { id: device.id },
+          data: {
+            signon_audit: updatedAudit,
+          },
+        });
+      }
     }
   });
 
   // Event Handlers
   io.on("connection", async (socket) => {
+    console.log(users, "users", devices, "device");
     socket.on("sendMessage", async ({ notificationId, sender }) => {
       const notification = await prisma.def_notifications.findUnique({
         where: {
@@ -128,9 +171,46 @@ const socket = (io) => {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log("user disconnected", socket.id);
+    socket.on("disconnect", async () => {
+      for (const deviceId in devices) {
+        if (devices[deviceId].includes(socket.id)) {
+          console.log(`user ${socket.id} device Id ${deviceId} disconnected `);
+          const device = await prisma.linked_devices.findUnique({
+            where: {
+              id: Number(deviceId),
+            },
+          });
+
+          if (device && device.signon_audit) {
+            const audit = device.signon_audit;
+
+            const updatedAudit = audit.map((entry) => {
+              if (entry.signon_id === device.signon_id) {
+                entry.session_log = entry.session_log.map((session) => {
+                  if (session.session_id === socket.id) {
+                    return {
+                      ...session,
+                      disconnect_time: new Date(),
+                    };
+                  }
+                  return session;
+                });
+              }
+              return entry;
+            });
+
+            await prisma.linked_devices.update({
+              where: { id: device.id },
+              data: { signon_audit: updatedAudit },
+            });
+          }
+        }
+      }
+
       for (const key in users) {
+        if (users[key].includes(socket.id)) {
+          console.log(`user ${socket.id} disconnected from key ${key}`);
+        }
         users[key] = users[key].filter((id) => id !== socket.id);
         if (users[key].length === 0) {
           delete users[key];
