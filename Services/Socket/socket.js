@@ -50,7 +50,6 @@ const socket = (io) => {
         const currentSignon = device.signon_audit.find(
           (item) => item.signon_id === device.signon_id
         );
-        console.log(currentSignon, "current sigin on");
 
         const session = currentSignon.session_log;
         const updatedAudit = device.signon_audit.map((entry) => {
@@ -58,11 +57,11 @@ const socket = (io) => {
             return {
               ...entry,
               session_log: [
-                ...session,
                 {
                   connect_time: new Date(),
                   session_id: socket.id,
                 },
+                ...session,
               ],
             };
           }
@@ -81,7 +80,6 @@ const socket = (io) => {
 
   // Event Handlers
   io.on("connection", async (socket) => {
-    console.log(users, "users", devices, "device");
     socket.on("sendMessage", async ({ notificationId, sender }) => {
       const notification = await prisma.def_notifications.findUnique({
         where: {
@@ -175,6 +173,7 @@ const socket = (io) => {
       for (const deviceId in devices) {
         if (devices[deviceId].includes(socket.id)) {
           console.log(`user ${socket.id} device Id ${deviceId} disconnected `);
+
           const device = await prisma.linked_devices.findUnique({
             where: {
               id: Number(deviceId),
