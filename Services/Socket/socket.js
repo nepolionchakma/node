@@ -39,6 +39,9 @@ const socket = (io) => {
       users[key].push(socket.id);
       devices[device_id].push(socket.id);
       next();
+      console.log(
+        `user ${device_id} connected in ${key} with socket id ${socket.id}`
+      );
       const device = await prisma.def_linked_devices.findUnique({
         where: {
           id: device_id,
