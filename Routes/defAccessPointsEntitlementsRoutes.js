@@ -1,5 +1,5 @@
 const Router = require("express");
-const accessPointsEntitlementController = require("../Controller/accessPointsEntitlementsController");
+const accessPointsEntitlementController = require("../Controller/defAccessPointsEntitlementsController");
 
 const router = Router();
 

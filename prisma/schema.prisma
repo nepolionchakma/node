@@ -153,38 +153,6 @@ model messages {
   @@schema("apps")
 }
 
-model access_entitlement_elements {
-  entitlement_id             Int
-  access_point_id            Int
-  created_by                 String?                   @db.VarChar(50)
-  created_on                 DateTime?                 @default(now()) @db.Timestamp(6)
-  last_updated_by            String?                   @db.VarChar(50)
-  last_updated_on            DateTime?                 @default(now()) @db.Timestamp(6)
-  access_points_elements     def_access_point_elements @relation(fields: [access_point_id], references: [def_access_point_id], onDelete: NoAction, onUpdate: NoAction)
-  manage_access_entitlements def_access_entitlements   @relation(fields: [entitlement_id], references: [def_entitlement_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([entitlement_id, access_point_id])
-  @@schema("apps")
-}
-
-model linked_devices {
-  id              Int       @id @default(autoincrement())
-  user_id         Int
-  device_type     String?   @db.VarChar(50)
-  browser_name    String?   @db.VarChar(50)
-  browser_version String?   @db.VarChar(20)
-  os              String?   @db.VarChar(50)
-  user_agent      String?
-  added_at        DateTime? @default(now()) @db.Timestamp(6)
-  is_active       Int?
-  ip_address      String?
-  location        String?
-  signon_audit    Json?
-  signon_id       String?
-
-  @@schema("apps")
-}
-
 model def_processes {
   process_id        Int    @id
   process_name      String
@@ -200,16 +168,6 @@ model def_access_profiles {
   profile_id    String     @db.VarChar(100)
   primary_yn    String?    @default("N") @db.Char(1)
   def_users     def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("apps")
-}
-
-model mobile_menu {
-  menu_id        Int     @id
-  menu_code      String? @unique
-  menu_name      String?
-  menu_desc      String?
-  menu_structure Json?
 
   @@schema("apps")
 }
@@ -234,19 +192,19 @@ model employees {
 }
 
 model def_access_entitlements {
-  def_entitlement_id          Int                           @id(map: "manage_access_entitlements_pkey") @default(autoincrement())
-  entitlement_name            String                        @db.VarChar(150)
-  description                 String?                       @db.VarChar(250)
-  comments                    String?                       @db.VarChar(200)
-  status                      String                        @db.VarChar(50)
-  effective_date              DateTime                      @db.Date
-  revision                    Int?
-  revision_date               DateTime?                     @db.Date
-  created_by                  Int?
-  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             Int?
-  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
-  access_entitlement_elements access_entitlement_elements[]
+  def_entitlement_id              Int                               @id(map: "manage_access_entitlements_pkey") @default(autoincrement())
+  entitlement_name                String                            @db.VarChar(150)
+  description                     String?                           @db.VarChar(250)
+  comments                        String?                           @db.VarChar(200)
+  status                          String                            @db.VarChar(50)
+  effective_date                  DateTime                          @db.Date
+  revision                        Int?
+  revision_date                   DateTime?                         @db.Date
+  created_by                      Int?
+  created_on                      DateTime?                         @default(now()) @db.Timestamp(6)
+  last_updated_by                 Int?
+  last_updated_on                 DateTime?                         @default(now()) @db.Timestamp(6)
+  def_access_entitlement_elements def_access_entitlement_elements[]
 
   @@schema("apps")
 }
@@ -292,20 +250,20 @@ model def_access_models {
 }
 
 model def_access_point_elements {
-  def_access_point_id         Int                           @id(map: "access_points_elements_pkey") @default(autoincrement())
-  def_data_source_id          Int
-  element_name                String?                       @db.VarChar(150)
-  description                 String?                       @db.VarChar(250)
-  platform                    String?                       @db.VarChar(50)
-  element_type                String?                       @db.VarChar(50)
-  access_control              String?                       @db.VarChar(10)
-  change_control              String?                       @db.VarChar(10)
-  audit                       String?                       @db.VarChar(50)
-  created_by                  Int?
-  created_on                  DateTime?                     @default(now()) @db.Timestamp(6)
-  last_updated_by             Int?
-  last_updated_on             DateTime?                     @default(now()) @db.Timestamp(6)
-  access_entitlement_elements access_entitlement_elements[]
+  def_access_point_id             Int                               @id(map: "access_points_elements_pkey") @default(autoincrement())
+  def_data_source_id              Int
+  element_name                    String?                           @db.VarChar(150)
+  description                     String?                           @db.VarChar(250)
+  platform                        String?                           @db.VarChar(50)
+  element_type                    String?                           @db.VarChar(50)
+  access_control                  String?                           @db.VarChar(10)
+  change_control                  String?                           @db.VarChar(10)
+  audit                           String?                           @db.VarChar(50)
+  created_by                      Int?
+  created_on                      DateTime?                         @default(now()) @db.Timestamp(6)
+  last_updated_by                 Int?
+  last_updated_on                 DateTime?                         @default(now()) @db.Timestamp(6)
+  def_access_entitlement_elements def_access_entitlement_elements[]
 
   @@schema("apps")
 }
@@ -466,6 +424,47 @@ model def_action_item_assignments {
   @@schema("apps")
 }
 
+model def_access_entitlement_elements {
+  entitlement_id            Int
+  access_point_id           Int
+  created_by                String?                   @db.VarChar(50)
+  created_on                DateTime?                 @default(now()) @db.Timestamp(6)
+  last_updated_by           String?                   @db.VarChar(50)
+  last_updated_on           DateTime?                 @default(now()) @db.Timestamp(6)
+  def_access_point_elements def_access_point_elements @relation(fields: [access_point_id], references: [def_access_point_id], onDelete: NoAction, onUpdate: NoAction, map: "access_entitlement_elements_access_point_id_fkey")
+  def_access_entitlements   def_access_entitlements   @relation(fields: [entitlement_id], references: [def_entitlement_id], onDelete: NoAction, onUpdate: NoAction, map: "access_entitlement_elements_entitlement_id_fkey")
+
+  @@id([entitlement_id, access_point_id], map: "access_entitlement_elements_pkey")
+  @@schema("apps")
+}
+
+model def_linked_devices {
+  id              Int       @id(map: "linked_devices_pkey") @default(autoincrement())
+  user_id         Int
+  device_type     String?   @db.VarChar(50)
+  browser_name    String?   @db.VarChar(50)
+  browser_version String?   @db.VarChar(20)
+  os              String?   @db.VarChar(50)
+  user_agent      String?
+  added_at        DateTime? @default(now()) @db.Timestamp(6)
+  is_active       Int?
+  ip_address      String?
+  location        String?
+  signon_audit    Json?
+  signon_id       String?
+
+  @@schema("apps")
+}
+
+model def_mobile_menu {
+  menu_id        Int     @id(map: "mobile_menu_pkey")
+  menu_code      String? @unique(map: "mobile_menu_menu_code_key")
+  menu_name      String?
+  menu_desc      String?
+  menu_structure Json?
+
+  @@schema("apps")
+}
 model def_users_v {
   user_id         Int     @id
   user_name       String

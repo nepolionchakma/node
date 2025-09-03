@@ -1,5 +1,5 @@
 const Router = require("express");
-const armControllers = require("../Controller/armController");
+const armControllers = require("../Controller/defArmController");
 
 const router = Router();
 // Execution Methods

@@ -39,7 +39,7 @@ const socket = (io) => {
       users[key].push(socket.id);
       devices[device_id].push(socket.id);
       next();
-      const device = await prisma.linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findUnique({
         where: {
           id: device_id,
           user_id: key,
@@ -68,7 +68,7 @@ const socket = (io) => {
           return entry;
         });
 
-        await prisma.linked_devices.update({
+        await prisma.def_linked_devices.update({
           where: { id: device.id },
           data: {
             signon_audit: updatedAudit,
@@ -128,7 +128,7 @@ const socket = (io) => {
 
     // Device Action
     socket.on("addDevice", async ({ deviceId, userId }) => {
-      const device = await prisma.linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findUnique({
         where: {
           id: deviceId,
           user_id: userId,
@@ -174,7 +174,7 @@ const socket = (io) => {
         if (devices[deviceId].includes(socket.id)) {
           console.log(`user ${socket.id} device Id ${deviceId} disconnected `);
 
-          const device = await prisma.linked_devices.findUnique({
+          const device = await prisma.def_linked_devices.findUnique({
             where: {
               id: Number(deviceId),
             },
@@ -198,7 +198,7 @@ const socket = (io) => {
               return entry;
             });
 
-            await prisma.linked_devices.update({
+            await prisma.def_linked_devices.update({
               where: { id: device.id },
               data: { signon_audit: updatedAudit },
             });
@@ -221,7 +221,7 @@ const socket = (io) => {
     const user = Number(socket.handshake.query.key);
     try {
       if (!device_id || device_id === 0) return;
-      const device = await prisma.linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findUnique({
         where: {
           id: device_id,
         },

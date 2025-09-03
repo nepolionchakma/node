@@ -1,5 +1,5 @@
 const Router = require("express");
-const accessProfileController = require("../Controller/accessProfileController");
+const accessProfileController = require("../Controller/defAccessProfileController");
 
 const router = Router();
 

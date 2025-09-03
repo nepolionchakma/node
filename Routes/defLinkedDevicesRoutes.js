@@ -1,5 +1,5 @@
 const Router = require("express");
-const linkedDevicesController = require("../Controller/linkedDevicesController");
+const linkedDevicesController = require("../Controller/defLinkedDevicesController");
 
 const router = Router();
 

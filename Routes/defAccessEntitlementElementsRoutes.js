@@ -1,5 +1,5 @@
 const Router = require("express");
-const accessEntitlementElementsController = require("../Controller/accessEntitlementElementsController");
+const accessEntitlementElementsController = require("../Controller/defAccessEntitlementElementsController");
 
 const router = Router();
 

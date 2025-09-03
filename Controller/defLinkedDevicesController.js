@@ -3,7 +3,7 @@ const prisma = require("../DB/db.config");
 exports.getDevices = async (req, res) => {
   const { user_id } = req.params;
   try {
-    const result = await prisma.linked_devices.findMany({
+    const result = await prisma.def_linked_devices.findMany({
       where: {
         user_id: Number(user_id),
       },
@@ -23,7 +23,7 @@ exports.addDevice = async (req, res) => {
   const { user_id, deviceInfo, signon_audit } = req.body;
 
   try {
-    const device = await prisma.linked_devices.findFirst({
+    const device = await prisma.def_linked_devices.findFirst({
       where: {
         user_id: Number(user_id),
         device_type: deviceInfo.device_type,
@@ -34,7 +34,7 @@ exports.addDevice = async (req, res) => {
     });
 
     if (!device) {
-      const result = await prisma.linked_devices.create({
+      const result = await prisma.def_linked_devices.create({
         data: {
           user_id: Number(user_id),
           device_type: deviceInfo.device_type,
@@ -52,7 +52,7 @@ exports.addDevice = async (req, res) => {
       return res.status(201).json(result);
     }
 
-    const result = await prisma.linked_devices.update({
+    const result = await prisma.def_linked_devices.update({
       where: {
         id: device.id,
       },
@@ -88,7 +88,7 @@ exports.inactiveDevice = async (req, res) => {
 
   try {
     // Find the existing device
-    const device = await prisma.linked_devices.findUnique({
+    const device = await prisma.def_linked_devices.findUnique({
       where: {
         id: Number(id),
         user_id: Number(user_id),
@@ -111,7 +111,7 @@ exports.inactiveDevice = async (req, res) => {
     });
 
     // Update device in DB
-    const result = await prisma.linked_devices.update({
+    const result = await prisma.def_linked_devices.update({
       where: {
         id: Number(id),
       },
@@ -138,7 +138,7 @@ exports.logoutFromDevices = async (req, res) => {
   try {
     const logoutTime = new Date();
 
-    const devices = await prisma.linked_devices.findMany({
+    const devices = await prisma.def_linked_devices.findMany({
       where: {
         user_id: Number(user_id),
       },
@@ -163,7 +163,7 @@ exports.logoutFromDevices = async (req, res) => {
           return entry;
         });
 
-        return prisma.linked_devices.update({
+        return prisma.def_linked_devices.update({
           where: { id: device.id },
           data: {
             is_active: is_active,
@@ -189,7 +189,7 @@ exports.getUniqueDevice = async (req, res) => {
   const { deviceId } = req.params;
 
   try {
-    const device = await prisma.linked_devices.findUnique({
+    const device = await prisma.def_linked_devices.findUnique({
       where: {
         id: parseInt(deviceId),
       },
@@ -207,7 +207,7 @@ exports.updateDeviceLocation = async (req, res) => {
   const { location } = req.body;
 
   try {
-    const result = await prisma.linked_devices.update({
+    const result = await prisma.def_linked_devices.update({
       where: {
         id: parseInt(deviceId),
       },
