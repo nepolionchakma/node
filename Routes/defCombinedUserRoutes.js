@@ -1,5 +1,5 @@
 const Router = require("express");
-const combinedUserController = require("../Controller/combinedUserController");
+const combinedUserController = require("../Controller/defCombinedUserController");
 // upload profile image middleware
 const { upload, generateThumbnail } = require("../Middleware/multerUpload");
 const router = Router();

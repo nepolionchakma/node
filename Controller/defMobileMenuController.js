@@ -2,7 +2,7 @@ const prisma = require("../DB/db.config");
 
 exports.getMobileMenu = async (req, res) => {
   try {
-    const mobileMenu = await prisma.mobile_menu.findMany();
+    const mobileMenu = await prisma.def_mobile_menu.findMany();
 
     return res.status(200).json(mobileMenu);
   } catch (error) {
@@ -13,7 +13,7 @@ exports.getMobileMenu = async (req, res) => {
 exports.createMobileMenu = async (req, res) => {
   try {
     const { menu_code, menu_name, menu_desc, menu_structure } = req.body;
-    const mobileMenu = await prisma.mobile_menu.findMany();
+    const mobileMenu = await prisma.def_mobile_menu.findMany();
     const maxID =
       mobileMenu.length > 0
         ? Math.max(...mobileMenu.map((item) => item.menu_id)) + 1
@@ -25,7 +25,7 @@ exports.createMobileMenu = async (req, res) => {
       });
     }
 
-    await prisma.mobile_menu.create({
+    await prisma.def_mobile_menu.create({
       data: {
         menu_id: maxID,
         menu_code: menu_code,
@@ -47,7 +47,7 @@ exports.updateMobileMenu = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { menu_code, menu_name, menu_desc, menu_structure } = req.body;
-    const mobileMenu = await prisma.mobile_menu.findUnique({
+    const mobileMenu = await prisma.def_mobile_menu.findUnique({
       where: {
         menu_id: id,
       },
@@ -57,7 +57,7 @@ exports.updateMobileMenu = async (req, res) => {
       return res.status(404).json({ message: "Mobile Menu not found" });
     }
 
-    await prisma.mobile_menu.update({
+    await prisma.def_mobile_menu.update({
       where: {
         menu_id: id,
       },

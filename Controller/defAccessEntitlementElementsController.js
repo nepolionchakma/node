@@ -4,7 +4,7 @@ const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 //get Data
 exports.getAccessEntitlementElement = async (req, res) => {
   try {
-    const result = await prisma.access_entitlement_elements.findMany({
+    const result = await prisma.def_access_entitlement_elements.findMany({
       //sorting desc
       orderBy: {
         entitlement_id: "desc",
@@ -41,7 +41,7 @@ exports.searchLazyLoadingAccessEntitilementElement = async (req, res) => {
 // create Data
 exports.createAccessEntitlementElement = async (req, res) => {
   try {
-    const result = await prisma.access_entitlement_elements.create({
+    const result = await prisma.def_access_entitlement_elements.create({
       data: req.body,
     });
     return res.status(201).json(result);
@@ -54,7 +54,7 @@ exports.createAccessEntitlementElement = async (req, res) => {
 exports.getUniqueAccessEntitlementElement = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await prisma.access_entitlement_elements.findMany({
+    const result = await prisma.def_access_entitlement_elements.findMany({
       where: {
         entitlement_id: Number(id),
       },
@@ -74,12 +74,13 @@ exports.deleteAccessEntitlementElement = async (req, res) => {
   const { entitlementId, accessPointId } = req.params;
 
   try {
-    const deletedRecord = await prisma.access_entitlement_elements.deleteMany({
-      where: {
-        entitlement_id: Number(entitlementId),
-        access_point_id: Number(accessPointId),
-      },
-    });
+    const deletedRecord =
+      await prisma.def_access_entitlement_elements.deleteMany({
+        where: {
+          entitlement_id: Number(entitlementId),
+          access_point_id: Number(accessPointId),
+        },
+      });
 
     if (deletedRecord.count > 0) {
       res.status(200).json({ message: "Deleted successfully" });
@@ -99,14 +100,14 @@ exports.getPerPageAccessEntitlementElement = async (req, res) => {
   const limit = Number(req.params.limit);
   const offset = (page - 1) * limit;
   try {
-    const results = await prisma.access_entitlement_elements.findMany({
+    const results = await prisma.def_access_entitlement_elements.findMany({
       take: limit,
       skip: offset,
       orderBy: {
         entitlement_id: "desc",
       },
     });
-    const totalCount = await prisma.access_entitlement_elements.count();
+    const totalCount = await prisma.def_access_entitlement_elements.count();
     const totalPages = Math.ceil(totalCount / limit);
 
     return res.status(200).json({
@@ -124,7 +125,7 @@ const prisma = require("../DB/db.config");
 //get Data
 exports.getAccessEntitlementElement = async (req, res) => {
   try {
-    const result = await prisma.access_entitlement_elements.findMany({
+    const result = await prisma.def_access_entitlement_elements.findMany({
       //sorting desc
       orderBy: {
         entitlement_id: "desc",
@@ -139,7 +140,7 @@ exports.getAccessEntitlementElement = async (req, res) => {
 // create Data
 exports.createAccessEntitlementElement = async (req, res) => {
   try {
-    const result = await prisma.access_entitlement_elements.create({
+    const result = await prisma.def_access_entitlement_elements.create({
       data: req.body,
     });
     return res.status(201).json(result);
@@ -152,7 +153,7 @@ exports.createAccessEntitlementElement = async (req, res) => {
 exports.getUniqueAccessEntitlementElement = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await prisma.access_entitlement_elements.findMany({
+    const result = await prisma.def_access_entitlement_elements.findMany({
       where: {
         entitlement_id: Number(id),
       },
@@ -172,7 +173,7 @@ exports.deleteAccessEntitlementElement = async (req, res) => {
   const { entitlementId, accessPointId } = req.params;
 
   try {
-    const deletedRecord = await prisma.access_entitlement_elements.deleteMany({
+    const deletedRecord = await prisma.def_access_entitlement_elements.deleteMany({
       where: {
         entitlement_id: Number(entitlementId),
         access_point_id: Number(accessPointId),
@@ -197,14 +198,14 @@ exports.getPerPageAccessEntitlementElement = async (req, res) => {
   const limit = Number(req.params.limit);
   const offset = (page - 1) * limit;
   try {
-    const results = await prisma.access_entitlement_elements.findMany({
+    const results = await prisma.def_access_entitlement_elements.findMany({
       take: limit,
       skip: offset,
       orderBy: {
         entitlement_id: "desc",
       },
     });
-    const totalCount = await prisma.access_entitlement_elements.count();
+    const totalCount = await prisma.def_access_entitlement_elements.count();
     const totalPages = Math.ceil(totalCount / limit);
 
     return res.status(200).json({

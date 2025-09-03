@@ -11,30 +11,30 @@ const defTenantsRoutes = require("../Routes/defTenantsRoutes");
 const defUserCredentialsRoutes = require("../Routes/defUserCredentialsRoutes");
 const authentication = require("../Routes/authenticationRoutes");
 const messagesRoutes = require("../Routes/messagesRoutes");
-const notificationsRoutes = require("../Routes/notificationRoutes");
+const defnotificationsRoutes = require("../Routes/defNotificationRoutes");
 const defDataSourcesRoutes = require("./defDataSourcesRoutes");
 const defAccessEntitlementsRoutes = require("./defAccessEntitlementsRoutes");
-const accessEntitlementElementsRoutes = require("../Routes/accessEntitlementElementsRoutes");
+const defAccessEntitlementElementsRoutes = require("../Routes/defAccessEntitlementElementsRoutes");
 const defAccessPointsElementsRoutes = require("./defAccessPointElementsRoutes");
-const combinedUserRoutes = require("../Routes/combinedUserRoutes");
+const defCombinedUserRoutes = require("../Routes/defCombinedUserRoutes");
 const defGlobalConditionsRoutes = require("./defGlobalConditionsRoutes");
 const defGlobalConditionsLogicsRoutes = require("./defGlobalConditionLogicsRoutes");
 const defGlobalConditionsLogicAttributesRoutes = require("./defGlobalConditionLogicAttributesRoutes");
 const defAccessModelsRoutes = require("./defAccessModelsRoutes");
 const defAccessModelLogicsRoutes = require("./defAccessModelLogicsRoutes");
 const defAccessModelLogicAttributesRoutes = require("./defAccessModelLogicAttributesRoutes");
-const controlesRoutes = require("./controlsRoutes");
-const linkedDevicesRoutes = require("./linkedDevicesRoutes");
-const armRoutes = require("./armRoutes");
-const asynchronousRequestsAndTaskSchedulesRoutes = require("./asynchronousRequestsAndTaskSchedulesRoutes");
+const defControlesRoutes = require("./defControlsRoutes");
+const defLinkedDevicesRoutes = require("./defLinkedDevicesRoutes");
+const defArmRoutes = require("./defArmRoutes");
+const defAsynchronousRequestsAndTaskSchedulesRoutes = require("./defAsynchronousRequestsAndTaskSchedulesRoutes");
 const pushNotificationRoutes = require("./pushNotificationRoutes");
 const orchestrationStudioRoutes = require("./orchestrationStudioRoutes");
-const accessProfileRoutes = require("./accessProfileRoutes");
-const mobileMenuRoutes = require("./mobileMenuRoutes");
+const defAccessProfileRoutes = require("./defAccessProfileRoutes");
+const defMobileMenuRoutes = require("./defMobileMenuRoutes");
 const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
-const alertsRoutes = require("./defAlertsRoutes");
-const recepientsRoutes = require("./defAlertRecepientsRoutes");
+const defAlertsRoutes = require("./defAlertsRoutes");
+const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -50,16 +50,16 @@ routes.use("/auth", authentication);
 routes.use("/persons", defPersonsRoutes);
 routes.use("/users", defUsersRoutes);
 routes.use("/user-credentials", defUserCredentialsRoutes);
-routes.use("/access-profiles", accessProfileRoutes);
-routes.use("/combined-user", combinedUserRoutes);
+routes.use("/access-profiles", defAccessProfileRoutes);
+routes.use("/combined-user", defCombinedUserRoutes);
 
 routes.use("/messages", messagesRoutes);
-routes.use("/notifications", notificationsRoutes);
+routes.use("/notifications", defnotificationsRoutes);
 routes.use("/def-data-sources", defDataSourcesRoutes);
 
 // Manage Access Entitlements
 routes.use("/def-access-entitlements", defAccessEntitlementsRoutes);
-routes.use("/access-entitlement-elements", accessEntitlementElementsRoutes);
+routes.use("/access-entitlement-elements", defAccessEntitlementElementsRoutes);
 routes.use("/def-access-point-elements", defAccessPointsElementsRoutes);
 
 // Condition section
@@ -79,21 +79,21 @@ routes.use(
 );
 
 // Control section
-routes.use("/controls", controlesRoutes);
-routes.use("/devices", linkedDevicesRoutes);
+routes.use("/controls", defControlesRoutes);
+routes.use("/devices", defLinkedDevicesRoutes);
 
 // ARM Task
-routes.use("/arm-tasks", armRoutes);
+routes.use("/arm-tasks", defArmRoutes);
 routes.use(
   "/asynchronous-requests-and-task-schedules",
-  asynchronousRequestsAndTaskSchedulesRoutes
+  defAsynchronousRequestsAndTaskSchedulesRoutes
 );
 
 // Orchestration Studio
 routes.use("/orchestration-studio-process", orchestrationStudioRoutes);
 
 //Mobile Menu
-routes.use("/mobile-menu", mobileMenuRoutes);
+routes.use("/mobile-menu", defMobileMenuRoutes);
 
 // Manage_Tenancy_And_Def_Tenant_Enterprise_Setup
 routes.use("/def-tenants", defTenantsRoutes);
@@ -103,9 +103,9 @@ routes.use("/def-tenant-enterprise-setup", defTenantEnterpriseSetupRoutes);
 routes.use("/test", testRoutes);
 
 // alerts
-routes.use("/alerts", alertsRoutes);
+routes.use("/alerts", defAlertsRoutes);
 
 // recepients
-routes.use("/recepients", recepientsRoutes);
+routes.use("/recepients", defRecepientsRoutes);
 
 module.exports = routes;

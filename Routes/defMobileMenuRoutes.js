@@ -1,5 +1,5 @@
 const Router = require("express");
-const mobileMenuController = require("../Controller/mobileMenuController");
+const mobileMenuController = require("../Controller/defMobileMenuController");
 
 const router = Router();
 
