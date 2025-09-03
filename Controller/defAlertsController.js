@@ -82,6 +82,7 @@ exports.getTotalAlerts = async (req, res) => {
       where: {
         user_id: id,
         acknowledge: false,
+        notification_status: "SENT",
       },
     });
 
