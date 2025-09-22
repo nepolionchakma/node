@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "com.procg",
+      "package_name": "com.procg",
+      "sha256_cert_fingerprints": [
+        "18:07:98:5F:AE:A7:2D:E8:6A:4E:AF:F5:13:0C:7D:E8:DC:8E:EA:F1:17:A3:C9:BD:87:70:65:FB:F1:90:4E:F7"
+      ]
+    }
+  }
+]
