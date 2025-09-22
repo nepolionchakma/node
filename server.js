@@ -38,6 +38,16 @@ app.use((err, req, res, next) => {
   next();
 });
 
+// for mobile app deep linking start
+// Serve apple-app-site-association file
+app.get("/apple-app-site-association", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.sendFile(path.join(__dirname, "apple-app-site-association"));
+});
+// Serve the .well-known folder
+app.use("/.well-known", express.static(path.join(__dirname, ".well-known")));
+// for mobile app deep linking stop
+
 // Import and initialize socket.io handlers
 require("./Services/Socket/socket")(io);
 
