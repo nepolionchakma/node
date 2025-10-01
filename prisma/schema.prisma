@@ -465,6 +465,32 @@ model def_mobile_menu {
 
   @@schema("apps")
 }
+
+model def_control_environments {
+  control_environment_id Int       @id(map: "control_environment_pk") @default(autoincrement())
+  name                   String?   @db.VarChar(100)
+  description            String?
+  created_by             Int
+  creation_date          DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by        Int?
+  last_update_date       DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@schema("apps")
+}
+
+model def_invitation {
+  id            Int       @id @default(autoincrement())
+  invited_by    Int
+  invited_email String?
+  type String?
+  token         String    @unique
+  status        String?   @default("pending") @db.VarChar(10)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  expires_at    DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '5 days'::interval)")) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
 model def_users_v {
   user_id         Int     @id
   user_name       String

@@ -35,6 +35,7 @@ const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
 const defAlertsRoutes = require("./defAlertsRoutes");
 const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
+const defInvitationRoutes = require("./defInvitationRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -107,5 +108,8 @@ routes.use("/alerts", defAlertsRoutes);
 
 // recepients
 routes.use("/recepients", defRecepientsRoutes);
+
+// Invitaion
+routes.use("/invitaion", defInvitationRoutes);
 
 module.exports = routes;
