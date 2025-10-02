@@ -478,7 +478,7 @@ model def_control_environments {
   @@schema("apps")
 }
 
-model def_invitation {
+model def_invitations {
   id            Int       @id @default(autoincrement())
   invited_by    Int
   invited_email String?
