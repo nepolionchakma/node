@@ -109,7 +109,7 @@ routes.use("/alerts", defAlertsRoutes);
 // recepients
 routes.use("/recepients", defRecepientsRoutes);
 
-// Invitaion
-routes.use("/invitaion", defInvitationRoutes);
+// Invitation
+routes.use("/invitation", defInvitationRoutes);
 
 module.exports = routes;

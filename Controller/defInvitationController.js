@@ -120,13 +120,18 @@ exports.invitaionViaEmail = async (req, res) => {
     // --- Send Email ---
     if (invited_email) {
       const res = await transporter.sendMail({
-        from: `"PROCG" <${user}>`,
+        from: `"PROCG Team" <${user}>`,
         to: invited_email,
-        subject: "You’re Invited to PROCG",
+        subject: "You’re Invited to join PROCG",
         html: `<p>Hello,</p>
-               <p>You have been invited to join PROCG App.</p>
+               <p>We are excited to invite you to join PROCG App!</p>
+               <p>Click the link below to accept your invitation and get started:</p>
                <p><a href="${inviteLink}">Click here to accept invite</a></p>
-               <p>This link will expire in 5 days.</p>`,
+               <p>Please note, this link will expire in 5 days.</p>
+               <p>We look forward to having you on board!</p>
+               <p>Best regards,</p>
+               <p>The PROCG Team</p>
+               `,
       });
       // console.log(res, "res");
     }
