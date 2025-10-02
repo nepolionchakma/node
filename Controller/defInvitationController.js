@@ -16,13 +16,13 @@ const transporter = nodemailer.createTransport({
 
 const verifyInvitation = async (token) => {
   if (!token || typeof token !== "string") {
-    return { valid: false, message: "Token missing" };
+    return { valid: false, message: "Token is missing" };
   }
 
   const invite = await prisma.def_invitations.findUnique({ where: { token } });
 
   if (!invite) {
-    return { valid: false, message: "Invalid invite" };
+    return { valid: false, message: "No invitation found" };
   }
 
   if (invite.expires_at < new Date()) {
@@ -86,7 +86,7 @@ exports.invitaionViaEmail = async (req, res) => {
     // const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     const existInvitaion = await prisma.def_invitations.findFirst({
-      where: { invited_email, status: "pending" },
+      where: { invited_email, status: "pending", type: "email" },
     });
 
     if (existInvitaion && existInvitaion.expires_at > new Date()) {
@@ -148,7 +148,7 @@ exports.invitaionViaEmail = async (req, res) => {
     res.status(201).json({
       success: true,
       invitation_link: inviteLink,
-      message: "The invitation sent successfully",
+      message: "The invitation was sent successfully",
     });
   } catch (err) {
     console.error(err);
@@ -165,13 +165,13 @@ exports.invitaionViaLink = async (req, res) => {
     const token = crypto.randomUUID();
 
     const invitedLinks = await prisma.def_invitations.findFirst({
-      where: { invited_by, status: "pending" },
+      where: { invited_by, status: "pending", type: "link" },
     });
 
     if (invitedLinks && invitedLinks.expires_at > new Date()) {
       return res.status(200).json({
         invitation_link: `${baseUrl}?token=${invitedLinks.token}`,
-        message: "Already you have a generated invitation link",
+        message: "Already, you have a generated invitation link",
       });
     }
 
@@ -195,7 +195,7 @@ exports.invitaionViaLink = async (req, res) => {
     return res.status(201).json({
       success: true,
       invitation_link: inviteLink,
-      message: "The invitation link generated successfully",
+      message: "The invitation link was generated successfully",
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -206,7 +206,9 @@ exports.verifyInvitation = async (req, res) => {
   try {
     const { token } = req.query;
     if (!token || typeof token !== "string") {
-      return res.status(200).json({ valid: false, message: "Token missing" });
+      return res
+        .status(200)
+        .json({ valid: false, message: "Token is missing" });
     }
 
     const invite = await prisma.def_invitations.findFirst({ where: { token } });
@@ -279,7 +281,7 @@ exports.acceptInvitaion = async (req, res) => {
     //   return res.status(400).json({ message: invite.message });
     // }
     if (!token || typeof token !== "string") {
-      return res.status(400).json({ message: "Token missing" });
+      return res.status(400).json({ message: "Token is missing" });
     }
     const tokenEmail = await prisma.def_invitations.findFirst({
       where: { token },
@@ -349,7 +351,8 @@ exports.acceptInvitaion = async (req, res) => {
     });
 
     return res.status(201).json({
-      message: "The invitation accepted and user created successfully",
+      message:
+        "The invitation was accepted, and the user was created successfully",
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
