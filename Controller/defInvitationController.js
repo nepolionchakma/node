@@ -206,23 +206,23 @@ exports.verifyInvitation = async (req, res) => {
   try {
     const { token } = req.query;
     if (!token || typeof token !== "string") {
-      return res.status(400).json({ valid: false, message: "Token missing" });
+      return res.status(200).json({ valid: false, message: "Token missing" });
     }
 
     const invite = await prisma.def_invitation.findFirst({ where: { token } });
     if (!invite) {
       return res
-        .status(404)
+        .status(200)
         .json({ valid: false, message: "No invitation found" });
     }
 
     if (invite.status === "expired") {
       return res
-        .status(400)
+        .status(200)
         .json({ valid: false, message: "The invitation has expired" });
     }
     if (invite.status === "accepted") {
-      return res.status(400).json({
+      return res.status(200).json({
         valid: false,
         message: "The invitation has already been accepted",
       });
@@ -234,7 +234,7 @@ exports.verifyInvitation = async (req, res) => {
         data: { status: "expired" },
       });
       return res
-        .status(400)
+        .status(200)
         .json({ valid: false, message: "The invitation has expired" });
     }
 
@@ -250,7 +250,7 @@ exports.verifyInvitation = async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ valid: false, message: "Server error" });
+    res.status(200).json({ valid: false, message: "Server error" });
   }
 };
 
