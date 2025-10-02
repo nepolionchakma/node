@@ -19,14 +19,14 @@ const verifyInvitation = async (token) => {
     return { valid: false, message: "Token missing" };
   }
 
-  const invite = await prisma.def_invitation.findUnique({ where: { token } });
+  const invite = await prisma.def_invitations.findUnique({ where: { token } });
 
   if (!invite) {
     return { valid: false, message: "Invalid invite" };
   }
 
   if (invite.expires_at < new Date()) {
-    await prisma.def_invitation.update({
+    await prisma.def_invitations.update({
       where: { token },
       data: { status: "expired" },
     });
@@ -85,7 +85,7 @@ exports.invitaionViaEmail = async (req, res) => {
     const token = crypto.randomUUID();
     // const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-    const existInvitaion = await prisma.def_invitation.findFirst({
+    const existInvitaion = await prisma.def_invitations.findFirst({
       where: { invited_email, status: "pending" },
     });
 
@@ -97,7 +97,7 @@ exports.invitaionViaEmail = async (req, res) => {
       });
     }
     if (existInvitaion && existInvitaion.expires_at < new Date()) {
-      await prisma.def_invitation.update({
+      await prisma.def_invitations.update({
         where: { id: existInvitaion.id },
         data: {
           status: "expired",
@@ -105,7 +105,7 @@ exports.invitaionViaEmail = async (req, res) => {
       });
     }
 
-    await prisma.def_invitation.create({
+    await prisma.def_invitations.create({
       data: {
         invited_by,
         invited_email,
@@ -164,7 +164,7 @@ exports.invitaionViaLink = async (req, res) => {
     }
     const token = crypto.randomUUID();
 
-    const invitedLinks = await prisma.def_invitation.findFirst({
+    const invitedLinks = await prisma.def_invitations.findFirst({
       where: { invited_by, status: "pending" },
     });
 
@@ -176,7 +176,7 @@ exports.invitaionViaLink = async (req, res) => {
     }
 
     if (invitedLinks && invitedLinks.expires_at < new Date()) {
-      await prisma.def_invitation.update({
+      await prisma.def_invitations.update({
         where: { id: invitedLinks.id },
         data: {
           status: "expired",
@@ -185,7 +185,7 @@ exports.invitaionViaLink = async (req, res) => {
     }
 
     // store in DB
-    await prisma.def_invitation.create({
+    await prisma.def_invitations.create({
       data: { invited_by, token, status: "pending", type: "link" },
     });
 
@@ -209,7 +209,7 @@ exports.verifyInvitation = async (req, res) => {
       return res.status(200).json({ valid: false, message: "Token missing" });
     }
 
-    const invite = await prisma.def_invitation.findFirst({ where: { token } });
+    const invite = await prisma.def_invitations.findFirst({ where: { token } });
     if (!invite) {
       return res
         .status(200)
@@ -229,7 +229,7 @@ exports.verifyInvitation = async (req, res) => {
     }
 
     if (invite.status === "pending" && invite.expires_at < new Date()) {
-      await prisma.def_invitation.update({
+      await prisma.def_invitations.update({
         where: { token },
         data: { status: "expired" },
       });
@@ -281,7 +281,7 @@ exports.acceptInvitaion = async (req, res) => {
     if (!token || typeof token !== "string") {
       return res.status(400).json({ message: "Token missing" });
     }
-    const tokenEmail = await prisma.def_invitation.findFirst({
+    const tokenEmail = await prisma.def_invitations.findFirst({
       where: { token },
     });
 
@@ -343,7 +343,7 @@ exports.acceptInvitaion = async (req, res) => {
       }),
     ]);
 
-    await prisma.def_invitation.update({
+    await prisma.def_invitations.update({
       where: { token },
       data: { status: "accepted" },
     });
