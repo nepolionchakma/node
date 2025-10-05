@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.invitaionViaEmail = async (req, res) => {
+exports.invitationViaEmail = async (req, res) => {
   try {
     const { invited_by, email } = req.body;
 
@@ -45,13 +45,13 @@ exports.invitaionViaEmail = async (req, res) => {
 
     // const token = crypto.randomUUID();
 
-    const props = { user_id: Number(invited_by) };
+    const props = { user_id: Number(invited_by), sub: String(invited_by) };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
       expiresIn: INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
     });
 
     const existInvitaion = await prisma.new_user_invitations.findFirst({
-      where: { email, status: "pending", type: "email" },
+      where: { email, status: "PENDING", type: "EMAIL" },
     });
 
     if (existInvitaion && existInvitaion.expires_at > new Date()) {
@@ -64,7 +64,7 @@ exports.invitaionViaEmail = async (req, res) => {
       await prisma.new_user_invitations.update({
         where: { user_invitation_id: existInvitaion.user_invitation_id },
         data: {
-          status: "expired",
+          status: "EXPIRED",
         },
       });
     }
@@ -74,8 +74,8 @@ exports.invitaionViaEmail = async (req, res) => {
         invited_by,
         email,
         token,
-        status: "pending",
-        type: "email",
+        status: "PENDING",
+        type: "EMAIL",
       },
     });
 
@@ -120,7 +120,7 @@ exports.invitaionViaEmail = async (req, res) => {
   }
 };
 
-exports.invitaionViaLink = async (req, res) => {
+exports.invitationViaLink = async (req, res) => {
   try {
     const { invited_by } = req.body;
 
@@ -128,13 +128,13 @@ exports.invitaionViaLink = async (req, res) => {
       return res.status(400).json({ error: "inviter_User ID is required" });
     }
 
-    const props = { user_id: Number(invited_by) };
+    const props = { user_id: Number(invited_by), sub: String(invited_by) };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
       expiresIn: INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
     });
 
     const invitedLink = await prisma.new_user_invitations.findFirst({
-      where: { invited_by, status: "pending", type: "link" },
+      where: { invited_by, status: "PENDING", type: "LINK" },
     });
 
     if (invitedLink && invitedLink.expires_at > new Date()) {
@@ -146,14 +146,14 @@ exports.invitaionViaLink = async (req, res) => {
       await prisma.new_user_invitations.update({
         where: { user_invitation_id: invitedLink.user_invitation_id },
         data: {
-          status: "expired",
+          status: "EXPIRED",
         },
       });
     }
 
     // store in DB
     const createdInvitation = await prisma.new_user_invitations.create({
-      data: { invited_by, token, status: "pending", type: "link" },
+      data: { invited_by, token, status: "PENDING", type: "LINK" },
     });
 
     // generated link
@@ -202,28 +202,28 @@ exports.verifyInvitation = async (req, res) => {
         return res
           .status(200)
           .json({ valid: false, message: "No invitation found" });
-      } else if (isInvited.status === "expired") {
+      } else if (isInvited.status === "EXPIRED") {
         return res
           .status(200)
           .json({ valid: false, message: "The invitation has expired" });
-      } else if (isInvited.status === "accepted") {
+      } else if (isInvited.status === "ACCEPTED") {
         return res.status(200).json({
           valid: false,
           message: "The invitation has already been accepted",
         });
       } else if (
-        isInvited.status === "pending" &&
+        isInvited.status === "PENDING" &&
         isInvited.expires_at < new Date()
       ) {
         await prisma.new_user_invitations.update({
           where: { user_invitation_id: isInvited.user_invitation_id },
-          data: { status: "expired" },
+          data: { status: "EXPIRED" },
         });
         return res
           .status(200)
           .json({ valid: false, message: "The invitation has expired" });
       } else if (
-        isInvited.status === "pending" &&
+        isInvited.status === "PENDING" &&
         isInvited.expires_at > new Date()
       ) {
         return res.status(200).json({
@@ -284,6 +284,7 @@ exports.acceptInvitaion = async (req, res) => {
         last_name,
         job_title,
         password,
+        user_invitation_id,
       },
       {
         headers: {
@@ -293,15 +294,6 @@ exports.acceptInvitaion = async (req, res) => {
     );
 
     if (res.status === 201) {
-      await prisma.new_user_invitations.update({
-        where: { user_invitation_id: Number(user_invitation_id) },
-        data: {
-          registered_user_id: res.data.user_id,
-          status: "accepted",
-          accepted_at: new Date(),
-        },
-      });
-
       return res.status(201).json({
         message:
           "The invitation was accepted, and the user was created successfully",
