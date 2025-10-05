@@ -42,7 +42,6 @@ routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);
 routes.use("/qr-code", authentication);
-routes.use("/invitation", newUserInvitationRoutes);
 
 // Verify user - middleware
 routes.use(verifyUser);
@@ -109,5 +108,8 @@ routes.use("/alerts", defAlertsRoutes);
 
 // recepients
 routes.use("/recepients", defRecepientsRoutes);
+
+// new user invitation
+routes.use("/invitation", newUserInvitationRoutes);
 
 module.exports = routes;
