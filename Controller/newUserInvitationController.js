@@ -19,14 +19,16 @@ const verifyInvitation = async (token) => {
     return { valid: false, message: "Token is missing" };
   }
 
-  const invite = await prisma.def_invitations.findUnique({ where: { token } });
+  const invite = await prisma.new_user_invitations.findUnique({
+    where: { token },
+  });
 
   if (!invite) {
     return { valid: false, message: "No invitation found" };
   }
 
   if (invite.expires_at < new Date()) {
-    await prisma.def_invitations.update({
+    await prisma.new_user_invitations.update({
       where: { token },
       data: { status: "expired" },
     });
@@ -74,19 +76,32 @@ const hashPassword = (password) => {
 
 exports.invitaionViaEmail = async (req, res) => {
   try {
-    const { invited_by, invited_email } = req.body;
+    const { invited_by, email } = req.body;
 
-    if (!invited_by && !invited_email) {
+    if (!invited_by && !email) {
       return res
         .status(400)
         .json({ error: "Inviter User ID and Invited Email required" });
     }
 
+    const isAlreadyExistEmail = await prisma.def_users.findFirst({
+      where: {
+        email_addresses: {
+          array_contains: email,
+        },
+      },
+    });
+    if (isAlreadyExistEmail) {
+      return res
+        .status(200)
+        .json({ message: "This email user already exists." });
+    }
+
     const token = crypto.randomUUID();
     // const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-    const existInvitaion = await prisma.def_invitations.findFirst({
-      where: { invited_email, status: "pending", type: "email" },
+    const existInvitaion = await prisma.new_user_invitations.findFirst({
+      where: { email, status: "pending", type: "email" },
     });
 
     if (existInvitaion && existInvitaion.expires_at > new Date()) {
@@ -97,7 +112,7 @@ exports.invitaionViaEmail = async (req, res) => {
       });
     }
     if (existInvitaion && existInvitaion.expires_at < new Date()) {
-      await prisma.def_invitations.update({
+      await prisma.new_user_invitations.update({
         where: { id: existInvitaion.id },
         data: {
           status: "expired",
@@ -105,10 +120,10 @@ exports.invitaionViaEmail = async (req, res) => {
       });
     }
 
-    await prisma.def_invitations.create({
+    await prisma.new_user_invitations.create({
       data: {
         invited_by,
-        invited_email,
+        email,
         token,
         status: "pending",
         type: "email",
@@ -118,14 +133,15 @@ exports.invitaionViaEmail = async (req, res) => {
     const inviteLink = `${baseUrl}?token=${token}`;
 
     // --- Send Email ---
-    if (invited_email) {
+    if (email) {
       const res = await transporter.sendMail({
         from: `"PROCG Team" <${user}>`,
-        to: invited_email,
+        to: email,
         subject: "You’re Invited to join PROCG",
         html: `<p>Hello,</p>
                <p>We are excited to invite you to join PROCG App!</p>
                <p>Click the link below to accept your invitation and get started:</p>
+               <p><a href="${inviteLink}">${inviteLink}</a></p>
                <p><a href="${inviteLink}">Click here to accept invite</a></p>
                <p>Please note, this link will expire in 5 days.</p>
                <p>We look forward to having you on board!</p>
@@ -159,12 +175,13 @@ exports.invitaionViaEmail = async (req, res) => {
 exports.invitaionViaLink = async (req, res) => {
   try {
     const { invited_by } = req.body;
+
     if (!invited_by) {
       return res.status(400).json({ error: "inviter_User ID is required" });
     }
     const token = crypto.randomUUID();
 
-    const invitedLinks = await prisma.def_invitations.findFirst({
+    const invitedLinks = await prisma.new_user_invitations.findFirst({
       where: { invited_by, status: "pending", type: "link" },
     });
 
@@ -176,7 +193,7 @@ exports.invitaionViaLink = async (req, res) => {
     }
 
     if (invitedLinks && invitedLinks.expires_at < new Date()) {
-      await prisma.def_invitations.update({
+      await prisma.new_user_invitations.update({
         where: { id: invitedLinks.id },
         data: {
           status: "expired",
@@ -185,7 +202,7 @@ exports.invitaionViaLink = async (req, res) => {
     }
 
     // store in DB
-    await prisma.def_invitations.create({
+    await prisma.new_user_invitations.create({
       data: { invited_by, token, status: "pending", type: "link" },
     });
 
@@ -211,7 +228,9 @@ exports.verifyInvitation = async (req, res) => {
         .json({ valid: false, message: "Token is missing" });
     }
 
-    const invite = await prisma.def_invitations.findFirst({ where: { token } });
+    const invite = await prisma.new_user_invitations.findFirst({
+      where: { token },
+    });
     if (!invite) {
       return res
         .status(200)
@@ -231,7 +250,7 @@ exports.verifyInvitation = async (req, res) => {
     }
 
     if (invite.status === "pending" && invite.expires_at < new Date()) {
-      await prisma.def_invitations.update({
+      await prisma.new_user_invitations.update({
         where: { token },
         data: { status: "expired" },
       });
@@ -244,7 +263,7 @@ exports.verifyInvitation = async (req, res) => {
       return res.status(200).json({
         valid: true,
         invited_by: invite.invited_by,
-        invited_email: invite.invited_email,
+        email: invite.email,
         type: invite.type,
         invitation_link: `${baseUrl}?token=${invite.token}`,
         message: "The invitation link is valid",
@@ -265,6 +284,7 @@ exports.acceptInvitaion = async (req, res) => {
     const {
       user_name,
       user_type,
+      email,
       created_by, //invite user id
       last_updated_by, //invite user id
       tenant_id,
@@ -283,23 +303,24 @@ exports.acceptInvitaion = async (req, res) => {
     if (!token || typeof token !== "string") {
       return res.status(400).json({ message: "Token is missing" });
     }
-    const tokenEmail = await prisma.def_invitations.findFirst({
+    const tokenEmail = await prisma.new_user_invitations.findFirst({
       where: { token },
     });
 
-    const usernameAndEmailCheck = await prisma.def_users.findFirst({
-      where: {
-        OR: [
-          { user_name: user_name },
-          { email_addresses: { array_contains: tokenEmail.invited_email } },
-        ],
-      },
-    });
+    const [userNameExist, emailExist] = await Promise.all([
+      prisma.def_users.findFirst({
+        where: { user_name },
+      }),
+      prisma.def_users.findFirst({
+        where: { email_addresses: { array_contains: tokenEmail.email } },
+      }),
+    ]);
 
-    if (usernameAndEmailCheck) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
+    if (userNameExist) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+    if (emailExist) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     const profile_picture = {
@@ -319,7 +340,7 @@ exports.acceptInvitaion = async (req, res) => {
           user_id: maxId,
           user_name,
           user_type,
-          email_addresses: [tokenEmail.invited_email],
+          email_addresses: [email],
           created_by,
           last_updated_by,
           tenant_id,
@@ -345,9 +366,13 @@ exports.acceptInvitaion = async (req, res) => {
       }),
     ]);
 
-    await prisma.def_invitations.update({
+    await prisma.new_user_invitations.update({
       where: { token },
-      data: { status: "accepted" },
+      data: {
+        registered_email: email,
+        status: "accepted",
+        accepted_at: new Date(),
+      },
     });
 
     return res.status(201).json({

@@ -35,14 +35,14 @@ const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
 const defAlertsRoutes = require("./defAlertsRoutes");
 const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
-const defInvitationRoutes = require("./defInvitationRoutes");
+const newUserInvitationRoutes = require("./newUserInvitationRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);
 routes.use("/qr-code", authentication);
-routes.use("/invitation", defInvitationRoutes);
+routes.use("/invitation", newUserInvitationRoutes);
 
 // Verify user - middleware
 routes.use(verifyUser);
