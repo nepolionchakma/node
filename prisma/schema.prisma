@@ -482,7 +482,7 @@ model new_user_invitations {
   user_invitation_id    Int       @id @default(autoincrement())
   invited_by            Int
   email                 String?
-  registered_email String?
+  registered_user_id    Int?
   type                  String?   @db.VarChar(10)
   token                 String    @unique
   status                String?   @default("pending") @db.VarChar(10)
