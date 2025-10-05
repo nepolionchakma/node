@@ -1,5 +1,5 @@
 const Router = require("express");
-const invitaionController = require("../Controller/defInvitationController");
+const invitaionController = require("../Controller/newUserInvitationController");
 
 const router = Router();
 

@@ -478,15 +478,17 @@ model def_control_environments {
   @@schema("apps")
 }
 
-model def_invitations {
-  id            Int       @id @default(autoincrement())
-  invited_by    Int
-  invited_email String?
-  type String?
-  token         String    @unique
-  status        String?   @default("pending") @db.VarChar(10)
-  created_at    DateTime? @default(now()) @db.Timestamp(6)
-  expires_at    DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '5 days'::interval)")) @db.Timestamp(6)
+model new_user_invitations {
+  user_invitation_id    Int       @id @default(autoincrement())
+  invited_by            Int
+  email                 String?
+  registered_email String?
+  type                  String?   @db.VarChar(10)
+  token                 String    @unique
+  status                String?   @default("pending") @db.VarChar(10)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  accepted_at           DateTime? @db.Timestamp(6)
+  expires_at            DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '5 days'::interval)")) @db.Timestamp(6)
 
   @@schema("apps")
 }
