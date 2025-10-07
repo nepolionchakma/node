@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 // fetch all Models
 exports.getDefAccessModels = async (req, res) => {

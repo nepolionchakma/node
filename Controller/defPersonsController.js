@@ -1,6 +1,6 @@
 const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 exports.defPersons = async (req, res) => {
   try {

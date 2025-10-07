@@ -1,7 +1,7 @@
 const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
 const currentDate = new Date().toLocaleString();
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 exports.getDefUsers = async (req, res) => {
   try {

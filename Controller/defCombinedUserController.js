@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const { default: axios } = require("axios");
 dotenv.config();
 
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 const hashPassword = (password) => {
   return new Promise((resolve, reject) => {

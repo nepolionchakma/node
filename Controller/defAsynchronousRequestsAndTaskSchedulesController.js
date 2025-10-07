@@ -1,5 +1,5 @@
 const axios = require("axios");
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 const pageLimitData = (page, limit) => {
   const pageNumber = parseInt(page);
   const limitNumber = parseInt(limit);

@@ -1,5 +1,5 @@
 const axios = require("axios");
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 // Get Data
 exports.getAccessProfiles = async (req, res) => {
