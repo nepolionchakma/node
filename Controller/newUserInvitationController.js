@@ -3,13 +3,15 @@ const nodemailer = require("nodemailer");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 // const crypto = require("crypto");
-const baseUrl = "https://procg.datafluent.team/invitation";
+// const baseUrl = "https://procg.datafluent.team/invitation";
 const user = "nepolion.datafluent.team@gmail.com";
 const pass = "qgpx iwbl xozo tbjg";
 
-const JWT_SECRET_ACCESS_TOKEN = process.env.JWT_SECRET_ACCESS_TOKEN;
-const INVITATION_ACCESS_TOKEN_EXPIRED_TIME =
-  process.env.INVITATION_ACCESS_TOKEN_EXPIRED_TIME;
+const {
+  JWT_SECRET_ACCESS_TOKEN,
+  INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
+  REACT_ENDPOINT_URL,
+} = require("../Variables/variables");
 
 // Email setup
 const transporter = nodemailer.createTransport({
@@ -57,7 +59,7 @@ exports.invitationViaEmail = async (req, res) => {
     if (existInvitaion && existInvitaion.expires_at > new Date()) {
       return res.status(200).json({
         invited_by: existInvitaion.invited_by,
-        invitation_link: `${baseUrl}?token=${existInvitaion.token}`,
+        invitation_link: `${REACT_ENDPOINT_URL}/invitation?token=${existInvitaion.token}`,
         message: "The invitation email already exists",
       });
     } else if (existInvitaion && existInvitaion.expires_at < new Date()) {
@@ -79,7 +81,7 @@ exports.invitationViaEmail = async (req, res) => {
       },
     });
 
-    const inviteLink = `${baseUrl}/${newInvitation.user_invitation_id}/${token}`;
+    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${newInvitation.user_invitation_id}/${token}`;
 
     // --- Send Email ---
     if (email) {
@@ -133,23 +135,23 @@ exports.invitationViaLink = async (req, res) => {
       expiresIn: INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
     });
 
-    const invitedLink = await prisma.new_user_invitations.findFirst({
-      where: { invited_by, status: "PENDING", type: "LINK" },
-    });
+    // const invitedLink = await prisma.new_user_invitations.findFirst({
+    //   where: { invited_by, status: "PENDING", type: "LINK" },
+    // });
 
-    if (invitedLink && invitedLink.expires_at > new Date()) {
-      return res.status(200).json({
-        invitation_link: `${baseUrl}/${invitedLink.user_invitation_id}/${token}`,
-        message: "Already, you have a generated invitation link",
-      });
-    } else if (invitedLink && invitedLink.expires_at < new Date()) {
-      await prisma.new_user_invitations.update({
-        where: { user_invitation_id: invitedLink.user_invitation_id },
-        data: {
-          status: "EXPIRED",
-        },
-      });
-    }
+    // if (invitedLink && invitedLink.expires_at > new Date()) {
+    //   return res.status(200).json({
+    //     invitation_link: `${REACT_ENDPOINT_URL}/${invitedLink.user_invitation_id}/${token}`,
+    //     message: "Already, you have a generated invitation link",
+    //   });
+    // } else if (invitedLink && invitedLink.expires_at < new Date()) {
+    //   await prisma.new_user_invitations.update({
+    //     where: { user_invitation_id: invitedLink.user_invitation_id },
+    //     data: {
+    //       status: "EXPIRED",
+    //     },
+    //   });
+    // }
 
     // store in DB
     const createdInvitation = await prisma.new_user_invitations.create({
@@ -157,7 +159,7 @@ exports.invitationViaLink = async (req, res) => {
     });
 
     // generated link
-    const inviteLink = `${baseUrl}/${createdInvitation.user_invitation_id}/${token}`;
+    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${createdInvitation.user_invitation_id}/${token}`;
 
     return res.status(201).json({
       success: true,
@@ -231,7 +233,7 @@ exports.verifyInvitation = async (req, res) => {
           invited_by: isInvited.invited_by,
           email: isInvited.email,
           type: isInvited.type,
-          invitation_link: `${baseUrl}/${isInvited.user_invitation_id}/${token}`,
+          invitation_link: `${REACT_ENDPOINT_URL}/invitation/${isInvited.user_invitation_id}/${token}`,
           message: "The invitation link is valid",
         });
       }

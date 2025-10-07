@@ -1,7 +1,8 @@
-const decodedKey = Buffer.from(
-  process.env.FIREBASE_PRIVATE_KEY_BASE64,
-  "base64"
-).toString("utf-8");
+const { FIREBASE_PRIVATE_KEY_BASE64 } = require("../Variables/variables");
+
+const decodedKey = Buffer.from(FIREBASE_PRIVATE_KEY_BASE64, "base64").toString(
+  "utf-8"
+);
 
 const admin = require("firebase-admin");
 

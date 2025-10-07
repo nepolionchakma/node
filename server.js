@@ -8,8 +8,10 @@ const multer = require("multer");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(__dirname, "../.server_env") });
+const { PORT, ALLOWED_ORIGINS } = require("./Variables/variables");
 
-const PORT = process.env.PORT;
+// console.log(ALLOWED_ORIGINS);
+
 const server = http.createServer(app);
 
 const io = socketIo(server, {
@@ -21,7 +23,7 @@ const io = socketIo(server, {
 });
 
 const options = {
-  origin: JSON.parse(process.env.ALLOWED_ORIGINS),
+  origin: JSON.parse(ALLOWED_ORIGINS),
   credentials: true,
 };
 

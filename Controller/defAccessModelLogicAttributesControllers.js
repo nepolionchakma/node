@@ -1,6 +1,6 @@
 const prisma = require("../DB/db.config");
 const { default: axios } = require("axios");
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 // fetch access model attributes
 exports.getDefAccessModelAttributes = async (req, res) => {

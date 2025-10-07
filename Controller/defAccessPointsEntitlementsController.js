@@ -1,7 +1,7 @@
 const { default: axios } = require("axios");
 const prisma = require("../DB/db.config");
 const currentDate = new Date();
-const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
+const { FLASK_ENDPOINT_URL } = require("../Variables/variables");
 
 // get Data
 exports.getAccessPointsEntitlement = async (req, res) => {

@@ -1,12 +1,11 @@
 const { Redis } = require("ioredis");
 const prisma = require("../../DB/db.config");
+const { VALKEY_HOST } = require("../../Variables/variables");
 let users = {};
 let devices = {};
 
-const url = process.env.VALKEY_HOST;
-
-const pub = new Redis(url);
-const sub = new Redis(url);
+const pub = new Redis(VALKEY_HOST);
+const sub = new Redis(VALKEY_HOST);
 
 const socket = (io) => {
   // Subscribe to Redis
