@@ -24,8 +24,8 @@ const generateAccessTokenAndRefreshToken = (props) => {
 
 // Login
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { user, password } = req.body;
+  if (!user || !password) {
     return res
       .status(400)
       .json({ message: "Email and password are required." });
@@ -54,27 +54,34 @@ exports.login = async (req, res) => {
   };
   //-------------------------
   try {
-    const user = await prisma.def_users.findFirst({
+    const userRecord = await prisma.def_users.findFirst({
       where: {
-        email_addresses: {
-          array_contains: email,
-        },
+        OR: [{ email_address: user }, { user_name: user }],
       },
     });
-    if (!user) {
-      res.status(404).json({ message: "User not found." });
+
+    const userProfile = await prisma.def_access_profiles.findFirst({
+      where: {
+        profile_id: user,
+      },
+    });
+    if (!userRecord && !userProfile) {
+      res.status(404).json({ message: "Invalid User." });
     } else {
-      const userCredential = await prisma.def_user_credentials.findUnique({
+      const userId = userRecord?.user_id || userProfile?.user_id;
+
+      const userCredential = await prisma.def_user_credentials.findFirst({
         where: {
-          user_id: user.user_id,
+          user_id: Number(userId),
         },
       });
+
       const passwordResult = await verifyPassword(
         userCredential.password,
         password
       );
       if (!passwordResult) {
-        return res.status(401).json({ message: "Invalid password." });
+        return res.status(401).json({ message: "Invalid Credentials." });
       }
 
       // const encryptedPassword = hashPassword(password);
@@ -83,13 +90,13 @@ exports.login = async (req, res) => {
         const { accessToken, refreshToken } =
           generateAccessTokenAndRefreshToken({
             isLoggedIn: true,
-            user_id: user.user_id,
+            user_id: Number(userId),
             sub: String(user.user_id),
-            user_type: user.user_type,
-            user_name: user.user_name,
-            tenant_id: user.tenant_id,
-            profile_picture: user.profile_picture,
-            issuedAt: new Date(),
+            // user_type: user.user_type,
+            // user_name: user.user_name,
+            // tenant_id: user.tenant_id,
+            // profile_picture: user.profile_picture,
+            // issuedAt: new Date(),
           });
 
         return res
@@ -104,14 +111,14 @@ exports.login = async (req, res) => {
           })
           .json({
             isLoggedIn: true,
-            user_id: user.user_id,
-            user_type: user.user_type,
-            user_name: user.user_name,
-            tenant_id: user.tenant_id,
-            profile_picture: user.profile_picture,
+            user_id: Number(userId),
+            // user_type: user.user_type,
+            // user_name: user.user_name,
+            // tenant_id: user.tenant_id,
+            // profile_picture: user.profile_picture,
             access_token: accessToken,
             refresh_token: refreshToken,
-            issuedAt: new Date(),
+            // issuedAt: new Date(),
           });
       } else {
         return res.status(401).json({ message: "Invalid credential" });
