@@ -6,11 +6,13 @@ const jwt = require("jsonwebtoken");
 // const baseUrl = "https://procg.datafluent.team/invitation";
 const user = "nepolion.datafluent.team@gmail.com";
 const pass = "qgpx iwbl xozo tbjg";
+const CryptoJS = require("crypto-js");
 
 const {
   JWT_SECRET_ACCESS_TOKEN,
   INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
   REACT_ENDPOINT_URL,
+  CRYPTO_SECRET_KEY,
 } = require("../Variables/variables");
 
 // Email setup
@@ -80,7 +82,16 @@ exports.invitationViaEmail = async (req, res) => {
         type: "EMAIL",
       },
     });
+    // const encryptedInvitationId = CryptoJS.AES.encrypt(
+    //   newInvitation.user_invitation_id,
+    //   CRYPTO_SECRET_KEY
+    // ).toString();
+    // const encryptedToken = CryptoJS.AES.encrypt(
+    //   token,
+    //   CRYPTO_SECRET_KEY
+    // ).toString();
 
+    // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
     const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${newInvitation.user_invitation_id}/${token}`;
 
     // --- Send Email ---
@@ -158,6 +169,17 @@ exports.invitationViaLink = async (req, res) => {
       data: { invited_by, token, status: "PENDING", type: "LINK" },
     });
 
+    //  const encryptedInvitationId = CryptoJS.AES.encrypt(
+    //   createdInvitation.user_invitation_id,
+    //   CRYPTO_SECRET_KEY
+    // ).toString();
+    // const encryptedToken = CryptoJS.AES.encrypt(
+    //   token,
+    //   CRYPTO_SECRET_KEY
+    // ).toString();
+
+    // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
+
     // generated link
     const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${createdInvitation.user_invitation_id}/${token}`;
 
@@ -204,7 +226,10 @@ exports.verifyInvitation = async (req, res) => {
         return res
           .status(200)
           .json({ valid: false, message: "No invitation found" });
-      } else if (isInvited.status === "EXPIRED") {
+      } else if (
+        isInvited.status === "EXPIRED" ||
+        isInvited.status === "ACCEPTED"
+      ) {
         return res
           .status(200)
           .json({ valid: false, message: "The invitation has expired" });

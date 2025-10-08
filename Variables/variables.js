@@ -14,7 +14,7 @@ const FLASK_ENDPOINT_URL = process.env.FLASK_ENDPOINT_URL;
 const REACT_ENDPOINT_URL = process.env.REACT_ENDPOINT_URL;
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
 const PORT = process.env.PORT;
-
+const CRYPTO_SECRET_KEY = process.env.CRYPTO_SECRET_KEY;
 const FIREBASE_PRIVATE_KEY_BASE64 = process.env.FIREBASE_PRIVATE_KEY_BASE64;
 
 module.exports = {
@@ -30,4 +30,5 @@ module.exports = {
   ALLOWED_ORIGINS,
   PORT,
   FIREBASE_PRIVATE_KEY_BASE64,
+  CRYPTO_SECRET_KEY,
 };
