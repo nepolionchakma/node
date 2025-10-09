@@ -15,6 +15,18 @@ const {
   CRYPTO_SECRET_KEY,
 } = require("../Variables/variables");
 
+const encrypt = (value) => {
+  if (typeof value !== "string") {
+    throw new Error("Value must be a string to encrypt");
+  }
+
+  // Encrypt
+  const ciphertext = CryptoJS.AES.encrypt(value, CRYPTO_SECRET_KEY).toString();
+
+  // Make it URL-safe
+  return encodeURIComponent(ciphertext);
+};
+
 // Email setup
 const transporter = nodemailer.createTransport({
   service: "gmail", // or SES/SendGrid
@@ -36,12 +48,15 @@ exports.invitationViaEmail = async (req, res) => {
 
     const isAlreadyExistEmail = await prisma.def_users.findFirst({
       where: {
-        email_addresses: {
-          array_contains: email,
-        },
+        email_address: email,
       },
     });
-    if (isAlreadyExistEmail) {
+    const isAlreadyExistProfile = await prisma.def_access_profiles.findFirst({
+      where: {
+        profile_id: email,
+      },
+    });
+    if (isAlreadyExistEmail || isAlreadyExistProfile) {
       return res
         .status(200)
         .json({ message: "This email user already exists." });
@@ -77,22 +92,18 @@ exports.invitationViaEmail = async (req, res) => {
       data: {
         invited_by,
         email,
-        token,
+        token: encrypt(token),
         status: "PENDING",
         type: "EMAIL",
       },
     });
-    // const encryptedInvitationId = CryptoJS.AES.encrypt(
-    //   newInvitation.user_invitation_id,
-    //   CRYPTO_SECRET_KEY
-    // ).toString();
-    // const encryptedToken = CryptoJS.AES.encrypt(
-    //   token,
-    //   CRYPTO_SECRET_KEY
-    // ).toString();
 
-    // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
-    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${newInvitation.user_invitation_id}/${token}`;
+    const encryptedInvitationId = encrypt(
+      newInvitation.user_invitation_id.toString()
+    );
+    const encryptedToken = encrypt(token);
+    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
+    // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${newInvitation.user_invitation_id}/${token}`;
 
     // --- Send Email ---
     if (email) {
@@ -165,29 +176,32 @@ exports.invitationViaLink = async (req, res) => {
     // }
 
     // store in DB
+    const encryptedToken = encrypt(token);
     const createdInvitation = await prisma.new_user_invitations.create({
-      data: { invited_by, token, status: "PENDING", type: "LINK" },
+      data: {
+        invited_by,
+        token: encryptedToken,
+        status: "PENDING",
+        type: "LINK",
+      },
     });
 
-    //  const encryptedInvitationId = CryptoJS.AES.encrypt(
-    //   createdInvitation.user_invitation_id,
-    //   CRYPTO_SECRET_KEY
-    // ).toString();
-    // const encryptedToken = CryptoJS.AES.encrypt(
-    //   token,
-    //   CRYPTO_SECRET_KEY
-    // ).toString();
+    if (createdInvitation) {
+      const encryptedInvitationId = encrypt(
+        createdInvitation.user_invitation_id.toString()
+      );
 
-    // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
+      const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
 
-    // generated link
-    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${createdInvitation.user_invitation_id}/${token}`;
+      // generated link
+      //  const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${createdInvitation.user_invitation_id}/${token}`;
 
-    return res.status(201).json({
-      success: true,
-      invitation_link: inviteLink,
-      message: "The invitation link was generated successfully",
-    });
+      return res.status(201).json({
+        success: true,
+        invitation_link: inviteLink,
+        message: "The invitation link was generated successfully",
+      });
+    }
   } catch (error) {
     console.log(error, "error");
     return res.status(500).json({ error: error.message });
@@ -218,7 +232,6 @@ exports.verifyInvitation = async (req, res) => {
         where: {
           user_invitation_id: Number(user_invitation_id),
           invited_by: user.user_id,
-          token,
         },
       });
 
