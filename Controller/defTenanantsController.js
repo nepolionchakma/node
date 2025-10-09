@@ -15,10 +15,17 @@ const pageLimitData = (page, limit) => {
 };
 
 exports.getDefTenants = async (req, res) => {
+  const authorizationHeader = req.headers["authorization"];
+
+  if (!authorizationHeader) {
+    return res.status(401).json({ error: "Authorization header missing" });
+  }
+
   try {
     const defTenants = await axios.get(`${FLASK_ENDPOINT_URL}/tenants`, {
       headers: {
-        Authorization: `Bearer ${req.cookies.access_token}`,
+        Authorization:
+          authorizationHeader ?? `Bearer ${req.cookies.access_token}`,
       },
     });
 

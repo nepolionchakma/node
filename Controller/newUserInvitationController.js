@@ -226,16 +226,16 @@ exports.verifyInvitation = async (req, res) => {
         return res
           .status(200)
           .json({ valid: false, message: "No invitation found" });
-      } else if (
-        isInvited.status === "EXPIRED" ||
-        isInvited.status === "ACCEPTED"
-      ) {
-        return res
-          .status(200)
-          .json({ valid: false, message: "The invitation has expired" });
+      } else if (isInvited.status === "EXPIRED") {
+        return res.status(200).json({
+          valid: false,
+          status: isInvited.status,
+          message: "The invitation has expired",
+        });
       } else if (isInvited.status === "ACCEPTED") {
         return res.status(200).json({
           valid: false,
+          status: isInvited.status,
           message: "The invitation has already been accepted",
         });
       } else if (
@@ -258,6 +258,7 @@ exports.verifyInvitation = async (req, res) => {
           invited_by: isInvited.invited_by,
           email: isInvited.email,
           type: isInvited.type,
+          status: isInvited.status,
           invitation_link: `${REACT_ENDPOINT_URL}/invitation/${isInvited.user_invitation_id}/${token}`,
           message: "The invitation link is valid",
         });
