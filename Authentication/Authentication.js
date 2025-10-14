@@ -198,11 +198,11 @@ exports.refreshToken = async (req, res) => {
             isLoggedIn: true,
             user_id: user.user_id,
             sub: String(user.user_id),
-            user_type: user.user_type,
-            user_name: user.user_name,
-            tenant_id: user.tenant_id,
-            profile_picture: user.profile_picture,
-            issuedAt: new Date(),
+            // user_type: user.user_type,
+            // user_name: user.user_name,
+            // tenant_id: user.tenant_id,
+            // profile_picture: user.profile_picture,
+            // issuedAt: new Date(),
           });
 
         return res
@@ -218,13 +218,13 @@ exports.refreshToken = async (req, res) => {
           .json({
             isLoggedIn: true,
             user_id: user.user_id,
-            user_type: user.user_type,
-            user_name: user.user_name,
-            tenant_id: user.tenant_id,
-            profile_picture: user.profile_picture,
+            // user_type: user.user_type,
+            // user_name: user.user_name,
+            // tenant_id: user.tenant_id,
+            // profile_picture: user.profile_picture,
             access_token: accessToken,
             refresh_token: refreshToken,
-            issuedAt: new Date(),
+            // issuedAt: new Date(),
           });
       }
     );
@@ -252,9 +252,9 @@ exports.verifyToken = async (req, res) => {
     const user = await prisma.def_users.findFirst({
       where: {
         user_id: decoded.user_id,
-        user_name: decoded.user_name,
-        tenant_id: decoded.tenant_id,
-        user_type: decoded.user_type,
+        // user_name: decoded.user_name,
+        // tenant_id: decoded.tenant_id,
+        // user_type: decoded.user_type,
       },
     });
 
@@ -265,11 +265,11 @@ exports.verifyToken = async (req, res) => {
         isLoggedIn: true,
         user_id: user.user_id,
         sub: String(user.user_id),
-        user_type: user.user_type,
-        user_name: user.user_name,
-        tenant_id: user.tenant_id,
-        profile_picture: user.profile_picture,
-        issuedAt: new Date(),
+        // user_type: user.user_type,
+        // user_name: user.user_name,
+        // tenant_id: user.tenant_id,
+        // profile_picture: user.profile_picture,
+        // issuedAt: new Date(),
       });
 
       return res
@@ -285,13 +285,13 @@ exports.verifyToken = async (req, res) => {
         .json({
           isLoggedIn: true,
           user_id: user.user_id,
-          user_type: user.user_type,
-          user_name: user.user_name,
-          tenant_id: user.tenant_id,
-          profile_picture: user.profile_picture,
+          // user_type: user.user_type,
+          // user_name: user.user_name,
+          // tenant_id: user.tenant_id,
+          // profile_picture: user.profile_picture,
           access_token: accessToken,
           refresh_token: refreshToken,
-          issuedAt: new Date(),
+          // issuedAt: new Date(),
         });
     }
   } catch (error) {
