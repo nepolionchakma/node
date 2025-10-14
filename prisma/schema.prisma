@@ -34,8 +34,13 @@ model def_api_endpoints {
 }
 
 model def_job_titles {
-  job_title_id   Int     @id
-  job_title_name String?
+  job_title_id    Int       @id(map: "job_titles_pk") @default(autoincrement())
+  job_title_name  String?
+  tenant_id       Int?
+  created_by      Int?
+  created_on      DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by Int?
+  last_updated_on DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -68,17 +73,25 @@ model def_roles {
 }
 
 model def_tenant_enterprise_setup {
-  tenant_id       Int     @id
+  tenant_id       Int       @id
   enterprise_name String?
   enterprise_type String?
+  last_updated_on DateTime? @db.Timestamptz(6)
+  last_updated_by Int?
+  created_on      DateTime? @db.Timestamptz(6)
+  created_by      Int?
 
   @@schema("apps")
 }
 
 model def_tenants {
-  tenant_id   Int         @id @default(autoincrement())
-  tenant_name String?
-  def_users   def_users[]
+  tenant_id       Int         @id @default(autoincrement())
+  tenant_name     String?
+  last_updated_on DateTime?   @db.Timestamptz(6)
+  last_updated_by Int?
+  created_on      DateTime?   @db.Timestamptz(6)
+  created_by      Int?
+  def_users       def_users[]
 
   @@schema("apps")
 }
@@ -118,15 +131,15 @@ model def_user_types {
 }
 
 model def_users {
-  user_id                     Int                           @id
+  user_id                     Int                           @id @default(autoincrement())
   user_name                   String?
   user_type                   String?
   email_address               String?
   profile_picture             Json?
   created_by                  Int?
-  created_on                  String?
+  created_on                  DateTime?                     @db.Timestamp(6)
   last_updated_by             Int?
-  last_updated_on             String?
+  last_updated_on             DateTime?                     @db.Timestamp(6)
   tenant_id                   Int?
   user_invitation_id          Int?
   def_access_profiles         def_access_profiles[]
@@ -320,23 +333,23 @@ model def_global_conditions {
 }
 
 model def_controls {
-  def_control_id        Int     @id(map: "controls_pkey") @default(autoincrement())
+  def_control_id        Int       @id(map: "controls_pkey") @default(autoincrement())
   control_name          String?
   description           String?
   pending_results_count Int?
   control_type          String?
   priority              Int?
   datasources           String?
-  last_run_date         String?
-  last_updated_date     String?
+  last_run_date         DateTime? @db.Timestamp(6)
+  last_updated_date     DateTime? @db.Timestamp(6)
   status                String?
   state                 String?
   result_investigator   String?
   authorized_data       String?
   revision              Int?
-  revision_date         String?
+  revision_date         DateTime? @db.Timestamp(6)
   created_by            Int?
-  created_date          String?
+  created_date          DateTime? @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -543,10 +556,10 @@ model def_action_items_v {
   description        String
   status             String?
   notification_status             String?
-  created_by         Int
-  creation_date      DateTime?
-  last_updated_by    Int
-  last_update_date   DateTime?
+ created_by                  Int?
+  created_on                  DateTime?                     @db.Timestamp(6)
+  last_updated_by             Int?
+  last_updated_on             DateTime?                     @db.Timestamp(6)
 
   @@map("def_action_items_v")
   @@schema("apps")
