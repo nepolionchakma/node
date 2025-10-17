@@ -575,7 +575,7 @@ model def_alerts_v {
 model def_action_items_v {
   user_id               Int
   user_name             String
-  action_item_id        Int
+  action_item_id        Int         @id @default(autoincrement())
   action_item_name      String
   notification_id       String?
   notification_status   String?
