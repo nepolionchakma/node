@@ -531,3 +531,61 @@ model new_user_invitations {
 
   @@schema("apps")
 }
+
+model def_users_v {
+  user_id             Int     @id
+  user_name           String
+  first_name          String
+  middle_name         String
+  last_name           String
+  email_address       String
+  job_title           String
+  user_type           String
+  created_by          Int
+  creation_date       DateTime?
+  last_updated_by     Int
+  last_updated_date   DateTime?
+  tenant_id           Int
+  user_invitation_id  String?
+  profile_picture     Json
+
+  @@map("def_users_v")
+  @@schema("apps")
+}
+
+model def_alerts_v {
+  user_id               Int
+  user_name             String
+  notification_id       String?
+  alert_id              Int
+  alert_name            String
+  description           String
+  acknowledge           Boolean?
+  notification_status   String
+  created_by            Int?
+  creation_date         DateTime?   @db.Timestamptz(6)
+  last_updated_by       Int?
+  last_update_date      DateTime?   @db.Timestamptz(6)
+
+  @@id([user_id,alert_id])
+  @@map("def_alerts_v")
+  @@schema("apps")
+}
+
+model def_action_items_v {
+  user_id               Int
+  user_name             String
+  action_item_id        Int         @id @default(autoincrement())
+  action_item_name      String
+  notification_id       String?
+  notification_status   String?
+  description           String
+  status                String?
+  created_by            Int?
+  creation_date         DateTime?   @db.Timestamp(6)
+  last_updated_by       Int?
+  last_updated_date     DateTime?   @db.Timestamp(6)
+
+  @@map("def_action_items_v")
+  @@schema("apps")
+}
