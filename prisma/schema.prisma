@@ -14,9 +14,9 @@ model def_api_endpoint_roles {
   api_endpoint_id   Int
   role_id           Int
   created_by        Int?
-  created_on        DateTime?         @default(now()) @db.Timestamp(6)
+  creation_date     DateTime?         @default(now()) @db.Timestamp(6)
   last_updated_by   Int?
-  last_updated_on   DateTime?         @default(now()) @db.Timestamp(6)
+  last_update_date  DateTime?         @default(now()) @db.Timestamp(6)
   def_api_endpoints def_api_endpoints @relation(fields: [api_endpoint_id], references: [api_endpoint_id], onDelete: NoAction, onUpdate: NoAction)
   def_roles         def_roles         @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -32,9 +32,9 @@ model def_api_endpoints {
   method                 String?
   privilege_id           Int?
   created_by             Int?
-  created_on             DateTime?                @default(now()) @db.Timestamp(6)
+  creation_date          DateTime?                @default(now()) @db.Timestamp(6)
   last_updated_by        Int?
-  last_updated_on        DateTime?                @default(now()) @db.Timestamp(6)
+  last_update_date       DateTime?                @default(now()) @db.Timestamp(6)
   def_api_endpoint_roles def_api_endpoint_roles[]
 
   @@unique([api_endpoint, parameter1, parameter2, method])
@@ -42,13 +42,13 @@ model def_api_endpoints {
 }
 
 model def_job_titles {
-  job_title_id    Int       @id(map: "job_titles_pk") @default(autoincrement())
-  job_title_name  String?
-  tenant_id       Int?
-  created_by      Int?
-  created_on      DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by Int?
-  last_updated_on DateTime? @default(now()) @db.Timestamp(6)
+  job_title_id     Int       @id(map: "job_titles_pk") @default(autoincrement())
+  job_title_name   String?
+  tenant_id        Int?
+  created_by       Int?
+  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -70,6 +70,10 @@ model def_persons {
 model def_privileges {
   privilege_id                Int                           @id
   privilege_name              String?
+  created_by                  Int?
+  creation_date               DateTime?                     @default(now()) @db.Timestamp(6)
+  last_updated_by             Int?
+  last_update_date            DateTime?                     @default(now()) @db.Timestamp(6)
   def_user_granted_privileges def_user_granted_privileges[]
 
   @@schema("apps")
@@ -78,6 +82,10 @@ model def_privileges {
 model def_roles {
   role_id                Int                      @id
   role_name              String?
+  created_by             Int?
+  creation_date          DateTime?                @default(now()) @db.Timestamp(6)
+  last_updated_by        Int?
+  last_update_date       DateTime?                @default(now()) @db.Timestamp(6)
   def_api_endpoint_roles def_api_endpoint_roles[]
   def_user_granted_roles def_user_granted_roles[]
 
@@ -85,25 +93,25 @@ model def_roles {
 }
 
 model def_tenant_enterprise_setup {
-  tenant_id       Int       @id
-  enterprise_name String?
-  enterprise_type String?
-  last_updated_on DateTime? @db.Timestamptz(6)
-  last_updated_by Int?
-  created_on      DateTime? @db.Timestamptz(6)
-  created_by      Int?
+  tenant_id        Int       @id
+  enterprise_name  String?
+  enterprise_type  String?
+  created_by       Int?
+  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
 
 model def_tenants {
-  tenant_id       Int         @id @default(autoincrement())
-  tenant_name     String?
-  last_updated_on DateTime?   @db.Timestamptz(6)
-  last_updated_by Int?
-  created_on      DateTime?   @db.Timestamptz(6)
-  created_by      Int?
-  def_users       def_users[]
+  tenant_id        Int         @id @default(autoincrement())
+  tenant_name      String?
+  created_by       Int?
+  creation_date    DateTime?   @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime?   @default(now()) @db.Timestamp(6)
+  def_users        def_users[]
 
   @@schema("apps")
 }
@@ -120,20 +128,28 @@ model def_user_credentials {
 }
 
 model def_user_granted_privileges {
-  user_id        Int
-  privilege_id   Int
-  def_privileges def_privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: NoAction, onUpdate: NoAction)
-  def_users      def_users      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user_id          Int
+  privilege_id     Int
+  created_by       Int?
+  creation_date    DateTime?      @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime?      @default(now()) @db.Timestamp(6)
+  def_privileges   def_privileges @relation(fields: [privilege_id], references: [privilege_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users        def_users      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, privilege_id])
   @@schema("apps")
 }
 
 model def_user_granted_roles {
-  user_id   Int
-  role_id   Int
-  def_roles def_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
-  def_users def_users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user_id          Int
+  role_id          Int
+  created_by       Int?
+  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  def_roles        def_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users        def_users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, role_id])
   @@schema("apps")
@@ -189,9 +205,13 @@ model messages {
 }
 
 model def_processes {
-  process_id        Int    @id
+  process_id        Int       @id
   process_name      String
   process_structure Json?
+  created_by        Int?
+  creation_date     DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by   Int?
+  last_update_date  DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -240,31 +260,39 @@ model def_access_entitlements {
   revision                        Int?
   revision_date                   DateTime?                         @db.Date
   created_by                      Int?
-  created_on                      DateTime?                         @default(now()) @db.Timestamp(6)
+  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
   last_updated_by                 Int?
-  last_updated_on                 DateTime?                         @default(now()) @db.Timestamp(6)
+  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
   def_access_entitlement_elements def_access_entitlement_elements[]
 
   @@schema("apps")
 }
 
 model def_access_model_logic_attributes {
-  id                        Int  @id(map: "manage_access_model_logic_attributes_pkey")
+  id                        Int       @id(map: "manage_access_model_logic_attributes_pkey")
   def_access_model_logic_id Int
   widget_position           Int?
   widget_state              Int?
+  created_by                Int?
+  creation_date             DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by           Int?
+  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
 
 model def_access_model_logics {
-  def_access_model_logic_id Int     @id(map: "manage_access_model_logics_pkey")
+  def_access_model_logic_id Int       @id(map: "manage_access_model_logics_pkey")
   def_access_model_id       Int
   filter                    String?
   object                    String?
   attribute                 String?
   condition                 String?
   value                     String?
+  created_by                Int?
+  creation_date             DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by           Int?
+  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -279,10 +307,11 @@ model def_access_models {
   last_run_date       DateTime?         @db.Timestamptz(6)
   created_by          Int?
   last_updated_by     Int?
-  last_updated_date   DateTime?         @db.Timestamptz(6)
+  last_update_date    DateTime?         @db.Timestamptz(6)
   revision            Int?
   revision_date       DateTime?         @db.Timestamptz(6)
   datasource_name     String?           @db.VarChar(50)
+  creation_date       DateTime?         @default(now()) @db.Timestamp(6)
   def_data_sources    def_data_sources? @relation(fields: [datasource_name], references: [datasource_name], onDelete: NoAction, onUpdate: NoAction, map: "datasource_name")
 
   @@schema("apps")
@@ -299,9 +328,9 @@ model def_access_point_elements {
   change_control                  String?                           @db.VarChar(10)
   audit                           String?                           @db.VarChar(50)
   created_by                      Int?
-  created_on                      DateTime?                         @default(now()) @db.Timestamp(6)
+  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
   last_updated_by                 Int?
-  last_updated_on                 DateTime?                         @default(now()) @db.Timestamp(6)
+  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
   def_access_entitlement_elements def_access_entitlement_elements[]
 
   @@schema("apps")
@@ -348,11 +377,15 @@ model def_global_condition_logics {
 }
 
 model def_global_conditions {
-  def_global_condition_id Int     @id(map: "manage_global_conditions_pkey") @default(autoincrement())
+  def_global_condition_id Int       @id(map: "manage_global_conditions_pkey") @default(autoincrement())
   name                    String?
   datasource              String?
   description             String?
   status                  String?
+  created_by              Int?
+  creation_date           DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by         Int?
+  last_update_date        DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -366,7 +399,7 @@ model def_controls {
   priority              Int?
   datasources           String?
   last_run_date         DateTime? @db.Timestamp(6)
-  last_updated_date     DateTime? @db.Timestamp(6)
+  last_update_date      DateTime? @db.Timestamp(6)
   status                String?
   state                 String?
   result_investigator   String?
@@ -374,7 +407,8 @@ model def_controls {
   revision              Int?
   revision_date         DateTime? @db.Timestamp(6)
   created_by            Int?
-  created_date          DateTime? @db.Timestamp(6)
+  creation_date         DateTime? @db.Timestamp(6)
+  last_updated_by       Int?
 
   @@schema("apps")
 }
@@ -431,6 +465,9 @@ model def_notifications {
   action_item_id                                                       Int?
   alert_id                                                             Int?
   sender                                                               Int?
+  created_by                                                           Int?
+  last_updated_by                                                      Int?
+  last_update_date                                                     DateTime?          @default(now()) @db.Timestamp(6)
   def_action_items_def_action_items_notification_idTodef_notifications def_action_items[] @relation("def_action_items_notification_idTodef_notifications")
   def_alerts                                                           def_alerts[]
 
@@ -478,19 +515,23 @@ model def_access_entitlement_elements {
 }
 
 model def_linked_devices {
-  id              Int       @id(map: "linked_devices_pkey") @default(autoincrement())
-  user_id         Int
-  device_type     String?   @db.VarChar(50)
-  browser_name    String?   @db.VarChar(50)
-  browser_version String?   @db.VarChar(20)
-  os              String?   @db.VarChar(50)
-  user_agent      String?
-  added_at        DateTime? @default(now()) @db.Timestamp(6)
-  is_active       Int?
-  ip_address      String?
-  location        String?
-  signon_audit    Json?
-  signon_id       String?
+  id               Int       @id(map: "linked_devices_pkey") @default(autoincrement())
+  user_id          Int
+  device_type      String?   @db.VarChar(50)
+  browser_name     String?   @db.VarChar(50)
+  browser_version  String?   @db.VarChar(20)
+  os               String?   @db.VarChar(50)
+  user_agent       String?
+  added_at         DateTime? @default(now()) @db.Timestamp(6)
+  is_active        Int?
+  ip_address       String?
+  location         String?
+  signon_audit     Json?
+  signon_id        String?
+  created_by       Int?
+  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
