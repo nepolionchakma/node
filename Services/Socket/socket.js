@@ -41,7 +41,7 @@ const socket = (io) => {
       console.log(
         `user ${device_id} connected in ${key} with socket id ${socket.id}`
       );
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: device_id,
           user_id: key,
@@ -86,7 +86,7 @@ const socket = (io) => {
   // Event Handlers
   io.on("connection", async (socket) => {
     socket.on("sendMessage", async ({ notificationId, sender }) => {
-      const notification = await prisma.def_notifications.findUnique({
+      const notification = await prisma.def_notifications.findFirst({
         where: {
           notification_id: notificationId,
         },
@@ -133,7 +133,7 @@ const socket = (io) => {
 
     // Device Action
     socket.on("addDevice", async ({ deviceId, userId }) => {
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: deviceId,
           user_id: Number(userId),
@@ -146,7 +146,7 @@ const socket = (io) => {
 
     socket.on("inactiveDevice", async ({ inactiveDevices, userId }) => {
       for (const item of inactiveDevices) {
-        const device = await prisma.def_linked_devices.findUnique({
+        const device = await prisma.def_linked_devices.findFirst({
           where: {
             id: item.id,
             user_id: Number(userId),
@@ -159,7 +159,7 @@ const socket = (io) => {
     socket.on("SendAlert", async ({ alertId, recipients, isAcknowledge }) => {
       try {
         for (const recipient of recipients) {
-          const alert = await prisma.def_alerts_v.findUnique({
+          const alert = await prisma.def_alerts_v.findFirst({
             where: {
               user_id_alert_id: {
                 user_id: recipient,
@@ -185,7 +185,7 @@ const socket = (io) => {
         if (devices[deviceId].includes(socket.id)) {
           console.log(`user ${socket.id} device Id ${deviceId} disconnected `);
 
-          const device = await prisma.def_linked_devices.findUnique({
+          const device = await prisma.def_linked_devices.findFirst({
             where: {
               id: Number(deviceId),
             },
@@ -237,7 +237,7 @@ const socket = (io) => {
     const user = Number(socket.handshake.query.key);
     try {
       if (!device_id || device_id === 0) return;
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: device_id,
         },
