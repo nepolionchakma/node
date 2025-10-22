@@ -70,12 +70,15 @@ const socket = (io) => {
           return entry;
         });
 
-        await prisma.def_linked_devices.update({
+        const connectedDevice = await prisma.def_linked_devices.update({
           where: { id: device.id },
           data: {
             signon_audit: updatedAudit,
+            is_online: true,
           },
         });
+
+        io.to(Number(device.user_id)).emit("addDevice", connectedDevice);
       }
     }
   });
@@ -133,7 +136,7 @@ const socket = (io) => {
       const device = await prisma.def_linked_devices.findUnique({
         where: {
           id: deviceId,
-          user_id: userId,
+          user_id: Number(userId),
         },
       });
       if (device) {
@@ -141,8 +144,14 @@ const socket = (io) => {
       }
     });
 
-    socket.on("inactiveDevice", ({ inactiveDevices, userId }) => {
-      for (const device of inactiveDevices) {
+    socket.on("inactiveDevice", async ({ inactiveDevices, userId }) => {
+      for (const item of inactiveDevices) {
+        const device = await prisma.def_linked_devices.findUnique({
+          where: {
+            id: item.id,
+            user_id: Number(userId),
+          },
+        });
         io.to(Number(userId)).emit("inactiveDevice", device);
       }
     });
@@ -200,10 +209,15 @@ const socket = (io) => {
               return entry;
             });
 
-            await prisma.def_linked_devices.update({
+            const disconnectedDevice = await prisma.def_linked_devices.update({
               where: { id: device.id },
-              data: { signon_audit: updatedAudit },
+              data: { signon_audit: updatedAudit, is_online: false },
             });
+
+            io.to(Number(device.user_id)).emit(
+              "inactiveDevice",
+              disconnectedDevice
+            );
           }
         }
       }

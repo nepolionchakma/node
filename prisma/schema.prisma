@@ -357,21 +357,29 @@ model def_data_sources {
 }
 
 model def_global_condition_logic_attributes {
-  id                            Int  @id(map: "manage_global_condition_logic_attributes_pkey")
+  id                            Int       @id(map: "manage_global_condition_logic_attributes_pkey")
   def_global_condition_logic_id Int
   widget_position               Int?
   widget_state                  Int?
+  created_by                    Int?
+  creation_date                 DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by               Int?
+  last_update_date              DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
 
 model def_global_condition_logics {
-  def_global_condition_logic_id Int     @id(map: "manage_global_condition_logics_pkey")
+  def_global_condition_logic_id Int       @id(map: "manage_global_condition_logics_pkey")
   def_global_condition_id       Int
   object                        String?
   attribute                     String?
   condition                     String?
   value                         String?
+  created_by                    Int?
+  creation_date                 DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by               Int?
+  last_update_date              DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -532,6 +540,7 @@ model def_linked_devices {
   creation_date    DateTime? @default(now()) @db.Timestamp(6)
   last_updated_by  Int?
   last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  is_online        Boolean?  @default(false)
 
   @@schema("apps")
 }

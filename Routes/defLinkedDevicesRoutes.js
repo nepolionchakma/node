@@ -10,7 +10,7 @@ router.put(
   "/inactive-device/:user_id/:id",
   linkedDevicesController.inactiveDevice
 );
-router.put("/:user_id", linkedDevicesController.logoutFromDevices);
+router.put("/:user_id", linkedDevicesController.logoutFromAllDevices);
 router.put(
   "/update-device-location/:deviceId",
   linkedDevicesController.updateDeviceLocation
