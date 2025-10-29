@@ -199,12 +199,12 @@ const socket = (io) => {
         for (const recipient of recipients) {
           const alert = await prisma.def_alerts_v.findFirst({
             where: {
-              user_id_alert_id: {
-                user_id: recipient,
-                alert_id: alertId,
-              },
+              user_id: Number(recipient),
+              alert_id: Number(alertId),
             },
           });
+
+          console.log(alert);
 
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", {
