@@ -3,7 +3,7 @@ const prisma = require("../DB/db.config");
 exports.getUniqueNotification = async (req, res) => {
   try {
     const { user_id, notification_id } = req.query;
-    const result = await prisma.def_notifications_v.findUnique({
+    const result = await prisma.def_notifications_v.findFirst({
       where: {
         user_id_notification_id: {
           user_id: Number(user_id),
