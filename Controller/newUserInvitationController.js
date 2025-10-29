@@ -115,7 +115,27 @@ exports.invitationViaEmail = async (req, res) => {
                <p>We are excited to invite you to join PROCG App!</p>
                <p>Click the link below to accept your invitation and get started:</p>
                <p><a href="${inviteLink}">Click here to register a user</a></p>
-               <p>Please note, this link will expire in 5 days.</p>
+               <p>Please note, this link will expire in 1 hour.</p>
+               <p>To downlod the mobile app</p>
+                <p>
+                  Android:
+                  <a
+                    className="text-blue-600 underline"
+                    href="https://play.google.com/store/apps/details?id=gov.bbg.voa
+"
+                  >
+                    PROCG Onboarding App
+                  </a>
+                </p>
+                <p>
+                  IOS:
+                  <a
+                    className="text-blue-600 underline"
+                    href="https://apps.apple.com/app/myapp/id123456789"
+                  >
+                    PROCG Onboarding App
+                  </a>
+                </p>
                <p>We look forward to having you on board!</p>
                <p>Best regards,</p>
                <p>The PROCG Team</p>

@@ -13,9 +13,8 @@ const socket = (io) => {
   sub.on("message", (channel, message) => {
     if (channel === "NOTIFICATION-MESSAGES") {
       const newMessage = JSON.parse(message);
-      newMessage.recipients.forEach((reciver) => {
-        io.to(Number(reciver)).emit("receivedMessage", newMessage);
-      });
+      // console.log(newMessage, "16");
+      io.to(Number(newMessage.user_id)).emit("receivedMessage", newMessage);
     }
   });
 
@@ -85,49 +84,88 @@ const socket = (io) => {
 
   // Event Handlers
   io.on("connection", async (socket) => {
-    socket.on("sendMessage", async ({ notificationId, sender }) => {
-      const notification = await prisma.def_notifications.findFirst({
+    socket.on("sendMessage", async ({ notificationId, sender, recipients }) => {
+      const sentNotification = await prisma.def_notifications_v.findFirst({
         where: {
           notification_id: notificationId,
+          user_id: Number(sender),
+          sender: Number(sender),
         },
       });
-      if (notification) {
-        io.to(Number(sender)).emit("sentMessage", notification);
+
+      if (sentNotification) {
+        io.to(Number(sender)).emit("sentMessage", sentNotification);
+      }
+      // console.log(recipients, "recipients");
+      for (const recipient of recipients) {
+        const recievedNotification = await prisma.def_notifications_v.findFirst(
+          {
+            where: {
+              notification_id: notificationId,
+              user_id: Number(recipient),
+              recipient: true,
+            },
+          }
+        );
+        // console.log(recievedNotification, recipient, "108");
+
         await pub.publish(
           "NOTIFICATION-MESSAGES",
-          JSON.stringify(notification)
+          JSON.stringify(recievedNotification)
         );
       }
     });
 
-    socket.on("sendDraft", async ({ notificationId, sender }) => {
-      const notification = await prisma.def_notifications.findUnique({
+    socket.on("sendDraft", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
         where: {
           notification_id: notificationId,
+          user_id: Number(sender),
+          sender: Number(sender),
+          status: "DRAFT",
         },
       });
-      io.to(Number(sender)).emit("draftMessage", notification);
+      io.to(Number(sender)).emit("draftMessage", { notification, type });
     });
 
-    socket.on("draftMsgId", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("draftMessageId", notificationId);
-    });
+    // socket.on("draftMsgId", ({ notificationId, sender }) => {
+    //   io.to(Number(sender)).emit("draftMessageId", notificationId);
+    // });
 
     socket.on("read", ({ parentID, sender }) => {
       io.to(Number(sender)).emit("sync", parentID);
     });
 
-    socket.on("deleteMessage", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("deletedMessage", notificationId);
+    socket.on("deleteMessage", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
+        where: {
+          user_id: Number(sender),
+          notification_id: notificationId,
+        },
+      });
+      io.to(Number(sender)).emit("deletedMessage", { notification, type });
     });
 
-    socket.on("restoreMessage", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("restoreMessage", notificationId);
+    socket.on("restoreMessage", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
+        where: {
+          user_id: Number(sender),
+          notification_id: notificationId,
+        },
+      });
+
+      io.to(Number(sender)).emit("restoreMessage", { notification, type });
     });
 
-    socket.on("multipleDelete", ({ ids, user }) => {
+    socket.on("multipleDelete", async ({ ids, user, type }) => {
       for (const id of ids) {
-        io.to(Number(user)).emit("deletedMessage", id);
+        const notification = await prisma.def_notifications_v.findFirst({
+          where: {
+            user_id: Number(sender),
+            notification_id: id,
+          },
+        });
+        io.to(Number(user)).emit("deletedMessage", { notification, type });
       }
     });
 
