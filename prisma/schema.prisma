@@ -10,6 +10,176 @@ datasource db {
   schemas  = ["apps", "test"]
 }
 
+model def_access_entitlement_elements {
+  def_access_point_id     Int
+  def_entitlement_id      Int
+  created_by              Int?
+  creation_date           DateTime?               @default(now()) @db.Timestamp(6)
+  last_updated_by         Int?
+  last_update_date        DateTime?               @default(now()) @db.Timestamp(6)
+  def_access_points       def_access_points       @relation(fields: [def_access_point_id], references: [def_access_point_id], onDelete: Cascade, onUpdate: NoAction)
+  def_access_entitlements def_access_entitlements @relation(fields: [def_entitlement_id], references: [def_entitlement_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([def_access_point_id, def_entitlement_id])
+  @@schema("apps")
+}
+
+model def_access_entitlements {
+  def_entitlement_id              Int                               @id(map: "manage_access_entitlements_pkey") @default(autoincrement())
+  entitlement_name                String                            @db.VarChar(150)
+  description                     String?                           @db.VarChar(250)
+  comments                        String?                           @db.VarChar(200)
+  status                          String                            @db.VarChar(50)
+  effective_date                  DateTime                          @db.Date
+  revision                        Int?
+  revision_date                   DateTime?                         @db.Date
+  created_by                      Int?
+  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
+  last_updated_by                 Int?
+  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
+  def_access_entitlement_elements def_access_entitlement_elements[]
+
+  @@schema("apps")
+}
+
+model def_access_model_logic_attributes {
+  id                        Int       @id(map: "manage_access_model_logic_attributes_pkey")
+  def_access_model_logic_id Int
+  widget_position           Int?
+  widget_state              Int?
+  created_by                Int?
+  creation_date             DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by           Int?
+  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_access_model_logics {
+  def_access_model_logic_id Int       @id(map: "manage_access_model_logics_pkey")
+  def_access_model_id       Int
+  filter                    String?
+  object                    String?
+  attribute                 String?
+  condition                 String?
+  value                     String?
+  created_by                Int?
+  creation_date             DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by           Int?
+  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_access_models {
+  def_access_model_id Int               @id(map: "manage_access_models_pkey") @default(autoincrement())
+  model_name          String?
+  description         String?
+  type                String?
+  run_status          String?
+  state               String?
+  last_run_date       DateTime?         @db.Timestamptz(6)
+  created_by          Int?
+  last_updated_by     Int?
+  last_update_date    DateTime?         @db.Timestamptz(6)
+  revision            Int?
+  revision_date       DateTime?         @db.Timestamptz(6)
+  datasource_name     String?           @db.VarChar(50)
+  creation_date       DateTime?         @default(now()) @db.Timestamp(6)
+  def_data_sources    def_data_sources? @relation(fields: [datasource_name], references: [datasource_name], onDelete: NoAction, onUpdate: NoAction, map: "datasource_name")
+
+  @@schema("apps")
+}
+
+model def_access_points {
+  def_access_point_id             Int                               @id(map: "access_point_pk") @default(autoincrement())
+  def_data_source_id              Int?
+  access_point_name               String?                           @db.VarChar(150)
+  description                     String?                           @db.VarChar(250)
+  platform                        String?                           @db.VarChar(50)
+  access_point_type               String?                           @db.VarChar(50)
+  access_control                  String?                           @db.VarChar(10)
+  change_control                  String?                           @db.VarChar(10)
+  audit                           String?                           @db.VarChar(50)
+  created_by                      Int?
+  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
+  last_updated_by                 Int?
+  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
+  def_access_entitlement_elements def_access_entitlement_elements[]
+  def_data_sources                def_data_sources?                 @relation(fields: [def_data_source_id], references: [def_data_source_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("apps")
+}
+
+model def_access_profiles {
+  serial_number    Int        @id @default(autoincrement())
+  user_id          Int?
+  profile_type     String     @db.VarChar(50)
+  profile_id       String     @db.VarChar(100)
+  primary_yn       String?    @default("N") @db.Char(1)
+  created_by       Int?
+  creation_date    DateTime?  @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime?  @default(now()) @db.Timestamp(6)
+  def_users        def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("apps")
+}
+
+model def_action_item_assignments {
+  action_item_id   Int
+  user_id          Int
+  created_by       Int
+  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+  status           String?   @db.VarChar(50)
+
+  @@id([action_item_id, user_id])
+  @@schema("apps")
+}
+
+model def_action_items {
+  action_item_id    Int                @id @default(autoincrement())
+  action_item_name  String             @db.VarChar(100)
+  description       String?
+  created_by        Int
+  creation_date     DateTime?          @default(now()) @db.Timestamptz(6)
+  last_updated_by   Int?
+  last_update_date  DateTime?          @default(now()) @db.Timestamptz(6)
+  notification_id   String?
+  def_notifications def_notifications? @relation(fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("apps")
+}
+
+model def_alert_recepients {
+  alert_id         Int
+  user_id          Int
+  created_by       Int
+  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
+  acknowledge      Boolean?
+
+  @@id([alert_id, user_id], map: "def_recepients_pkey")
+  @@schema("apps")
+}
+
+model def_alerts {
+  alert_id          Int                @id @default(autoincrement())
+  alert_name        String             @db.VarChar(100)
+  description       String?
+  created_by        Int
+  creation_date     DateTime?          @default(now()) @db.Timestamptz(6)
+  last_updated_by   Int?
+  last_update_date  DateTime?          @default(now()) @db.Timestamptz(6)
+  notification_id   String?
+  def_notifications def_notifications? @relation(fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("apps")
+}
+
 model def_api_endpoint_roles {
   api_endpoint_id   Int
   role_id           Int
@@ -41,6 +211,104 @@ model def_api_endpoints {
   @@schema("apps")
 }
 
+model def_control_environments {
+  control_environment_id Int       @id(map: "control_environment_pk") @default(autoincrement())
+  name                   String?   @db.VarChar(100)
+  description            String?
+  created_by             Int
+  creation_date          DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by        Int?
+  last_update_date       DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@schema("apps")
+}
+
+model def_controls {
+  def_control_id        Int       @id(map: "controls_pkey") @default(autoincrement())
+  control_name          String?
+  description           String?
+  pending_results_count Int?
+  control_type          String?
+  priority              Int?
+  datasources           String?
+  last_run_date         DateTime? @db.Timestamp(6)
+  last_update_date      DateTime? @db.Timestamp(6)
+  status                String?
+  state                 String?
+  result_investigator   String?
+  authorized_data       String?
+  revision              Int?
+  revision_date         DateTime? @db.Timestamp(6)
+  created_by            Int?
+  creation_date         DateTime? @db.Timestamp(6)
+  last_updated_by       Int?
+
+  @@schema("apps")
+}
+
+model def_data_sources {
+  def_data_source_id                      Int                 @id(map: "data_sources_pkey") @default(autoincrement())
+  datasource_name                         String?             @unique(map: "unique_datasource_name") @db.VarChar(50)
+  description                             String?             @db.VarChar(250)
+  application_type                        String?             @db.VarChar(50)
+  application_type_version                String?             @db.VarChar(50)
+  last_access_synchronization_date        DateTime?           @db.Timestamp(6)
+  last_access_synchronization_status      String?             @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime?           @db.Timestamp(6)
+  last_transaction_synchronization_status String?             @db.VarChar(50)
+  default_datasource                      String?             @db.VarChar(50)
+  created_by                              Int?
+  creation_date                           DateTime?           @default(now()) @db.Timestamp(6)
+  last_updated_by                         Int?
+  last_update_date                        DateTime?           @default(now()) @db.Timestamp(6)
+  def_access_models                       def_access_models[]
+  def_access_points                       def_access_points[]
+
+  @@schema("apps")
+}
+
+model def_global_condition_logic_attributes {
+  id                            Int       @id(map: "manage_global_condition_logic_attributes_pkey")
+  def_global_condition_logic_id Int
+  widget_position               Int?
+  widget_state                  Int?
+  created_by                    Int?
+  creation_date                 DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by               Int?
+  last_update_date              DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_global_condition_logics {
+  def_global_condition_logic_id Int       @id(map: "manage_global_condition_logics_pkey")
+  def_global_condition_id       Int
+  object                        String?
+  attribute                     String?
+  condition                     String?
+  value                         String?
+  created_by                    Int?
+  creation_date                 DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by               Int?
+  last_update_date              DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_global_conditions {
+  def_global_condition_id Int       @id(map: "manage_global_conditions_pkey") @default(autoincrement())
+  name                    String?
+  datasource              String?
+  description             String?
+  status                  String?
+  created_by              Int?
+  creation_date           DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by         Int?
+  last_update_date        DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
 model def_job_titles {
   job_title_id     Int       @id(map: "job_titles_pk") @default(autoincrement())
   job_title_name   String?
@@ -49,6 +317,76 @@ model def_job_titles {
   creation_date    DateTime? @default(now()) @db.Timestamp(6)
   last_updated_by  Int?
   last_update_date DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("apps")
+}
+
+model def_linked_devices {
+  id               Int       @id(map: "linked_devices_pkey") @default(autoincrement())
+  user_id          Int
+  device_type      String?   @db.VarChar(50)
+  browser_name     String?   @db.VarChar(50)
+  browser_version  String?   @db.VarChar(20)
+  os               String?   @db.VarChar(50)
+  user_agent       String?
+  added_at         DateTime? @default(now()) @db.Timestamp(6)
+  is_active        Int?
+  ip_address       String?
+  location         String?
+  signon_audit     Json?
+  signon_id        String?
+  created_by       Int?
+  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by  Int?
+  last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  is_online        Boolean?  @default(false)
+
+  @@schema("apps")
+}
+
+model def_mobile_menu {
+  menu_id        Int     @id(map: "mobile_menu_pkey")
+  menu_code      String? @unique(map: "mobile_menu_menu_code_key")
+  menu_name      String?
+  menu_desc      String?
+  menu_structure Json?
+
+  @@schema("apps")
+}
+
+model def_notification_holders {
+  notification_id   String
+  user_id           Int
+  recipient         Boolean?          @default(false)
+  reader            Boolean?          @default(false)
+  holder            Boolean?          @default(false)
+  recycle_bin       Boolean?          @default(false)
+  created_by        Int?
+  creation_date     DateTime?         @default(now()) @db.Timestamp(6)
+  last_updated_by   Int?
+  last_update_date  DateTime?         @default(now()) @db.Timestamp(6)
+  def_notifications def_notifications @relation(fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
+  def_users         def_users         @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([notification_id, user_id], map: "def_notification_holders_pk")
+  @@schema("apps")
+}
+
+model def_notifications {
+  notification_id          String                     @id(map: "notification_pk")
+  notification_type        String
+  subject                  String?                    @db.VarChar(100)
+  notification_body        String?
+  status                   String?
+  parent_notification_id   String?
+  involved_users           Json?
+  action_item_id           Int?
+  alert_id                 Int?
+  sender                   Int?
+  recipients               Json?
+  def_action_items         def_action_items[]
+  def_alerts               def_alerts[]
+  def_notification_holders def_notification_holders[]
 
   @@schema("apps")
 }
@@ -75,6 +413,18 @@ model def_privileges {
   last_updated_by             Int?
   last_update_date            DateTime?                     @default(now()) @db.Timestamp(6)
   def_user_granted_privileges def_user_granted_privileges[]
+
+  @@schema("apps")
+}
+
+model def_processes {
+  process_id        Int       @id
+  process_name      String
+  process_structure Json?
+  created_by        Int?
+  creation_date     DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by   Int?
+  last_update_date  DateTime? @default(now()) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -180,9 +530,10 @@ model def_users {
   tenant_id                   Int?
   user_invitation_id          Int?
   def_access_profiles         def_access_profiles[]
+  def_notification_holders    def_notification_holders[]
   def_user_granted_privileges def_user_granted_privileges[]
   def_user_granted_roles      def_user_granted_roles[]
-  def_tenants                 def_tenants?                  @relation(fields: [tenant_id], references: [tenant_id], onDelete: NoAction, onUpdate: NoAction)
+  def_tenants                 def_tenants?                  @relation(fields: [tenant_id], references: [tenant_id], onUpdate: NoAction)
 
   @@schema("apps")
 }
@@ -204,29 +555,17 @@ model messages {
   @@schema("apps")
 }
 
-model def_processes {
-  process_id        Int       @id
-  process_name      String
-  process_structure Json?
-  created_by        Int?
-  creation_date     DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by   Int?
-  last_update_date  DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
-model def_access_profiles {
-  serial_number    Int        @id @default(autoincrement())
-  user_id          Int?
-  profile_type     String     @db.VarChar(50)
-  profile_id       String     @db.VarChar(100)
-  primary_yn       String?    @default("N") @db.Char(1)
-  created_by       Int?
-  creation_date    DateTime?  @default(now()) @db.Timestamp(6)
-  last_updated_by  Int?
-  last_update_date DateTime?  @default(now()) @db.Timestamp(6)
-  def_users        def_users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+model new_user_invitations {
+  user_invitation_id Int       @id @default(autoincrement())
+  invited_by         Int
+  email              String?
+  registered_user_id Int?
+  type               String?   @db.VarChar(10)
+  token              String    @unique
+  status             String?   @default("pending") @db.VarChar(10)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  accepted_at        DateTime? @db.Timestamp(6)
+  expires_at         DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '01:00:00'::interval)")) @db.Timestamp(6)
 
   @@schema("apps")
 }
@@ -250,327 +589,12 @@ model employees {
   @@schema("test")
 }
 
-model def_access_entitlements {
-  def_entitlement_id              Int                               @id(map: "manage_access_entitlements_pkey") @default(autoincrement())
-  entitlement_name                String                            @db.VarChar(150)
-  description                     String?                           @db.VarChar(250)
-  comments                        String?                           @db.VarChar(200)
-  status                          String                            @db.VarChar(50)
-  effective_date                  DateTime                          @db.Date
-  revision                        Int?
-  revision_date                   DateTime?                         @db.Date
-  created_by                      Int?
-  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
-  last_updated_by                 Int?
-  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
-  def_access_entitlement_elements def_access_entitlement_elements[]
-
-  @@schema("apps")
-}
-
-model def_access_model_logic_attributes {
-  id                        Int       @id(map: "manage_access_model_logic_attributes_pkey")
-  def_access_model_logic_id Int
-  widget_position           Int?
-  widget_state              Int?
-  created_by                Int?
-  creation_date             DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by           Int?
-  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
-model def_access_model_logics {
-  def_access_model_logic_id Int       @id(map: "manage_access_model_logics_pkey")
-  def_access_model_id       Int
-  filter                    String?
-  object                    String?
-  attribute                 String?
-  condition                 String?
-  value                     String?
-  created_by                Int?
-  creation_date             DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by           Int?
-  last_update_date          DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
-model def_access_models {
-  def_access_model_id Int               @id(map: "manage_access_models_pkey") @default(autoincrement())
-  model_name          String?
-  description         String?
-  type                String?
-  run_status          String?
-  state               String?
-  last_run_date       DateTime?         @db.Timestamptz(6)
-  created_by          Int?
-  last_updated_by     Int?
-  last_update_date    DateTime?         @db.Timestamptz(6)
-  revision            Int?
-  revision_date       DateTime?         @db.Timestamptz(6)
-  datasource_name     String?           @db.VarChar(50)
-  creation_date       DateTime?         @default(now()) @db.Timestamp(6)
-  def_data_sources    def_data_sources? @relation(fields: [datasource_name], references: [datasource_name], onDelete: NoAction, onUpdate: NoAction, map: "datasource_name")
-
-  @@schema("apps")
-}
-
-model def_access_point_elements {
-  def_access_point_id             Int                               @id(map: "access_points_elements_pkey") @default(autoincrement())
-  def_data_source_id              Int
-  element_name                    String?                           @db.VarChar(150)
-  description                     String?                           @db.VarChar(250)
-  platform                        String?                           @db.VarChar(50)
-  element_type                    String?                           @db.VarChar(50)
-  access_control                  String?                           @db.VarChar(10)
-  change_control                  String?                           @db.VarChar(10)
-  audit                           String?                           @db.VarChar(50)
-  created_by                      Int?
-  creation_date                   DateTime?                         @default(now()) @db.Timestamp(6)
-  last_updated_by                 Int?
-  last_update_date                DateTime?                         @default(now()) @db.Timestamp(6)
-  def_access_entitlement_elements def_access_entitlement_elements[]
-
-  @@schema("apps")
-}
-
-model def_data_sources {
-  def_data_source_id                      Int                 @id(map: "data_sources_pkey") @default(autoincrement())
-  datasource_name                         String?             @unique(map: "unique_datasource_name") @db.VarChar(50)
-  description                             String?             @db.VarChar(250)
-  application_type                        String?             @db.VarChar(50)
-  application_type_version                String?             @db.VarChar(50)
-  last_access_synchronization_date        DateTime?           @db.Timestamp(6)
-  last_access_synchronization_status      String?             @db.VarChar(50)
-  last_transaction_synchronization_date   DateTime?           @db.Timestamp(6)
-  last_transaction_synchronization_status String?             @db.VarChar(50)
-  default_datasource                      String?             @db.VarChar(50)
-  created_by                              Int?
-  creation_date                           DateTime?           @default(now()) @db.Timestamp(6)
-  last_updated_by                         Int?
-  last_update_date                        DateTime?           @default(now()) @db.Timestamp(6)
-  def_access_models                       def_access_models[]
-
-  @@schema("apps")
-}
-
-model def_global_condition_logic_attributes {
-  id                            Int  @id(map: "manage_global_condition_logic_attributes_pkey")
-  def_global_condition_logic_id Int
-  widget_position               Int?
-  widget_state                  Int?
-
-  @@schema("apps")
-}
-
-model def_global_condition_logics {
-  def_global_condition_logic_id Int     @id(map: "manage_global_condition_logics_pkey")
-  def_global_condition_id       Int
-  object                        String?
-  attribute                     String?
-  condition                     String?
-  value                         String?
-
-  @@schema("apps")
-}
-
-model def_global_conditions {
-  def_global_condition_id Int       @id(map: "manage_global_conditions_pkey") @default(autoincrement())
-  name                    String?
-  datasource              String?
-  description             String?
-  status                  String?
-  created_by              Int?
-  creation_date           DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by         Int?
-  last_update_date        DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
-model def_controls {
-  def_control_id        Int       @id(map: "controls_pkey") @default(autoincrement())
-  control_name          String?
-  description           String?
-  pending_results_count Int?
-  control_type          String?
-  priority              Int?
-  datasources           String?
-  last_run_date         DateTime? @db.Timestamp(6)
-  last_update_date      DateTime? @db.Timestamp(6)
-  status                String?
-  state                 String?
-  result_investigator   String?
-  authorized_data       String?
-  revision              Int?
-  revision_date         DateTime? @db.Timestamp(6)
-  created_by            Int?
-  creation_date         DateTime? @db.Timestamp(6)
-  last_updated_by       Int?
-
-  @@schema("apps")
-}
-
 model users {
   id       Int    @id @default(autoincrement())
   username String @db.VarChar(50)
   email    String @db.VarChar(100)
 
   @@schema("test")
-}
-
-model def_action_items {
-  action_item_id                                                        Int                @id @default(autoincrement())
-  action_item_name                                                      String             @db.VarChar(100)
-  description                                                           String?
-  created_by                                                            Int
-  creation_date                                                         DateTime?          @default(now()) @db.Timestamptz(6)
-  last_updated_by                                                       Int?
-  last_update_date                                                      DateTime?          @default(now()) @db.Timestamptz(6)
-  notification_id                                                       String?
-  def_notifications_def_action_items_notification_idTodef_notifications def_notifications? @relation("def_action_items_notification_idTodef_notifications", fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("apps")
-}
-
-model def_alerts {
-  alert_id          Int                @id @default(autoincrement())
-  alert_name        String             @db.VarChar(100)
-  description       String?
-  created_by        Int
-  creation_date     DateTime?          @default(now()) @db.Timestamptz(6)
-  last_updated_by   Int?
-  last_update_date  DateTime?          @default(now()) @db.Timestamptz(6)
-  notification_id   String?
-  def_notifications def_notifications? @relation(fields: [notification_id], references: [notification_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("apps")
-}
-
-model def_notifications {
-  notification_id                                                      String             @id(map: "notification_pk")
-  notification_type                                                    String
-  recipients                                                           Json?
-  subject                                                              String?            @db.VarChar(100)
-  notification_body                                                    String?
-  creation_date                                                        DateTime?          @default(now()) @db.Timestamp(6)
-  status                                                               String?
-  parent_notification_id                                               String?
-  involved_users                                                       Json?
-  readers                                                              Json?
-  holders                                                              Json?
-  recycle_bin                                                          Json?
-  action_item_id                                                       Int?
-  alert_id                                                             Int?
-  sender                                                               Int?
-  created_by                                                           Int?
-  last_updated_by                                                      Int?
-  last_update_date                                                     DateTime?          @default(now()) @db.Timestamp(6)
-  def_action_items_def_action_items_notification_idTodef_notifications def_action_items[] @relation("def_action_items_notification_idTodef_notifications")
-  def_alerts                                                           def_alerts[]
-
-  @@schema("apps")
-}
-
-model def_alert_recepients {
-  alert_id         Int
-  user_id          Int
-  created_by       Int
-  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
-  last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
-  acknowledge      Boolean?
-
-  @@id([alert_id, user_id], map: "def_recepients_pkey")
-  @@schema("apps")
-}
-
-model def_action_item_assignments {
-  action_item_id   Int
-  user_id          Int
-  created_by       Int
-  creation_date    DateTime? @default(now()) @db.Timestamptz(6)
-  last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamptz(6)
-  status           String?   @db.VarChar(50)
-
-  @@id([action_item_id, user_id])
-  @@schema("apps")
-}
-
-model def_access_entitlement_elements {
-  entitlement_id            Int
-  access_point_id           Int
-  created_by                Int?
-  creation_date             DateTime?                 @default(now()) @db.Timestamp(6)
-  last_updated_by           Int?
-  last_update_date          DateTime?                 @default(now()) @db.Timestamp(6)
-  def_access_point_elements def_access_point_elements @relation(fields: [access_point_id], references: [def_access_point_id], onDelete: NoAction, onUpdate: NoAction, map: "access_entitlement_elements_access_point_id_fkey")
-  def_access_entitlements   def_access_entitlements   @relation(fields: [entitlement_id], references: [def_entitlement_id], onDelete: NoAction, onUpdate: NoAction, map: "access_entitlement_elements_entitlement_id_fkey")
-
-  @@id([entitlement_id, access_point_id], map: "access_entitlement_elements_pkey")
-  @@schema("apps")
-}
-
-model def_linked_devices {
-  id               Int       @id(map: "linked_devices_pkey") @default(autoincrement())
-  user_id          Int
-  device_type      String?   @db.VarChar(50)
-  browser_name     String?   @db.VarChar(50)
-  browser_version  String?   @db.VarChar(20)
-  os               String?   @db.VarChar(50)
-  user_agent       String?
-  added_at         DateTime? @default(now()) @db.Timestamp(6)
-  is_active        Int?
-  ip_address       String?
-  location         String?
-  signon_audit     Json?
-  signon_id        String?
-  created_by       Int?
-  creation_date    DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamp(6)
-
-  @@schema("apps")
-}
-
-model def_mobile_menu {
-  menu_id        Int     @id(map: "mobile_menu_pkey")
-  menu_code      String? @unique(map: "mobile_menu_menu_code_key")
-  menu_name      String?
-  menu_desc      String?
-  menu_structure Json?
-
-  @@schema("apps")
-}
-
-model def_control_environments {
-  control_environment_id Int       @id(map: "control_environment_pk") @default(autoincrement())
-  name                   String?   @db.VarChar(100)
-  description            String?
-  created_by             Int
-  creation_date          DateTime? @default(now()) @db.Timestamptz(6)
-  last_updated_by        Int?
-  last_update_date       DateTime? @default(now()) @db.Timestamptz(6)
-
-  @@schema("apps")
-}
-
-model new_user_invitations {
-  user_invitation_id Int       @id @default(autoincrement())
-  invited_by         Int
-  email              String?
-  registered_user_id Int?
-  type               String?   @db.VarChar(10)
-  token              String    @unique
-  status             String?   @default("pending") @db.VarChar(10)
-  created_at         DateTime? @default(now()) @db.Timestamp(6)
-  accepted_at        DateTime? @db.Timestamp(6)
-  expires_at         DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '01:00:00'::interval)")) @db.Timestamp(6)
-
-  @@schema("apps")
 }
 
 model def_users_v {
@@ -628,5 +652,32 @@ model def_action_items_v {
   last_updated_date     DateTime?   @db.Timestamp(6)
 
   @@map("def_action_items_v")
+  @@schema("apps")
+}
+
+model def_notifications_v {
+  user_id               Int
+  notification_id       String
+  notification_type        String
+  subject                  String?                    @db.VarChar(100)
+  notification_body        String?
+  status                   String?
+  parent_notification_id   String?
+  involved_users           Json?
+  action_item_id           Int?
+  alert_id                 Int?
+  sender                   Int?
+  recipients               Json?
+  recipient         Boolean?          @default(false)
+  reader            Boolean?          @default(false)
+  holder            Boolean?          @default(false)
+  recycle_bin       Boolean?          @default(false)
+  created_by        Int?
+  creation_date     DateTime?         @default(now()) @db.Timestamp(6)
+  last_updated_by   Int?
+  last_update_date  DateTime?         @default(now()) @db.Timestamp(6)
+ 
+ @@id([user_id,notification_id])
+  @@map("def_notifications_v")
   @@schema("apps")
 }

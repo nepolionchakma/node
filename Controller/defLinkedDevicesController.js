@@ -47,6 +47,7 @@ exports.addDevice = async (req, res) => {
           location: deviceInfo.location,
           signon_audit: [signon_audit],
           signon_id: signon_audit.signon_id,
+          is_online: true,
         },
       });
       return res.status(201).json(result);
@@ -70,6 +71,7 @@ exports.addDevice = async (req, res) => {
           ? [...device.signon_audit, signon_audit] // Append the new object
           : [signon_audit], // If not an array, create a new array with the new object
         signon_id: signon_audit.signon_id,
+        is_online: true,
       },
     });
 
@@ -118,6 +120,7 @@ exports.inactiveDevice = async (req, res) => {
       data: {
         is_active,
         signon_audit: updatedAudit,
+        is_online: false,
       },
     });
 
@@ -131,7 +134,7 @@ exports.inactiveDevice = async (req, res) => {
 };
 
 //logout from all devices
-exports.logoutFromDevices = async (req, res) => {
+exports.logoutFromAllDevices = async (req, res) => {
   const { user_id } = req.params;
   const { is_active } = req.body;
 
@@ -168,6 +171,7 @@ exports.logoutFromDevices = async (req, res) => {
           data: {
             is_active: is_active,
             signon_audit: updatedAudit,
+            is_online: false,
           },
         });
       })

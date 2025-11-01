@@ -13,9 +13,8 @@ const socket = (io) => {
   sub.on("message", (channel, message) => {
     if (channel === "NOTIFICATION-MESSAGES") {
       const newMessage = JSON.parse(message);
-      newMessage.recipients.forEach((reciver) => {
-        io.to(Number(reciver)).emit("receivedMessage", newMessage);
-      });
+      // console.log(newMessage, "16");
+      io.to(Number(newMessage.user_id)).emit("receivedMessage", newMessage);
     }
   });
 
@@ -41,7 +40,7 @@ const socket = (io) => {
       console.log(
         `user ${device_id} connected in ${key} with socket id ${socket.id}`
       );
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: device_id,
           user_id: key,
@@ -70,70 +69,112 @@ const socket = (io) => {
           return entry;
         });
 
-        await prisma.def_linked_devices.update({
+        const connectedDevice = await prisma.def_linked_devices.update({
           where: { id: device.id },
           data: {
             signon_audit: updatedAudit,
+            is_online: true,
           },
         });
+
+        io.to(Number(device.user_id)).emit("addDevice", connectedDevice);
       }
     }
   });
 
   // Event Handlers
   io.on("connection", async (socket) => {
-    socket.on("sendMessage", async ({ notificationId, sender }) => {
-      const notification = await prisma.def_notifications.findUnique({
+    socket.on("sendMessage", async ({ notificationId, sender, recipients }) => {
+      const sentNotification = await prisma.def_notifications_v.findFirst({
         where: {
           notification_id: notificationId,
+          user_id: Number(sender),
+          sender: Number(sender),
         },
       });
-      if (notification) {
-        io.to(Number(sender)).emit("sentMessage", notification);
+
+      if (sentNotification) {
+        io.to(Number(sender)).emit("sentMessage", sentNotification);
+      }
+      // console.log(recipients, "recipients");
+      for (const recipient of recipients) {
+        const recievedNotification = await prisma.def_notifications_v.findFirst(
+          {
+            where: {
+              notification_id: notificationId,
+              user_id: Number(recipient),
+              recipient: true,
+            },
+          }
+        );
+        // console.log(recievedNotification, recipient, "108");
+
         await pub.publish(
           "NOTIFICATION-MESSAGES",
-          JSON.stringify(notification)
+          JSON.stringify(recievedNotification)
         );
       }
     });
 
-    socket.on("sendDraft", async ({ notificationId, sender }) => {
-      const notification = await prisma.def_notifications.findUnique({
+    socket.on("sendDraft", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
         where: {
           notification_id: notificationId,
+          user_id: Number(sender),
+          sender: Number(sender),
+          status: "DRAFT",
         },
       });
-      io.to(Number(sender)).emit("draftMessage", notification);
+      io.to(Number(sender)).emit("draftMessage", { notification, type });
     });
 
-    socket.on("draftMsgId", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("draftMessageId", notificationId);
-    });
+    // socket.on("draftMsgId", ({ notificationId, sender }) => {
+    //   io.to(Number(sender)).emit("draftMessageId", notificationId);
+    // });
 
     socket.on("read", ({ parentID, sender }) => {
       io.to(Number(sender)).emit("sync", parentID);
     });
 
-    socket.on("deleteMessage", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("deletedMessage", notificationId);
+    socket.on("deleteMessage", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
+        where: {
+          user_id: Number(sender),
+          notification_id: notificationId,
+        },
+      });
+      io.to(Number(sender)).emit("deletedMessage", { notification, type });
     });
 
-    socket.on("restoreMessage", ({ notificationId, sender }) => {
-      io.to(Number(sender)).emit("restoreMessage", notificationId);
+    socket.on("restoreMessage", async ({ notificationId, sender, type }) => {
+      const notification = await prisma.def_notifications_v.findFirst({
+        where: {
+          user_id: Number(sender),
+          notification_id: notificationId,
+        },
+      });
+
+      io.to(Number(sender)).emit("restoreMessage", { notification, type });
     });
 
-    socket.on("multipleDelete", ({ ids, user }) => {
+    socket.on("multipleDelete", async ({ ids, user, type }) => {
       for (const id of ids) {
-        io.to(Number(user)).emit("deletedMessage", id);
+        const notification = await prisma.def_notifications_v.findFirst({
+          where: {
+            user_id: Number(sender),
+            notification_id: id,
+          },
+        });
+        io.to(Number(user)).emit("deletedMessage", { notification, type });
       }
     });
 
     // Device Action
     socket.on("addDevice", async ({ deviceId, userId }) => {
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: deviceId,
-          user_id: userId,
+          user_id: Number(userId),
         },
       });
       if (device) {
@@ -141,8 +182,14 @@ const socket = (io) => {
       }
     });
 
-    socket.on("inactiveDevice", ({ inactiveDevices, userId }) => {
-      for (const device of inactiveDevices) {
+    socket.on("inactiveDevice", async ({ inactiveDevices, userId }) => {
+      for (const item of inactiveDevices) {
+        const device = await prisma.def_linked_devices.findFirst({
+          where: {
+            id: item.id,
+            user_id: Number(userId),
+          },
+        });
         io.to(Number(userId)).emit("inactiveDevice", device);
       }
     });
@@ -150,14 +197,14 @@ const socket = (io) => {
     socket.on("SendAlert", async ({ alertId, recipients, isAcknowledge }) => {
       try {
         for (const recipient of recipients) {
-          const alert = await prisma.def_alerts_v.findUnique({
+          const alert = await prisma.def_alerts_v.findFirst({
             where: {
-              user_id_alert_id: {
-                user_id: recipient,
-                alert_id: alertId,
-              },
+              user_id: Number(recipient),
+              alert_id: Number(alertId),
             },
           });
+
+          console.log(alert);
 
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", {
@@ -176,7 +223,7 @@ const socket = (io) => {
         if (devices[deviceId].includes(socket.id)) {
           console.log(`user ${socket.id} device Id ${deviceId} disconnected `);
 
-          const device = await prisma.def_linked_devices.findUnique({
+          const device = await prisma.def_linked_devices.findFirst({
             where: {
               id: Number(deviceId),
             },
@@ -200,10 +247,15 @@ const socket = (io) => {
               return entry;
             });
 
-            await prisma.def_linked_devices.update({
+            const disconnectedDevice = await prisma.def_linked_devices.update({
               where: { id: device.id },
-              data: { signon_audit: updatedAudit },
+              data: { signon_audit: updatedAudit, is_online: false },
             });
+
+            io.to(Number(device.user_id)).emit(
+              "inactiveDevice",
+              disconnectedDevice
+            );
           }
         }
       }
@@ -223,7 +275,7 @@ const socket = (io) => {
     const user = Number(socket.handshake.query.key);
     try {
       if (!device_id || device_id === 0) return;
-      const device = await prisma.def_linked_devices.findUnique({
+      const device = await prisma.def_linked_devices.findFirst({
         where: {
           id: device_id,
         },

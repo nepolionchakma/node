@@ -2,14 +2,15 @@ const prisma = require("../DB/db.config");
 
 /** create alerts */
 exports.createAlert = async (req, res) => {
+  const userId = Number(req.user.user_id);
   try {
     const {
       alert_name,
       description,
       recepients,
       notification_id,
-      created_by,
-      last_updated_by,
+      // created_by,
+      // last_updated_by,
     } = req.body;
 
     const result = await prisma.def_alerts.create({
@@ -17,26 +18,36 @@ exports.createAlert = async (req, res) => {
         alert_name,
         description,
         notification_id,
-        created_by,
-        last_updated_by,
+        created_by: userId,
+        last_updated_by: userId,
       },
     });
-
-    // add recepients
-    for (const recepient of recepients) {
-      await prisma.def_alert_recepients.create({
+    if (result) {
+      for (const recepient of recepients) {
+        await prisma.def_alert_recepients.create({
+          data: {
+            alert_id: result.alert_id,
+            user_id: recepient,
+            acknowledge: false,
+            created_by: userId,
+            last_updated_by: userId,
+          },
+        });
+      }
+      await prisma.def_notifications.update({
+        where: {
+          notification_id: result.notification_id,
+        },
         data: {
           alert_id: result.alert_id,
-          user_id: recepient,
-          acknowledge: false,
-          created_by: result.created_by,
-          last_updated_by: result.last_updated_by,
         },
       });
+      return res.status(201).json({ result, message: "Alert Sent." });
     }
 
+    // add recepients
+
     if (result) {
-      return res.status(201).json({ result, message: "Alert Sent." });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
