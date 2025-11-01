@@ -25,12 +25,10 @@ router.put(
   "/move-multiple-from-recyclebin/:userId",
   notificationsController.removeMultipleFromRecycleBin
 );
+router.get("/unique", notificationsController.getUniqueNotification);
+router.put("/:notificationId", notificationsController.updateNotification);
 
 // router.get("/", notificationsController.getAllNotification);
-
-router.get("/unique", notificationsController.getUniqueNotification);
-
-router.put("/:notificationId", notificationsController.updateNotification);
 
 router.delete("/:notificationId", notificationsController.deleteNotification);
 

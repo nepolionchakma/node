@@ -5,10 +5,8 @@ exports.getUniqueNotification = async (req, res) => {
     const { user_id, notification_id } = req.query;
     const result = await prisma.def_notifications_v.findFirst({
       where: {
-        user_id_notification_id: {
-          user_id: Number(user_id),
-          notification_id: notification_id,
-        },
+        user_id: Number(user_id),
+        notification_id,
       },
     });
     if (result) {
