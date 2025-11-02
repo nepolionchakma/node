@@ -611,7 +611,9 @@ exports.updateNotification = async (req, res) => {
         await prisma.def_notification_holders.deleteMany({
           where: {
             notification_id: notificationId,
-            user_id: { in: toDelete },
+            user_id: {
+              in: toDelete.map((notification) => notification.user_id),
+            },
           },
         });
       }
