@@ -4,7 +4,15 @@ const prisma = require("../DB/db.config");
 exports.createAlert = async (req, res) => {
   const userId = Number(req.user.user_id);
   try {
-    const { alert_name, description, recepients, notification_id } = req.body;
+    const { alert_name, description, recepients, notification_id, status } =
+      req.body;
+
+    let message = "";
+    if (status === "SENT") {
+      message = "Alert Sent";
+    } else {
+      message = "Alert saved to Drafts";
+    }
 
     const result = await prisma.def_alerts.create({
       data: {
@@ -35,7 +43,7 @@ exports.createAlert = async (req, res) => {
           alert_id: result.alert_id,
         },
       });
-      return res.status(201).json({ result, message: "Alert Sent." });
+      return res.status(201).json({ result, message });
     }
 
     // add recepients
@@ -49,7 +57,7 @@ exports.createAlert = async (req, res) => {
 
 /** get alerts from view pagination*/
 exports.getAlerts = async (req, res) => {
-  const { user_id, page, limit } = req.query;
+  const { user_id, page, limit, alert_id } = req.query;
 
   try {
     // const totalAcknowledged = await prisma.def_alerts_v.count({
@@ -59,6 +67,7 @@ exports.getAlerts = async (req, res) => {
     //     notification_status: "SENT",
     //   },
     // });
+
     const totalUnacknowledged = await prisma.def_alerts_v.findMany({
       where: {
         user_id: Number(user_id),
@@ -72,6 +81,15 @@ exports.getAlerts = async (req, res) => {
         notification_status: "SENT",
       },
     });
+
+    if (alert_id) {
+      const result = await prisma.def_alerts.findFirst({
+        where: {
+          alert_id: Number(alert_id),
+        },
+      });
+      return res.status(200).json({ result });
+    }
 
     if (page && limit) {
       const result = await prisma.def_alerts_v.findMany({
@@ -107,8 +125,14 @@ exports.getAlerts = async (req, res) => {
 exports.updateAlert = async (req, res) => {
   const userId = Number(req.user.user_id);
   const alert_id = Number(req.params.alert_id);
-  const { alert_name, description, recipients = [] } = req.body;
+  const { alert_name, description, recipients = [], status } = req.body;
   try {
+    let message = "";
+    if (status === "SENT") {
+      message = "Alert Sent";
+    } else {
+      message = "Alert saved to Drafts";
+    }
     // Update alert info
     const result = await prisma.def_alerts.update({
       where: { alert_id },
@@ -159,7 +183,7 @@ exports.updateAlert = async (req, res) => {
           },
         });
       }
-      return res.status(200).json({ result });
+      return res.status(200).json({ result, message });
     }
   } catch (error) {
     console.error(error);
