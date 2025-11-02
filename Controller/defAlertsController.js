@@ -52,14 +52,14 @@ exports.getAlerts = async (req, res) => {
   const { user_id, page, limit } = req.query;
 
   try {
-    const totalAcknowledged = await prisma.def_alerts_v.count({
-      where: {
-        user_id: Number(user_id),
-        acknowledge: true,
-        notification_status: "SENT",
-      },
-    });
-    const totalUnacknowledged = await prisma.def_alerts_v.count({
+    // const totalAcknowledged = await prisma.def_alerts_v.count({
+    //   where: {
+    //     user_id: Number(user_id),
+    //     acknowledge: true,
+    //     notification_status: "SENT",
+    //   },
+    // });
+    const totalUnacknowledged = await prisma.def_alerts_v.findMany({
       where: {
         user_id: Number(user_id),
         acknowledge: false,
@@ -95,8 +95,7 @@ exports.getAlerts = async (req, res) => {
     } else {
       return res.status(200).json({
         total,
-        totalAcknowledged,
-        totalUnacknowledged,
+        result: totalUnacknowledged,
       });
     }
   } catch (error) {

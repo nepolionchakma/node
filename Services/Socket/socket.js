@@ -204,8 +204,6 @@ const socket = (io) => {
             },
           });
 
-          console.log(alert);
-
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", {
               alert,
