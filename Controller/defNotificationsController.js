@@ -109,9 +109,8 @@ exports.getReplyNotifications = async (req, res) => {
 };
 
 exports.getRecievedNotifications = async (req, res) => {
+  const { user_id, page, limit } = req.query;
   try {
-    const { user_id, page, limit } = req.query;
-
     const total = await prisma.def_notifications_v.count({
       where: {
         status: "SENT",
@@ -534,7 +533,7 @@ exports.updateNotification = async (req, res) => {
       notification_body,
       status,
       parent_notification_id,
-      involved_users,
+      involved_users = [],
       readers,
       holders,
       recycle_bin,
@@ -596,6 +595,23 @@ exports.updateNotification = async (req, res) => {
             recycle_bin: recycle_bin.includes(user) ? true : false,
             created_by: Number(userId),
             last_updated_by: Number(userId),
+          },
+        });
+      }
+
+      const existingHolders = await prisma.def_notification_holders.findMany({
+        where: { notification_id: notificationId },
+      });
+
+      const toDelete = existingHolders.filter(
+        (user) => !involved_users.includes(user.user_id)
+      );
+
+      if (toDelete.length > 0) {
+        await prisma.def_notification_holders.deleteMany({
+          where: {
+            notification_id: notificationId,
+            user_id: { in: toDelete },
           },
         });
       }
