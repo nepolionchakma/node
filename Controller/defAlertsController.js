@@ -108,21 +108,15 @@ exports.getAlerts = async (req, res) => {
 exports.updateAlert = async (req, res) => {
   const userId = Number(req.user.user_id);
   const alert_id = Number(req.params.alert_id);
-  const {
-    alert_name,
-    description,
-    notification_id,
-    recipients = [],
-  } = req.body;
+  const { alert_name, description, recipients = [] } = req.body;
   try {
     // Update alert info
     const result = await prisma.def_alerts.update({
-      where: { alert_id: id },
+      where: { alert_id },
       data: {
         alert_name,
         description,
-        last_updated_by,
-        notification_id,
+        last_updated_by: userId,
       },
     });
 
@@ -155,14 +149,14 @@ exports.updateAlert = async (req, res) => {
       });
 
       const toDelete = existingRecipients.filter(
-        (userId) => !involved_users.includes(userId)
+        (user) => !recipients.includes(user.user_id)
       );
-
+      console.log(toDelete);
       if (toDelete.length > 0) {
         await prisma.def_alert_recepients.deleteMany({
           where: {
             alert_id: alert_id,
-            user_id: { in: toDelete },
+            user_id: { in: toDelete.map((alert) => alert.user_id) },
           },
         });
       }
