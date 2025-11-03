@@ -75,6 +75,13 @@ exports.getAlerts = async (req, res) => {
         notification_status: "SENT",
       },
     });
+    const totalUnacknowledgedCount = await prisma.def_alerts_v.count({
+      where: {
+        user_id: Number(user_id),
+        acknowledge: false,
+        notification_status: "SENT",
+      },
+    });
     const total = await prisma.def_alerts_v.count({
       where: {
         user_id: Number(user_id),
@@ -112,7 +119,7 @@ exports.getAlerts = async (req, res) => {
       });
     } else {
       return res.status(200).json({
-        total,
+        total: totalUnacknowledgedCount,
         result: totalUnacknowledged,
       });
     }
