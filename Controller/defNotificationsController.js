@@ -443,13 +443,10 @@ exports.moveMultipleToRecycleBin = async (req, res) => {
 
   try {
     const user_id = Number(req.user.user_id);
-
-    const result = await prisma.def_notification_holders.update({
+    const result = await prisma.def_notification_holders.updateMany({
       where: {
-        notification_id_user_id: {
-          notification_id: { in: ids },
-          user_id: Number(userId),
-        },
+        notification_id: { in: ids },
+        user_id: Number(userId),
         holder: true,
       },
       data: {
@@ -474,10 +471,9 @@ exports.removeMultipleFromRecycleBin = async (req, res) => {
   try {
     const result = await prisma.def_notification_holders.update({
       where: {
-        notification_id_user_id: {
-          notification_id: { in: ids },
-          user_id: Number(userId),
-        },
+        notification_id: { in: ids },
+        user_id: Number(userId),
+        holder: true,
         recycle_bin: true,
       },
       data: {
