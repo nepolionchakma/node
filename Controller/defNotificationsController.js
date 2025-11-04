@@ -467,7 +467,6 @@ exports.removeMultipleFromRecycleBin = async (req, res) => {
   const { ids } = req.body;
   const { userId } = req.params;
   const user_id = Number(req.user.user_id);
-  console.log(ids, "j");
   try {
     const result = await prisma.def_notification_holders.updateMany({
       where: {
@@ -481,11 +480,9 @@ exports.removeMultipleFromRecycleBin = async (req, res) => {
         last_updated_by: user_id,
       },
     });
-    console.log(result);
 
     res.status(200).json({ message: "Notification Deleted.", result });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -624,7 +621,6 @@ exports.deleteNotification = async (req, res) => {
     //   });
     // }
     if (result) {
-      console.log(result);
       return res.status(200).json({ message: `Notification deleted.` });
     }
   } catch (error) {
