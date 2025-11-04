@@ -162,7 +162,7 @@ const socket = (io) => {
       for (const id of ids) {
         const notification = await prisma.def_notifications_v.findFirst({
           where: {
-            user_id: Number(sender),
+            user_id: Number(user),
             notification_id: id,
           },
         });
