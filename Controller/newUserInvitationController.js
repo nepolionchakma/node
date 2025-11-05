@@ -10,7 +10,6 @@ const CryptoJS = require("crypto-js");
 
 const {
   JWT_SECRET_ACCESS_TOKEN,
-  INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
   REACT_ENDPOINT_URL,
   CRYPTO_SECRET_KEY,
 } = require("../Variables/variables");
@@ -27,6 +26,30 @@ const encrypt = (value) => {
   return encodeURIComponent(ciphertext);
 };
 
+// utils/timeUtils.ts
+const parseValidityToMs = (validity) => {
+  // if (typeof validity === "number") return validity * 1000; // already seconds
+
+  const match = /^(\d+)([mhdw])$/.exec(validity.trim().toLowerCase());
+  if (!match) {
+    throw new Error(
+      "Invalid user_invitation_validity format. Use like '15m', '2h', '3d', '1w'."
+    );
+  }
+
+  const value = parseInt(match[1]);
+  const unit = match[2];
+
+  const multipliers = {
+    m: 60 * 1000, // minutes → ms
+    h: 60 * 60 * 1000, // hours → ms
+    d: 24 * 60 * 60 * 1000, // days → ms
+    w: 7 * 24 * 60 * 60 * 1000, // weeks → ms
+  };
+
+  return value * multipliers[unit];
+};
+
 // Email setup
 const transporter = nodemailer.createTransport({
   service: "gmail", // or SES/SendGrid
@@ -38,7 +61,7 @@ const transporter = nodemailer.createTransport({
 
 exports.invitationViaEmail = async (req, res) => {
   try {
-    const { invited_by, email } = req.body;
+    const { invited_by, email, tenant_id, user_invitation_validity } = req.body;
 
     if (!invited_by && !email) {
       return res
@@ -66,7 +89,7 @@ exports.invitationViaEmail = async (req, res) => {
 
     const props = { user_id: Number(invited_by), sub: String(invited_by) };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
-      expiresIn: INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
+      expiresIn: user_invitation_validity,
     });
 
     const existInvitaion = await prisma.new_user_invitations.findFirst({
@@ -95,14 +118,19 @@ exports.invitationViaEmail = async (req, res) => {
         token: encrypt(token),
         status: "PENDING",
         type: "EMAIL",
+        expires_at: new Date(
+          Date.now() + parseValidityToMs(user_invitation_validity)
+        ),
       },
     });
 
     const encryptedInvitationId = encrypt(
       newInvitation.user_invitation_id.toString()
     );
+
+    const encryptedTenantId = encrypt(tenant_id.toString());
     const encryptedToken = encrypt(token);
-    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
+    const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedTenantId}/${encryptedToken}`;
     // const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${newInvitation.user_invitation_id}/${token}`;
 
     // --- Send Email ---
@@ -166,7 +194,7 @@ exports.invitationViaEmail = async (req, res) => {
 
 exports.invitationViaLink = async (req, res) => {
   try {
-    const { invited_by } = req.body;
+    const { invited_by, tenant_id, user_invitation_validity } = req.body;
 
     if (!invited_by) {
       return res.status(400).json({ error: "inviter_User ID is required" });
@@ -174,7 +202,7 @@ exports.invitationViaLink = async (req, res) => {
 
     const props = { user_id: Number(invited_by), sub: String(invited_by) };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
-      expiresIn: INVITATION_ACCESS_TOKEN_EXPIRED_TIME,
+      expiresIn: user_invitation_validity,
     });
 
     // const invitedLink = await prisma.new_user_invitations.findFirst({
@@ -203,6 +231,9 @@ exports.invitationViaLink = async (req, res) => {
         token: encryptedToken,
         status: "PENDING",
         type: "LINK",
+        expires_at: new Date(
+          Date.now() + parseValidityToMs(user_invitation_validity)
+        ),
       },
     });
 
@@ -210,8 +241,9 @@ exports.invitationViaLink = async (req, res) => {
       const encryptedInvitationId = encrypt(
         createdInvitation.user_invitation_id.toString()
       );
+      const encryptedTenantId = encrypt(tenant_id.toString());
 
-      const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedToken}`;
+      const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${encryptedInvitationId}/${encryptedTenantId}/${encryptedToken}`;
 
       // generated link
       //  const inviteLink = `${REACT_ENDPOINT_URL}/invitation/${createdInvitation.user_invitation_id}/${token}`;
