@@ -5,10 +5,8 @@ exports.getUniqueNotification = async (req, res) => {
     const { user_id, notification_id } = req.query;
     const result = await prisma.def_notifications_v.findFirst({
       where: {
-        user_id_notification_id: {
-          user_id: Number(user_id),
-          notification_id: notification_id,
-        },
+        user_id: Number(user_id),
+        notification_id,
       },
     });
     if (result) {
@@ -111,9 +109,8 @@ exports.getReplyNotifications = async (req, res) => {
 };
 
 exports.getRecievedNotifications = async (req, res) => {
+  const { user_id, page, limit } = req.query;
   try {
-    const { user_id, page, limit } = req.query;
-
     const total = await prisma.def_notifications_v.count({
       where: {
         status: "SENT",
@@ -446,13 +443,10 @@ exports.moveMultipleToRecycleBin = async (req, res) => {
 
   try {
     const user_id = Number(req.user.user_id);
-
-    const result = await prisma.def_notification_holders.update({
+    const result = await prisma.def_notification_holders.updateMany({
       where: {
-        notification_id_user_id: {
-          notification_id: { in: ids },
-          user_id: Number(userId),
-        },
+        notification_id: { in: ids },
+        user_id: Number(userId),
         holder: true,
       },
       data: {
@@ -473,14 +467,11 @@ exports.removeMultipleFromRecycleBin = async (req, res) => {
   const { ids } = req.body;
   const { userId } = req.params;
   const user_id = Number(req.user.user_id);
-
   try {
-    const result = await prisma.def_notification_holders.update({
+    const result = await prisma.def_notification_holders.updateMany({
       where: {
-        notification_id_user_id: {
-          notification_id: { in: ids },
-          user_id: Number(userId),
-        },
+        notification_id: { in: ids },
+        user_id: Number(userId),
         recycle_bin: true,
       },
       data: {
@@ -489,35 +480,6 @@ exports.removeMultipleFromRecycleBin = async (req, res) => {
         last_updated_by: user_id,
       },
     });
-
-    // for (const message of messagesToUpdate) {
-    //   const updatedRecycle = message.recycle_bin.filter(
-    //     (usr) => usr !== Number(userId)
-    //   );
-
-    //   const updatedMessage = await prisma.def_notifications.update({
-    //     where: {
-    //       notification_id: message.notification_id,
-    //     },
-    //     data: {
-    //       recycle_bin: updatedRecycle,
-    //     },
-    //   });
-
-    //   if (
-    //     updatedMessage.holders.length === 0 &&
-    //     updatedMessage.recycle_bin.length === 0
-    //   ) {
-    //     await prisma.def_notifications.update({
-    //       where: {
-    //         notification_id: updatedMessage.notification_id,
-    //       },
-    //       data: {
-    //         status: "DELETED",
-    //       },
-    //     });
-    //   }
-    // }
 
     res.status(200).json({ message: "Notification Deleted.", result });
   } catch (error) {
@@ -536,7 +498,7 @@ exports.updateNotification = async (req, res) => {
       notification_body,
       status,
       parent_notification_id,
-      involved_users,
+      involved_users = [],
       readers,
       holders,
       recycle_bin,
@@ -601,6 +563,25 @@ exports.updateNotification = async (req, res) => {
           },
         });
       }
+
+      const existingHolders = await prisma.def_notification_holders.findMany({
+        where: { notification_id: notificationId },
+      });
+
+      const toDelete = existingHolders.filter(
+        (user) => !involved_users.includes(user.user_id)
+      );
+
+      if (toDelete.length > 0) {
+        await prisma.def_notification_holders.deleteMany({
+          where: {
+            notification_id: notificationId,
+            user_id: {
+              in: toDelete.map((notification) => notification.user_id),
+            },
+          },
+        });
+      }
       return res.status(200).json({ result, message });
     }
   } catch (error) {
@@ -640,7 +621,6 @@ exports.deleteNotification = async (req, res) => {
     //   });
     // }
     if (result) {
-      console.log(result);
       return res.status(200).json({ message: `Notification deleted.` });
     }
   } catch (error) {

@@ -84,37 +84,38 @@ const socket = (io) => {
 
   // Event Handlers
   io.on("connection", async (socket) => {
-    socket.on("sendMessage", async ({ notificationId, sender, recipients }) => {
-      const sentNotification = await prisma.def_notifications_v.findFirst({
-        where: {
-          notification_id: notificationId,
-          user_id: Number(sender),
-          sender: Number(sender),
-        },
-      });
+    socket.on(
+      "sendMessage",
+      async ({ notificationId, sender, recipients, type }) => {
+        const notification = await prisma.def_notifications_v.findFirst({
+          where: {
+            notification_id: notificationId,
+            user_id: Number(sender),
+            sender: Number(sender),
+          },
+        });
 
-      if (sentNotification) {
-        io.to(Number(sender)).emit("sentMessage", sentNotification);
-      }
-      // console.log(recipients, "recipients");
-      for (const recipient of recipients) {
-        const recievedNotification = await prisma.def_notifications_v.findFirst(
-          {
-            where: {
-              notification_id: notificationId,
-              user_id: Number(recipient),
-              recipient: true,
-            },
-          }
-        );
-        // console.log(recievedNotification, recipient, "108");
+        if (notification) {
+          io.to(Number(sender)).emit("sentMessage", { notification, type });
+        }
 
-        await pub.publish(
-          "NOTIFICATION-MESSAGES",
-          JSON.stringify(recievedNotification)
-        );
+        for (const recipient of recipients) {
+          const recievedNotification =
+            await prisma.def_notifications_v.findFirst({
+              where: {
+                notification_id: notificationId,
+                user_id: Number(recipient),
+                recipient: true,
+              },
+            });
+
+          await pub.publish(
+            "NOTIFICATION-MESSAGES",
+            JSON.stringify(recievedNotification)
+          );
+        }
       }
-    });
+    );
 
     socket.on("sendDraft", async ({ notificationId, sender, type }) => {
       const notification = await prisma.def_notifications_v.findFirst({
@@ -161,7 +162,7 @@ const socket = (io) => {
       for (const id of ids) {
         const notification = await prisma.def_notifications_v.findFirst({
           where: {
-            user_id: Number(sender),
+            user_id: Number(user),
             notification_id: id,
           },
         });
@@ -203,8 +204,6 @@ const socket = (io) => {
               alert_id: Number(alertId),
             },
           });
-
-          console.log(alert);
 
           if (alert) {
             io.to(Number(recipient)).emit("SentAlert", {

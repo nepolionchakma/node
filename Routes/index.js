@@ -34,7 +34,7 @@ const defMobileMenuRoutes = require("./defMobileMenuRoutes");
 const defTenantEnterpriseSetupRoutes = require("./defEnterprisesRoutes");
 const testRoutes = require("./testRoutes");
 const defAlertsRoutes = require("./defAlertsRoutes");
-const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
+// const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
 const newUserInvitationRoutes = require("./newUserInvitationRoutes");
 
 routes.use(cookieParser());
@@ -107,7 +107,7 @@ routes.use("/test", testRoutes);
 routes.use("/alerts", defAlertsRoutes);
 
 // recepients
-routes.use("/recepients", defRecepientsRoutes);
+// routes.use("/recepients", defRecepientsRoutes);
 
 // new user invitation
 routes.use("/invitation", newUserInvitationRoutes);
