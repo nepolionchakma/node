@@ -36,12 +36,14 @@ const testRoutes = require("./testRoutes");
 const defAlertsRoutes = require("./defAlertsRoutes");
 // const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
 const newUserInvitationRoutes = require("./newUserInvitationRoutes");
+const forgotPasswordRoutes = require("./forgotPasswordRequestsRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
 routes.use("/login", authentication);
 routes.use("/logout", authentication);
 routes.use("/qr-code", authentication);
+routes.use("/forgot_password_request", forgotPasswordRoutes);
 
 // Verify user - middleware
 routes.use(verifyUser);
