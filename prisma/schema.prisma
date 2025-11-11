@@ -443,13 +443,14 @@ model def_roles {
 }
 
 model def_tenant_enterprise_setup {
-  tenant_id        Int       @id
-  enterprise_name  String?
-  enterprise_type  String?
-  created_by       Int?
-  creation_date    DateTime? @default(now()) @db.Timestamp(6)
-  last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  tenant_id                Int       @id
+  enterprise_name          String?
+  enterprise_type          String?
+  created_by               Int?
+  creation_date            DateTime? @default(now()) @db.Timestamp(6)
+  last_updated_by          Int?
+  last_update_date         DateTime? @default(now()) @db.Timestamp(6)
+  user_invitation_validity String?   @default("1h") @db.VarChar(5)
 
   @@schema("apps")
 }
@@ -597,6 +598,20 @@ model users {
   @@schema("test")
 }
 
+model forgot_password_requests {
+  request_id         Int       @id @default(autoincrement())
+  request_by         Int?
+  email              String?
+  temporary_password Int?
+  access_token       String?
+  created_by         Int?
+  creation_date      DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated_by    Int?
+  last_updated_date  DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@schema("apps")
+}
+
 model def_users_v {
   user_id             Int     @id
   user_name           String
@@ -606,10 +621,10 @@ model def_users_v {
   email_address       String
   job_title           String
   user_type           String
-  created_by          Int
-  creation_date       DateTime?
-  last_updated_by     Int
-  last_updated_date   DateTime?
+ created_by                  Int?
+  creation_date               DateTime?                     @db.Timestamp(6)
+  last_updated_by             Int?
+  last_update_date            DateTime?                     @db.Timestamp(6)
   tenant_id           Int
   user_invitation_id  String?
   profile_picture     Json
