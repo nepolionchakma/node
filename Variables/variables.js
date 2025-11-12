@@ -16,6 +16,8 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
 const PORT = process.env.PORT;
 const CRYPTO_SECRET_KEY = process.env.CRYPTO_SECRET_KEY;
 const FIREBASE_PRIVATE_KEY_BASE64 = process.env.FIREBASE_PRIVATE_KEY_BASE64;
+const MAILER_USER = process.env.MAILER_USER;
+const MAILER_PASS = process.env.MAILER_PASS;
 
 module.exports = {
   JWT_SECRET_ACCESS_TOKEN,
@@ -31,4 +33,6 @@ module.exports = {
   PORT,
   FIREBASE_PRIVATE_KEY_BASE64,
   CRYPTO_SECRET_KEY,
+  MAILER_USER,
+  MAILER_PASS,
 };
