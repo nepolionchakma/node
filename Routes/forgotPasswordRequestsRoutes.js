@@ -4,5 +4,6 @@ const forgotPasswordController = require("../Controller/forgotPasswordRequestsCo
 const router = Router();
 
 router.post("/", forgotPasswordController.createRequest);
+router.get("/verify", forgotPasswordController.verifyRequest);
 
 module.exports = router;
