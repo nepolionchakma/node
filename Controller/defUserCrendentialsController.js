@@ -64,7 +64,7 @@ exports.resetForgotPassword = async (req, res) => {
           user_id: Number(user_id),
         },
         data: {
-          password: hashPassword(password),
+          password: await hashPassword(password),
           last_update_date: new Date(),
           last_updated_by: userId,
         },
@@ -72,7 +72,7 @@ exports.resetForgotPassword = async (req, res) => {
 
       if (newPassword) {
         return res
-          .status(201)
+          .status(200)
           .json({ message: "Password updated successfully." });
       }
     }
