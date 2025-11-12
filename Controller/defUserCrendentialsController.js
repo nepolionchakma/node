@@ -31,6 +31,56 @@ const hashPassword = (password) => {
 };
 //-------------------------Hash Password End
 
+exports.resetForgotPassword = async (req, res) => {
+  const user_id = Number(req.params.user_id);
+  const { request_id, temporary_password, password } = req.body;
+  const userId = Number(req.user.user_id);
+
+  //Check temporary password
+  const isValidRequest = await prisma.forgot_password_requests.findFirst({
+    where: {
+      request_id: Number(request_id),
+      request_by: userId,
+      temporary_password: Number(temporary_password),
+    },
+  });
+
+  if (!isValidRequest) {
+    return res.status(400).json({
+      message: "Invalid temporary password.",
+    });
+  }
+  // verify user
+  const user = await prisma.def_user_credentials.findUnique({
+    where: {
+      user_id: user_id,
+    },
+  });
+
+  try {
+    if (user) {
+      const newPassword = await prisma.def_user_credentials.update({
+        where: {
+          user_id: Number(user_id),
+        },
+        data: {
+          password: hashPassword(password),
+          last_update_date: new Date(),
+          last_updated_by: userId,
+        },
+      });
+
+      if (newPassword) {
+        return res
+          .status(201)
+          .json({ message: "Password updated successfully." });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getDefUserCredentials = async (req, res) => {
   try {
     const result = await prisma.def_user_credentials.findMany({

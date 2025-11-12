@@ -37,6 +37,7 @@ const defAlertsRoutes = require("./defAlertsRoutes");
 // const defRecepientsRoutes = require("./defAlertRecepientsRoutes");
 const newUserInvitationRoutes = require("./newUserInvitationRoutes");
 const forgotPasswordRoutes = require("./forgotPasswordRequestsRoutes");
+const openbaoRoutes = require("./openbaoRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -52,7 +53,7 @@ routes.use(verifyUser);
 routes.use("/auth", authentication);
 routes.use("/persons", defPersonsRoutes);
 routes.use("/users", defUsersRoutes);
-routes.use("/user-credentials", defUserCredentialsRoutes);
+routes.use("/def_user_credentials", defUserCredentialsRoutes);
 routes.use("/access-profiles", defAccessProfileRoutes);
 routes.use("/combined-user", defCombinedUserRoutes);
 
@@ -110,6 +111,9 @@ routes.use("/alerts", defAlertsRoutes);
 
 // recepients
 // routes.use("/recepients", defRecepientsRoutes);
+
+// openbao
+routes.use("/openbao", openbaoRoutes);
 
 // new user invitation
 routes.use("/invitation", newUserInvitationRoutes);
