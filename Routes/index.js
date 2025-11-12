@@ -52,7 +52,7 @@ routes.use(verifyUser);
 routes.use("/auth", authentication);
 routes.use("/persons", defPersonsRoutes);
 routes.use("/users", defUsersRoutes);
-routes.use("/user-credentials", defUserCredentialsRoutes);
+routes.use("/def_user_credentials", defUserCredentialsRoutes);
 routes.use("/access-profiles", defAccessProfileRoutes);
 routes.use("/combined-user", defCombinedUserRoutes);
 

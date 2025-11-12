@@ -1,6 +1,6 @@
 const prisma = require("../DB/db.config");
 const nodemailer = require("nodemailer");
-const axios = require("axios");
+// const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const user = "nepolion.datafluent.team@gmail.com";
 const pass = "qgpx iwbl xozo tbjg";
@@ -10,7 +10,6 @@ const {
   JWT_SECRET_ACCESS_TOKEN,
   REACT_ENDPOINT_URL,
   CRYPTO_SECRET_KEY,
-  ACCESS_TOKEN_EXPIRED_TIME,
 } = require("../Variables/variables");
 
 const encrypt = (value) => {
@@ -35,7 +34,8 @@ const transporter = nodemailer.createTransport({
 
 exports.createRequest = async (req, res) => {
   try {
-    const { user_name, email_address, tenant_id, job_title } = req.body;
+    const { user_name, email_address, tenant_id, job_title, validity } =
+      req.body;
 
     if (!user_name || !email_address || !tenant_id || !job_title) {
       return res.status(400).json({
@@ -63,7 +63,7 @@ exports.createRequest = async (req, res) => {
 
     const props = { user_id: Number(user.user_id), sub: String(user.user_id) };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
-      expiresIn: ACCESS_TOKEN_EXPIRED_TIME,
+      expiresIn: validity,
     });
 
     const encryptedToken = encrypt(token);
@@ -108,5 +108,55 @@ exports.createRequest = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.verifyRequest = async (req, res) => {
+  try {
+    const { request_id, token } = req.query;
+    if (!token || typeof token !== "string") {
+      return res
+        .status(200)
+        .json({ valid: false, message: "Token is missing" });
+    }
+
+    jwt.verify(token, JWT_SECRET_ACCESS_TOKEN, async (err, user) => {
+      if (err) {
+        if (err.name === "TokenExpiredError") {
+          return res
+            .status(401)
+            .json({
+              message: "Unauthorized Access: Token has expired",
+              valid: false,
+            });
+        }
+        //if token is invalid
+        return res
+          .status(403)
+          .json({ message: "Forbidden: Invalid token", valid: false });
+      }
+
+      const request = await prisma.forgot_password_requests.findFirst({
+        where: {
+          request_id: Number(request_id),
+          request_by: user.user_id,
+        },
+      });
+
+      if (!request) {
+        return res
+          .status(200)
+          .json({ valid: false, message: "No request found" });
+      } else {
+        return res.status(200).json({
+          valid: true,
+          message: "The request is valid",
+          result: request,
+        });
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message, valid: false });
   }
 };

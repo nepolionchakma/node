@@ -13,6 +13,10 @@ router.put(
   "/reset-password/:user_id",
   defUserCredentialsController.resetPassword
 );
+router.put(
+  "/reset_forgot_password/:user_id",
+  defUserCredentialsController.resetForgotPassword
+);
 router.delete(
   "/:user_id",
   defUserCredentialsController.deleteDefUserCredential
