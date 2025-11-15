@@ -71,6 +71,19 @@ exports.resetForgotPassword = async (req, res) => {
       });
 
       if (newPassword) {
+        await prisma.forgot_password_requests.update({
+          where: {
+            request_id: Number(request_id),
+            request_by: userId,
+            temporary_password: Number(temporary_password),
+          },
+          data: {
+            is_valid: false,
+            last_updated_by: userId,
+            last_updated_date: new Date(),
+          },
+        });
+
         return res
           .status(200)
           .json({ message: "Password updated successfully." });
