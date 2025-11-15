@@ -2,14 +2,15 @@ const prisma = require("../DB/db.config");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const user = "nepolion.datafluent.team@gmail.com";
-const pass = "qgpx iwbl xozo tbjg";
+
 const CryptoJS = require("crypto-js");
 
 const {
   JWT_SECRET_ACCESS_TOKEN,
   REACT_ENDPOINT_URL,
   CRYPTO_SECRET_KEY,
+  MAILER_USER,
+  MAILER_PASS,
 } = require("../Variables/variables");
 
 const encrypt = (value) => {
@@ -52,8 +53,8 @@ const parseValidityToMs = (validity) => {
 const transporter = nodemailer.createTransport({
   service: "gmail", // or SES/SendGrid
   auth: {
-    user, // process.env.EMAIL_USER,
-    pass, // process.env.EMAIL_PASS, // generated pass
+    user: MAILER_USER, // process.env.EMAIL_USER,
+    pass: MAILER_PASS, // process.env.EMAIL_PASS, // generated pass
   },
 });
 
@@ -134,7 +135,7 @@ exports.invitationViaEmail = async (req, res) => {
     // --- Send Email ---
     if (email) {
       const res = await transporter.sendMail({
-        from: `"PROCG Team" <${user}>`,
+        from: `"PROCG Team" <${MAILER_USER}>`,
         to: email,
         subject: "You’re Invited to join PROCG",
         html: `<p>Hello,</p>
