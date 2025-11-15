@@ -11,6 +11,7 @@ const {
   CRYPTO_SECRET_KEY,
   MAILER_USER,
   MAILER_PASS,
+  ACCESS_TOKEN_EXPIRED_TIME,
 } = require("../Variables/variables");
 
 const encrypt = (value) => {
@@ -35,12 +36,11 @@ const transporter = nodemailer.createTransport({
 
 exports.createRequest = async (req, res) => {
   try {
-    const { user_name, email_address, tenant_id, job_title, validity } =
-      req.body;
+    const { user_name, email_address, date_of_birth } = req.body;
 
-    if (!user_name || !email_address || !tenant_id || !job_title) {
+    if (!user_name || !email_address || !date_of_birth) {
       return res.status(400).json({
-        error: "Username, Email, Tenant ID, and Job Title are required.",
+        error: "Username, Email, and Date of Birth are required.",
       });
     }
 
@@ -51,14 +51,13 @@ exports.createRequest = async (req, res) => {
           mode: "insensitive", // 👈 makes it case-insensitive
         },
         email_address,
-        tenant_id: Number(tenant_id),
-        job_title,
+        date_of_birth: new Date(date_of_birth),
       },
     });
 
     if (!userInfo) {
       return res.status(400).json({
-        message: "Invalid input.",
+        message: "Input field is invalid",
       });
     }
 
@@ -67,7 +66,7 @@ exports.createRequest = async (req, res) => {
       sub: String(userInfo.user_id),
     };
     const token = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN, {
-      expiresIn: validity,
+      expiresIn: ACCESS_TOKEN_EXPIRED_TIME,
     });
 
     const encryptedToken = encrypt(token);
@@ -80,6 +79,7 @@ exports.createRequest = async (req, res) => {
         access_token: encryptedToken,
         created_by: Number(userInfo.user_id),
         last_updated_by: Number(userInfo.user_id),
+        is_valid: true,
       },
     });
 
@@ -142,13 +142,14 @@ exports.verifyRequest = async (req, res) => {
         where: {
           request_id: Number(request_id),
           request_by: user.user_id,
+          is_valid: true,
         },
       });
 
       if (!request) {
         return res
           .status(200)
-          .json({ valid: false, message: "No request found" });
+          .json({ valid: false, message: "The request is invalid" });
       } else {
         return res.status(200).json({
           valid: true,

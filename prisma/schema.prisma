@@ -310,13 +310,14 @@ model def_global_conditions {
 }
 
 model def_job_titles {
-  job_title_id     Int       @id(map: "job_titles_pk") @default(autoincrement())
+  job_title_id     Int           @id(map: "job_titles_pk") @default(autoincrement())
   job_title_name   String?
   tenant_id        Int?
   created_by       Int?
-  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  creation_date    DateTime?     @default(now()) @db.Timestamp(6)
   last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  last_update_date DateTime?     @default(now()) @db.Timestamp(6)
+  def_persons      def_persons[]
 
   @@schema("apps")
 }
@@ -392,15 +393,16 @@ model def_notifications {
 }
 
 model def_persons {
-  user_id          Int       @id
+  user_id          Int             @id
   first_name       String?
   middle_name      String?
   last_name        String?
-  job_title        String?
+  job_title_id     Int?
   created_by       Int?
-  creation_date    DateTime? @default(now()) @db.Timestamp(6)
+  creation_date    DateTime?       @default(now()) @db.Timestamp(6)
   last_updated_by  Int?
-  last_update_date DateTime? @default(now()) @db.Timestamp(6)
+  last_update_date DateTime?       @default(now()) @db.Timestamp(6)
+  def_job_titles   def_job_titles? @relation(fields: [job_title_id], references: [job_title_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_job_title_id")
 
   @@schema("apps")
 }
@@ -530,6 +532,7 @@ model def_users {
   last_update_date            DateTime?                     @db.Timestamp(6)
   tenant_id                   Int?
   user_invitation_id          Int?
+  date_of_birth               DateTime?                     @db.Date
   def_access_profiles         def_access_profiles[]
   def_notification_holders    def_notification_holders[]
   def_user_granted_privileges def_user_granted_privileges[]
@@ -608,6 +611,7 @@ model forgot_password_requests {
   creation_date      DateTime? @default(now()) @db.Timestamptz(6)
   last_updated_by    Int?
   last_updated_date  DateTime? @default(now()) @db.Timestamptz(6)
+  is_valid           Boolean?
 
   @@schema("apps")
 }
@@ -619,7 +623,8 @@ model def_users_v {
   middle_name         String
   last_name           String
   email_address       String
-  job_title           String
+  date_of_birth       DateTime?
+  job_title_id        Int
   user_type           String
  created_by                  Int?
   creation_date               DateTime?                     @db.Timestamp(6)
@@ -691,7 +696,7 @@ model def_notifications_v {
   creation_date     DateTime?         @default(now()) @db.Timestamp(6)
   last_updated_by   Int?
   last_update_date  DateTime?         @default(now()) @db.Timestamp(6)
- 
+
  @@id([user_id,notification_id])
   @@map("def_notifications_v")
   @@schema("apps")
