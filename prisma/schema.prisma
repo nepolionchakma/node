@@ -701,3 +701,16 @@ model def_notifications_v {
   @@map("def_notifications_v")
   @@schema("apps")
 }
+
+model def_user_granted_roles_previleges_v {
+  user_id           Int
+  user_name         String?
+  tenant_id        Int
+  granted_roles     Json
+  granted_privileges Json
+
+ @@id([user_id,tenant_id])
+  @@map("def_user_granted_roles_previleges_v")
+  @@schema("apps")
+  
+}
