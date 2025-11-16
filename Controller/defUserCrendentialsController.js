@@ -47,6 +47,7 @@ exports.resetForgotPassword = async (req, res) => {
 
   if (!isValidRequest) {
     return res.status(400).json({
+      isSuccess: false,
       message: "Invalid temporary password.",
     });
   }
@@ -86,11 +87,11 @@ exports.resetForgotPassword = async (req, res) => {
 
         return res
           .status(200)
-          .json({ message: "Password updated successfully." });
+          .json({ isSuccess: true, message: "Password updated successfully." });
       }
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ isSuccess: false, error: error.message });
   }
 };
 
