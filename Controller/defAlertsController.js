@@ -60,14 +60,6 @@ exports.getAlerts = async (req, res) => {
   const { user_id, page, limit, alert_id } = req.query;
 
   try {
-    // const totalAcknowledged = await prisma.def_alerts_v.count({
-    //   where: {
-    //     user_id: Number(user_id),
-    //     acknowledge: true,
-    //     notification_status: "SENT",
-    //   },
-    // });
-
     const totalUnacknowledged = await prisma.def_alerts_v.findMany({
       where: {
         user_id: Number(user_id),
@@ -202,13 +194,30 @@ exports.updateAlert = async (req, res) => {
 exports.removeAlert = async (req, res) => {
   const id = +req.params.alert_id;
   try {
-    const result = await prisma.def_alerts.delete({
-      where: {
-        alert_id: id,
-      },
-    });
-    if (result) {
-      return res.status(200).json({ message: "Deleted Successfully" });
+    const deleteAlertsAssignment = await prisma.def_alert_recepients.deleteMany(
+      {
+        where: {
+          alert_id: id,
+        },
+      }
+    );
+    if (deleteAlertsAssignment) {
+      const result = await prisma.def_alerts.delete({
+        where: {
+          alert_id: id,
+        },
+      });
+      if (result) {
+        await prisma.def_notifications.updateMany({
+          where: {
+            notification_id: result.notification_id,
+          },
+          data: {
+            alert_id: null,
+          },
+        });
+        return res.status(200).json({ message: "Deleted Successfully" });
+      }
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });

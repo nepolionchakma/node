@@ -593,35 +593,23 @@ exports.deleteNotification = async (req, res) => {
   try {
     const { notificationId } = req.params;
 
-    const result = await prisma.def_notifications.delete({
-      where: {
-        notification_id: notificationId,
-      },
-    });
+    const deletedNotificationHolders =
+      await prisma.def_notification_holders.deleteMany({
+        where: {
+          notification_id: notificationId,
+        },
+      });
 
-    // const childNotifications = await prisma.def_notifications.findMany({
-    //   where: {
-    //     parent_notification_id: notificationId,
-    //   },
-    // });
+    if (deletedNotificationHolders) {
+      const result = await prisma.def_notifications.delete({
+        where: {
+          notification_id: notificationId,
+        },
+      });
 
-    // if (childNotifications.length > 1) {
-    //   for (const notification of childNotifications) {
-    //     await prisma.def_notifications.delete({
-    //       where: {
-    //         notification_id: notification.notification_id,
-    //       },
-    //     });
-    //   }
-    // } else {
-    //   await prisma.def_notifications.delete({
-    //     where: {
-    //       notification_id: notificationId,
-    //     },
-    //   });
-    // }
-    if (result) {
-      return res.status(200).json({ message: `Notification deleted.` });
+      if (result) {
+        return res.status(200).json({ message: `Deleted Successfully.` });
+      }
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });

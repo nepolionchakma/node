@@ -40,45 +40,45 @@ const socket = (io) => {
       console.log(
         `user ${device_id} connected in ${key} with socket id ${socket.id}`
       );
-      // const device = await prisma.def_linked_devices.findFirst({
-      //   where: {
-      //     id: device_id,
-      //     user_id: key,
-      //   },
-      // });
+      const device = await prisma.def_linked_devices.findFirst({
+        where: {
+          id: device_id,
+          user_id: key,
+        },
+      });
 
-      // if (device) {
-      //   const currentSignon = device.signon_audit.find(
-      //     (item) => item.signon_id === device.signon_id
-      //   );
+      if (device) {
+        const currentSignon = device.signon_audit.find(
+          (item) => item.signon_id === device.signon_id
+        );
 
-      //   const session = currentSignon.session_log;
-      //   const updatedAudit = device.signon_audit.map((entry) => {
-      //     if (entry.signon_id === device.signon_id) {
-      //       return {
-      //         ...entry,
-      //         session_log: [
-      //           {
-      //             connect_time: new Date(),
-      //             session_id: socket.id,
-      //           },
-      //           ...session,
-      //         ],
-      //       };
-      //     }
-      //     return entry;
-      //   });
+        const session = currentSignon.session_log;
+        const updatedAudit = device.signon_audit.map((entry) => {
+          if (entry.signon_id === device.signon_id) {
+            return {
+              ...entry,
+              session_log: [
+                {
+                  connect_time: new Date(),
+                  session_id: socket.id,
+                },
+                ...session,
+              ],
+            };
+          }
+          return entry;
+        });
 
-      //   const connectedDevice = await prisma.def_linked_devices.update({
-      //     where: { id: device.id },
-      //     data: {
-      //       signon_audit: updatedAudit,
-      //       is_online: true,
-      //     },
-      //   });
+        const connectedDevice = await prisma.def_linked_devices.update({
+          where: { id: device.id },
+          data: {
+            signon_audit: updatedAudit,
+            is_online: true,
+          },
+        });
 
-      //   io.to(Number(device.user_id)).emit("addDevice", connectedDevice);
-      // }
+        io.to(Number(device.user_id)).emit("addDevice", connectedDevice);
+      }
     }
   });
 
@@ -145,6 +145,10 @@ const socket = (io) => {
         },
       });
       io.to(Number(sender)).emit("deletedMessage", { notification, type });
+    });
+
+    socket.on("permanentDeleteMessage", async ({ notificationId, sender }) => {
+      io.to(Number(sender)).emit("permanentDeleteMessage", notificationId);
     });
 
     socket.on("restoreMessage", async ({ notificationId, sender, type }) => {
