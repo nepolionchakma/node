@@ -147,6 +147,10 @@ const socket = (io) => {
       io.to(Number(sender)).emit("deletedMessage", { notification, type });
     });
 
+    socket.on("permanentDeleteMessage", async ({ notificationId, sender }) => {
+      io.to(Number(sender)).emit("permanentDeleteMessage", notificationId);
+    });
+
     socket.on("restoreMessage", async ({ notificationId, sender, type }) => {
       const notification = await prisma.def_notifications_v.findFirst({
         where: {
