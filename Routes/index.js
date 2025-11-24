@@ -10,7 +10,7 @@ const defUsersRoutes = require("../Routes/defUsersRoutes");
 const defTenantsRoutes = require("../Routes/defTenantsRoutes");
 const defUserCredentialsRoutes = require("../Routes/defUserCredentialsRoutes");
 const authentication = require("../Routes/authenticationRoutes");
-const messagesRoutes = require("../Routes/messagesRoutes");
+// const messagesRoutes = require("../Routes/messagesRoutes");
 const defnotificationsRoutes = require("../Routes/defNotificationRoutes");
 const defDataSourcesRoutes = require("./defDataSourcesRoutes");
 const defAccessEntitlementsRoutes = require("./defAccessEntitlementsRoutes");
@@ -58,7 +58,7 @@ routes.use("/def_user_credentials", defUserCredentialsRoutes);
 routes.use("/access-profiles", defAccessProfileRoutes);
 routes.use("/combined-user", defCombinedUserRoutes);
 
-routes.use("/messages", messagesRoutes);
+// routes.use("/messages", messagesRoutes);
 routes.use("/notifications", defnotificationsRoutes);
 routes.use("/def-data-sources", defDataSourcesRoutes);
 
