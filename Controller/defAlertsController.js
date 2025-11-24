@@ -224,6 +224,53 @@ exports.removeAlert = async (req, res) => {
   }
 };
 
+exports.deleteMultipleAlerts = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Invalid or empty array of alert IDs" });
+  }
+  try {
+    const deleteAlertsAssignment = await prisma.def_alert_recepients.deleteMany(
+      {
+        where: {
+          alert_id: { in: ids },
+        },
+      }
+    );
+
+    if (deleteAlertsAssignment.count > 0) {
+      const result = await prisma.def_alerts.deleteMany({
+        where: {
+          alert_id: { in: ids },
+        },
+      });
+
+      if (result.count > 0) {
+        await prisma.def_notifications.updateMany({
+          where: {
+            alert_id: { in: ids },
+          },
+          data: {
+            alert_id: null,
+          },
+        });
+        return res.status(200).json({ message: "Deleted Successfully" });
+      } else {
+        return res.status(404).json({ error: "No alerts found to delete" });
+      }
+    } else {
+      return res
+        .status(404)
+        .json({ error: "No alert recipients found to delete" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 /** update recepient */
 exports.updateAcknowledge = async (req, res) => {
   try {

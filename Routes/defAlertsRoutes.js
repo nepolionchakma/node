@@ -9,6 +9,7 @@ router.put(
   "/acknowledge/:alert_id/:user_id",
   alertsController.updateAcknowledge
 );
+router.delete("/delete-multiple-alerts", alertsController.deleteMultipleAlerts);
 router.delete("/:alert_id", alertsController.removeAlert);
 
 // router.get("/", alertsController.alerts);
