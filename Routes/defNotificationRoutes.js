@@ -30,6 +30,11 @@ router.put("/:notificationId", notificationsController.updateNotification);
 
 // router.get("/", notificationsController.getAllNotification);
 
+router.delete(
+  "/delete-multiple-drafts",
+  notificationsController.deleteMultipleDrafts
+);
+
 router.delete("/:notificationId", notificationsController.deleteNotification);
 
 module.exports = router;

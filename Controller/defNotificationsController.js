@@ -615,3 +615,28 @@ exports.deleteNotification = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+exports.deleteMultipleDrafts = async (req, res) => {
+  const { ids } = req.body;
+  try {
+    const deletedNotificationHolders =
+      await prisma.def_notification_holders.deleteMany({
+        where: {
+          notification_id: { in: ids },
+        },
+      });
+
+    if (deletedNotificationHolders) {
+      const result = await prisma.def_notifications.deleteMany({
+        where: {
+          notification_id: { in: ids },
+        },
+      });
+
+      if (result) {
+        return res.status(200).json({ message: `Deleted Successfully.` });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
