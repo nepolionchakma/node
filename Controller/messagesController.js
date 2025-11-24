@@ -591,3 +591,17 @@ exports.moveMultipleFromRecycleBin = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteMultipleDrafts = async (req, res) => {
+  const { ids } = req.body;
+  try {
+    const result = await prisma.messages.delete({
+      where: {
+        id: { in: ids },
+      },
+    });
+    return res.status(200).json({ result });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
