@@ -2,6 +2,7 @@ const prisma = require("../DB/db.config");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const dotenv = require("dotenv");
+
 const {
   JWT_SECRET_ACCESS_TOKEN,
   ACCESS_TOKEN_EXPIRED_TIME,
@@ -118,6 +119,7 @@ exports.login = async (req, res) => {
             // profile_picture: user.profile_picture,
             access_token: accessToken,
             refresh_token: refreshToken,
+            message: "Log in Successful.",
             // issuedAt: new Date(),
           });
       } else {
