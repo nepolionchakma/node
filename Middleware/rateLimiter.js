@@ -1,4 +1,4 @@
-const rateLimit = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
 exports.loginLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
@@ -8,8 +8,6 @@ exports.loginLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in RateLimit-* headers
   legacyHeaders: false,
-  keyGenerator: (req, res) => {
-    // Default is req.ip; you can customize:
-    return req.ip;
-  },
+  keyGenerator: (req, res) =>
+    `${ipKeyGenerator(req, res)}-${req.headers["user-agent"]}`,
 });
