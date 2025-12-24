@@ -8,8 +8,8 @@ const {
   ACCESS_TOKEN_EXPIRED_TIME,
   JWT_SECRET_REFRESH_TOKEN,
   REFRESH_TOKEN_EXPIRED_TIME,
-  JWT_SECRET_MFA_TOKEN,
-  MFA_TOKEN_EXPIRED_TIME,
+  JWT_SECRET_MFA_TOKEN = "sdfhkhfsd",
+  MFA_TOKEN_EXPIRED_TIME = "10m",
 } = require("../Variables/variables");
 const { verifyTotp } = require("../Services/MFA/mfa_service");
 
