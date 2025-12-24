@@ -8,7 +8,10 @@ const {
   ACCESS_TOKEN_EXPIRED_TIME,
   JWT_SECRET_REFRESH_TOKEN,
   REFRESH_TOKEN_EXPIRED_TIME,
+  JWT_SECRET_MFA_TOKEN = "sdfhkhfsd",
+  MFA_TOKEN_EXPIRED_TIME = "10m",
 } = require("../Variables/variables");
+const { verifyTotp } = require("../Services/MFA/mfa_service");
 
 dotenv.config();
 
@@ -21,6 +24,12 @@ const generateAccessTokenAndRefreshToken = (props) => {
     expiresIn: REFRESH_TOKEN_EXPIRED_TIME,
   });
   return { accessToken, refreshToken };
+};
+
+const generateMfaToken = (payload) => {
+  return jwt.sign(payload, JWT_SECRET_MFA_TOKEN, {
+    expiresIn: MFA_TOKEN_EXPIRED_TIME || "5m",
+  });
 };
 
 // Login
@@ -85,6 +94,42 @@ exports.login = async (req, res) => {
         return res.status(401).json({ message: "Invalid Credentials." });
       }
 
+      const mfaCheck = await prisma.def_user_mfas.findFirst({
+        where: {
+          user_id: Number(userId),
+        },
+      });
+      // console.log(mfaCheck, "mfaCheck");
+      if (mfaCheck?.mfa_enabled) {
+        /* ---------- CHECK MFA ---------- */
+        const mfaList = await prisma.def_user_mfas.findMany({
+          where: {
+            user_id: userRecord.user_id,
+            mfa_enabled: true,
+          },
+        });
+        /* ---------- MFA REQUIRED ---------- */
+        if (mfaList.length > 0) {
+          // console.log(mfaList, "mfaList");
+          const mfaToken = generateMfaToken({
+            user_id: userRecord.user_id,
+            purpose: "MFA_LOGIN",
+          });
+
+          return res.status(200).json({
+            mfa_required: true,
+            mfa_token: mfaToken,
+            mfa_methods: mfaList.map((m) => ({
+              mfa_id: m.mfa_id,
+              mfa_type: m.mfa_type,
+            })),
+            message: "MFA verification required",
+          });
+        }
+        return;
+        /* ---------- NO MFA → NORMAL LOGIN ---------- */
+      }
+      // console.log("break the wall");
       // const encryptedPassword = hashPassword(password);
       if (userCredential && passwordResult) {
         // if (userCredential && userCredential.password === encryptedPassword) {
@@ -128,6 +173,70 @@ exports.login = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+/* -------- VERIFY MFA -------- */
+exports.verifyMFALogin = async (req, res) => {
+  // console.log("first");
+  const mfa_token = req.body.mfa_token;
+  const otp = Number(req.body.otp);
+  const mfa_id = Number(req.body.mfa_id);
+  // console.log({ mfa_token, otp, mfa_id }, "MFA body 182 line");
+  if (!mfa_token || !otp || !mfa_id)
+    return res.status(400).json({ message: "Missing MFA data" });
+
+  try {
+    const decoded = jwt.verify(mfa_token, JWT_SECRET_MFA_TOKEN);
+    // console.log(decoded, "decode 188 line");
+    if (decoded.purpose !== "MFA_LOGIN")
+      return res.status(403).json({ message: "Invalid MFA token" });
+
+    const mfa = await prisma.def_user_mfas.findFirst({
+      where: {
+        mfa_id,
+        user_id: decoded.user_id,
+        mfa_enabled: true,
+      },
+    });
+    // console.log(mfa, "mfa 199 line");
+    if (!mfa) return res.status(404).json({ message: "MFA not found" });
+
+    const valid = verifyTotp(mfa.mfa_secret, otp);
+    // console.log(valid, "valid 203 line");
+    if (!valid)
+      return res.status(400).json({ message: "Invalid MFA TOTP code" });
+
+    const { accessToken, refreshToken } = generateAccessTokenAndRefreshToken({
+      isLoggedIn: true,
+      user_id: decoded.user_id,
+      sub: String(decoded.user_id),
+      mfa_verified: true,
+    });
+    // console.log(
+    //   accessToken,
+    //   refreshToken,
+    //   "accessToken and refreshToken 212 line"
+    // );
+    return res
+      .cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .cookie("access_token", accessToken, {
+        httpOnly: true,
+        secure: false,
+      })
+      .json({
+        isLoggedIn: true,
+        user_id: decoded.user_id,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        message: "MFA verification successful",
+      });
+  } catch (err) {
+    // console.log(err, "err line 234");
+    return res.status(401).json({ message: "MFA token expired/invalid" });
   }
 };
 

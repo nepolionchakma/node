@@ -247,22 +247,23 @@ model def_controls {
 }
 
 model def_data_sources {
-  def_data_source_id                      Int                 @id(map: "data_sources_pkey") @default(autoincrement())
-  datasource_name                         String?             @unique(map: "unique_datasource_name") @db.VarChar(50)
-  description                             String?             @db.VarChar(250)
-  application_type                        String?             @db.VarChar(50)
-  application_type_version                String?             @db.VarChar(50)
-  last_access_synchronization_date        DateTime?           @db.Timestamp(6)
-  last_access_synchronization_status      String?             @db.VarChar(50)
-  last_transaction_synchronization_date   DateTime?           @db.Timestamp(6)
-  last_transaction_synchronization_status String?             @db.VarChar(50)
-  default_datasource                      String?             @db.VarChar(50)
+  def_data_source_id                      Int                                   @id(map: "data_sources_pkey") @default(autoincrement())
+  datasource_name                         String?                               @unique(map: "unique_datasource_name") @db.VarChar(50)
+  description                             String?                               @db.VarChar(250)
+  application_type                        String?                               @db.VarChar(50)
+  application_type_version                String?                               @db.VarChar(50)
+  last_access_synchronization_date        DateTime?                             @db.Timestamp(6)
+  last_access_synchronization_status      String?                               @db.VarChar(50)
+  last_transaction_synchronization_date   DateTime?                             @db.Timestamp(6)
+  last_transaction_synchronization_status String?                               @db.VarChar(50)
+  default_datasource                      String?                               @db.VarChar(50)
   created_by                              Int?
-  creation_date                           DateTime?           @default(now()) @db.Timestamp(6)
+  creation_date                           DateTime?                             @default(now()) @db.Timestamp(6)
   last_updated_by                         Int?
-  last_update_date                        DateTime?           @default(now()) @db.Timestamp(6)
+  last_update_date                        DateTime?                             @default(now()) @db.Timestamp(6)
   def_access_models                       def_access_models[]
   def_access_points                       def_access_points[]
+  def_datasource_connector_properties     def_datasource_connector_properties[]
 
   @@schema("apps")
 }
@@ -537,6 +538,7 @@ model def_users {
   def_notification_holders    def_notification_holders[]
   def_user_granted_privileges def_user_granted_privileges[]
   def_user_granted_roles      def_user_granted_roles[]
+  def_user_mfas               def_user_mfas[]
   def_tenants                 def_tenants?                  @relation(fields: [tenant_id], references: [tenant_id], onUpdate: NoAction)
 
   @@schema("apps")
@@ -612,6 +614,53 @@ model forgot_password_requests {
   last_updated_by    Int?
   last_updated_date  DateTime? @default(now()) @db.Timestamptz(6)
   is_valid           Boolean?
+
+  @@schema("apps")
+}
+
+model def_datasource_connector_properties {
+  def_property_id    Int              @id @default(autoincrement())
+  def_data_source_id Int
+  database_type      String           @db.VarChar(20)
+  host_name          String
+  service_name       String?          @db.VarChar(20)
+  port               Int?
+  username           String?          @db.VarChar(20)
+  password           String?          @db.VarChar(20)
+  created_by         Int?
+  creation_date      DateTime?        @default(now()) @db.Timestamp(6)
+  last_updated_by    Int?
+  last_update_date   DateTime?        @default(now()) @db.Timestamp(6)
+  def_data_sources   def_data_sources @relation(fields: [def_data_source_id], references: [def_data_source_id], onDelete: Cascade, map: "fk_def_data_source")
+
+  @@schema("apps")
+}
+
+model def_user_mfas {
+  mfa_id           Int           @id @default(autoincrement())
+  user_id          Int
+  mfa_type         mfa_type_enum
+  identifier       String?
+  mfa_secret       String?
+  mfa_enabled      Boolean?      @default(true)
+  is_primary       Boolean?      @default(false)
+  failed_attempts  Int?          @default(0)
+  locked_until     DateTime?     @db.Timestamp(6)
+  last_verified_at DateTime?     @db.Timestamp(6)
+  metadata         Json?
+  created_at       DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?     @default(now()) @db.Timestamp(6)
+  def_users        def_users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "def_user_mfas_user_id_fk")
+
+  @@unique([user_id, mfa_type], map: "def_user_mfas_type_uq")
+  @@schema("apps")
+}
+
+enum mfa_type_enum {
+  TOTP
+  EMAIL
+  SMS
+  WEBAUTHN
 
   @@schema("apps")
 }
@@ -712,5 +761,5 @@ model def_user_granted_roles_privileges_v {
  @@id([user_id,tenant_id])
   @@map("def_user_granted_roles_privileges_v")
   @@schema("apps")
-  
+
 }
