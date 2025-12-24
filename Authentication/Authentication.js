@@ -97,6 +97,7 @@ exports.login = async (req, res) => {
       const mfaCheck = await prisma.def_user_mfas.findFirst({
         where: {
           user_id: Number(userId),
+          mfa_enabled: true,
         },
       });
       // console.log(mfaCheck, "mfaCheck");

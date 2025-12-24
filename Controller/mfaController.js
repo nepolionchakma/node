@@ -1,5 +1,6 @@
 const prisma = require("../DB/db.config");
 const { setupTotpMfa, verifyTotp } = require("../Services/MFA/mfa_service");
+const crypto = require("crypto");
 
 exports.getMFAList = async (req, res) => {
   try {
@@ -41,7 +42,7 @@ exports.setupTOTP = async (req, res) => {
 //   } catch (error) {}
 // };
 
-exports.verify = async (req, res) => {
+exports.verifyOTP = async (req, res) => {
   const { otp, mfa_id, mfa_type } = req.body;
 
   const mfa = await prisma.def_user_mfas.findFirst({
@@ -72,6 +73,52 @@ exports.verify = async (req, res) => {
   });
 
   return res.status(200).json({ message: "MFA enabled" });
+};
+
+exports.checkPassword = async (req, res) => {
+  const { password } = req.body;
+
+  const verifyPassword = (storedData, password) => {
+    return new Promise((resolve, reject) => {
+      const [, digest, iterations, salt, storedHash] = storedData.split(/[:$]/);
+
+      const iterationsNumber = parseInt(iterations, 10);
+
+      crypto.pbkdf2(
+        password,
+        salt,
+        iterationsNumber,
+        32,
+        digest,
+        (err, derivedKey) => {
+          if (err) return reject(err);
+
+          const isMatch = storedHash === derivedKey.toString("hex");
+          resolve(isMatch);
+        }
+      );
+    });
+  };
+
+  try {
+    const userCredential = await prisma.def_user_credentials.findFirst({
+      where: { user_id: req.user.user_id },
+    });
+
+    const passwordResult = await verifyPassword(
+      userCredential.password,
+      password
+    );
+    if (!passwordResult) {
+      return res.status(401).json({ message: "Invalid Credentials." });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Password matched", is_valid_password: true });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 exports.deleteMFA = async (req, res) => {
