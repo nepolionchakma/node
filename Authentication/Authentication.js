@@ -2,6 +2,7 @@ const prisma = require("../DB/db.config");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
 
 const {
   JWT_SECRET_ACCESS_TOKEN,
@@ -9,7 +10,9 @@ const {
   JWT_SECRET_REFRESH_TOKEN,
   REFRESH_TOKEN_EXPIRED_TIME,
   JWT_SECRET_MFA_TOKEN = "sdfhkhfsd",
-  MFA_TOKEN_EXPIRED_TIME = "10m",
+  MFA_TOKEN_EXPIRED_TIME = "30m",
+  MAILER_USER,
+  MAILER_PASS,
 } = require("../Variables/variables");
 const { verifyTotp } = require("../Services/MFA/mfa_service");
 
@@ -28,9 +31,18 @@ const generateAccessTokenAndRefreshToken = (props) => {
 
 const generateMfaToken = (payload) => {
   return jwt.sign(payload, JWT_SECRET_MFA_TOKEN, {
-    expiresIn: MFA_TOKEN_EXPIRED_TIME || "5m",
+    expiresIn: MFA_TOKEN_EXPIRED_TIME,
   });
 };
+
+// Email setup
+const transporter = nodemailer.createTransport({
+  service: "gmail", // or SES/SendGrid
+  auth: {
+    user: MAILER_USER, // process.env.EMAIL_USER,
+    pass: MAILER_PASS, // process.env.EMAIL_PASS,
+  },
+});
 
 // Login
 exports.login = async (req, res) => {
@@ -237,6 +249,111 @@ exports.verifyMFALogin = async (req, res) => {
       });
   } catch (err) {
     // console.log(err, "err line 234");
+    return res.status(401).json({ message: "MFA token expired/invalid" });
+  }
+};
+
+exports.sendEmailMfaCode = async (req, res) => {
+  const { mfa_token } = req.body;
+
+  const decoded = jwt.verify(mfa_token, JWT_SECRET_MFA_TOKEN);
+
+  if (decoded.purpose !== "MFA_LOGIN")
+    return res.status(403).json({ message: "Invalid token" });
+  const user = await prisma.def_users.findUnique({
+    where: {
+      user_id: decoded.user_id,
+    },
+  });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const otp = crypto.randomInt(100000, 999999);
+
+  try {
+    await prisma.def_user_mfa_email_codes.create({
+      data: {
+        user_id: decoded.user_id,
+        otp,
+        expires_at: new Date(Date.now() + 5 * 60 * 1000),
+      },
+    });
+
+    // Send email
+    const mail = await transporter.sendMail({
+      from: `"PROCG Team" <${MAILER_USER}>`,
+      to: user.email_address,
+      subject: "Your Login Verification Code",
+      html: `<p>Hello,</p>
+            <p>Your verification code is: <strong>${otp}</strong></p>
+            <p>This code will expire in 5 minutes.</p>
+            <p>Best regards,</p>
+            <p>The PROCG Team</p>
+            `,
+    });
+    console.log(mail, "mail sent");
+    res
+      .status(200)
+      .json({ message: "OTP sent to email", email: user.email_address });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to send OTP", error: error.message });
+  }
+};
+
+exports.verifyEmailedMfaCode = async (req, res) => {
+  const { mfa_token, otp } = req.body;
+
+  const decoded = jwt.verify(mfa_token, JWT_SECRET_MFA_TOKEN);
+
+  if (decoded.purpose !== "MFA_LOGIN")
+    return res.status(403).json({ message: "Invalid token" });
+
+  try {
+    const storedCode = await prisma.def_user_mfa_email_codes.findFirst({
+      where: {
+        user_id: decoded.user_id,
+        otp,
+        expires_at: { gt: new Date() },
+      },
+    });
+
+    if (!storedCode) {
+      return res.status(400).json({ message: "Invalid or expired code" });
+    }
+
+    const { accessToken, refreshToken } = generateAccessTokenAndRefreshToken({
+      isLoggedIn: true,
+      user_id: decoded.user_id,
+      sub: String(decoded.user_id),
+      mfa_verified: true,
+    });
+
+    await prisma.def_user_mfa_email_codes.update({
+      where: { mfa_id: storedCode.mfa_id },
+      data: {
+        last_verified_at: new Date(),
+        updated_at: new Date(),
+      },
+    });
+
+    return res
+      .cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .cookie("access_token", accessToken, {
+        httpOnly: true,
+        secure: false,
+      })
+      .json({
+        isLoggedIn: true,
+        user_id: decoded.user_id,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        message: "MFA verification successful",
+      });
+  } catch (err) {
     return res.status(401).json({ message: "MFA token expired/invalid" });
   }
 };
