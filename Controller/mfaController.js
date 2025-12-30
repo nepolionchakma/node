@@ -5,7 +5,11 @@ const crypto = require("crypto");
 exports.getMFAList = async (req, res) => {
   try {
     const mfaList = await prisma.def_user_mfas.findMany({
-      where: { user_id: req.user.user_id, mfa_enabled: true },
+      where: {
+        user_id: req.user.user_id,
+        // mfa_enabled: true,
+        is_validated: true,
+      },
     });
     // console.log(mfaList, "mfalist");
     return res.status(200).json({ result: mfaList });
@@ -27,8 +31,9 @@ exports.checkIsMFAEnabled = async (req, res) => {
 
 exports.setupTOTP = async (req, res) => {
   const { mfa_type } = req.body;
+  const user_id = req.user.user_id;
   try {
-    const data = await setupTotpMfa(req.user.user_id, mfa_type);
+    const data = await setupTotpMfa(user_id, mfa_type);
     // console.log(data);
     return res.status(200).json(data);
   } catch (error) {
@@ -43,7 +48,7 @@ exports.setupTOTP = async (req, res) => {
 // };
 
 exports.verifyOTP = async (req, res) => {
-  const { otp, mfa_id, mfa_type } = req.body;
+  const { otp, mfa_id, mfa_type, identifier } = req.body;
 
   const mfa = await prisma.def_user_mfas.findFirst({
     where: { user_id: req.user.user_id, mfa_id, mfa_type },
@@ -68,6 +73,8 @@ exports.verifyOTP = async (req, res) => {
     data: {
       mfa_enabled: true,
       is_primary: true,
+      is_validated: true,
+      identifier,
       last_verified_at: new Date(),
     },
   });
@@ -116,6 +123,26 @@ exports.checkPassword = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Password matched", is_valid_password: true });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.switchMFA = async (req, res) => {
+  const { mfa_id, mfa_enabled } = req.body;
+  const user_id = req.user.user_id;
+  try {
+    const mfa = await prisma.def_user_mfas.update({
+      where: { user_id, mfa_id },
+      data: {
+        mfa_enabled,
+        updated_at: new Date(),
+      },
+    });
+    if (mfa)
+      return res
+        .status(200)
+        .json({ message: `MFA ${mfa_enabled ? "Enabled" : "Disabled"}` });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

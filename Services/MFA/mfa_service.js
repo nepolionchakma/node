@@ -27,7 +27,7 @@ exports.setupTotpMfa = async (userId, mfa_type) => {
   return { result, qrCode };
 };
 
-exports.upsertMfa = async (userId, mfa_type) => {
+exports.upsertMfa = async (userId, mfa_type, identifier = mfa_type) => {
   const secret = speakeasy.generateSecret({ name: "PRO-CG", length: 20 });
 
   const result = await prisma.def_user_mfas.upsert({
@@ -41,7 +41,7 @@ exports.upsertMfa = async (userId, mfa_type) => {
     data: {
       user_id: userId,
       mfa_type: mfa_type,
-      identifier: mfa_type,
+      identifier: identifier,
       mfa_enabled: false,
       metadata: secret,
       mfa_secret: secret.base32,
