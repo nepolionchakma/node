@@ -315,6 +315,7 @@ exports.verifyEmailedMfaCode = async (req, res) => {
         user_id: decoded.user_id,
         otp,
         expires_at: { gt: new Date() },
+        is_validated: false,
       },
     });
 
@@ -334,6 +335,7 @@ exports.verifyEmailedMfaCode = async (req, res) => {
       data: {
         last_verified_at: new Date(),
         updated_at: new Date(),
+        is_validated: true,
       },
     });
 
