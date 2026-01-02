@@ -646,8 +646,6 @@ model def_user_mfas {
   mfa_secret       String?
   mfa_enabled      Boolean?      @default(true)
   is_primary       Boolean?      @default(false)
-  mfa_enabled      Boolean?      @default(false)
-  is_primary       Boolean?      @default(false)
   is_validated     Boolean?      @default(false)
   failed_attempts  Int?          @default(0)
   locked_until     DateTime?     @db.Timestamp(6)
