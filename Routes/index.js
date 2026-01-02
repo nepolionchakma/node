@@ -13,6 +13,7 @@ const authentication = require("../Routes/authenticationRoutes");
 // const messagesRoutes = require("../Routes/messagesRoutes");
 const defnotificationsRoutes = require("../Routes/defNotificationRoutes");
 const defDataSourcesRoutes = require("./defDataSourcesRoutes");
+const defDatasourceConnectorPropertiesRoutes = require("./defDatasourceConnectorPropertiesRoutes");
 const defAccessEntitlementsRoutes = require("./defAccessEntitlementsRoutes");
 const defAccessEntitlementElementsRoutes = require("../Routes/defAccessEntitlementElementsRoutes");
 const defAccessPointsElementsRoutes = require("./defAccessPointElementsRoutes");
@@ -60,7 +61,13 @@ routes.use("/combined-user", defCombinedUserRoutes);
 
 // routes.use("/messages", messagesRoutes);
 routes.use("/notifications", defnotificationsRoutes);
+
+//Manage Data Sources
 routes.use("/def-data-sources", defDataSourcesRoutes);
+routes.use(
+  "/def_datasource_connector_properties",
+  defDatasourceConnectorPropertiesRoutes
+);
 
 // Manage Access Entitlements
 routes.use("/def-access-entitlements", defAccessEntitlementsRoutes);
