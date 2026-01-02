@@ -40,6 +40,7 @@ const newUserInvitationRoutes = require("./newUserInvitationRoutes");
 const forgotPasswordRoutes = require("./forgotPasswordRequestsRoutes");
 const openbaoRoutes = require("./openbaoRoutes");
 const grantedRolesPrevilegesRoutes = require("./defUserGrantedRolesPrevilegesRoutes");
+const mfaRoutes = require("./mfaRoutes");
 
 routes.use(cookieParser());
 routes.use("/push-notification", pushNotificationRoutes);
@@ -128,5 +129,7 @@ routes.use("/invitation", newUserInvitationRoutes);
 
 // granted roles and previleges
 routes.use("/def_user_granted_roles_previleges", grantedRolesPrevilegesRoutes);
+
+routes.use("/mfa", mfaRoutes);
 
 module.exports = routes;
