@@ -54,7 +54,7 @@ exports.verifyOTP = async (req, res) => {
     where: { user_id: req.user.user_id, mfa_id, mfa_type },
   });
 
-  if (!mfa) return res.status(404).json({ message: "MFA not found" });
+  if (!mfa) return res.status(404).json({ message: "MFA record not found" });
 
   const valid = verifyTotp(mfa.mfa_secret, otp);
 
@@ -68,7 +68,7 @@ exports.verifyOTP = async (req, res) => {
     return res.status(400).json({ message: "Invalid OTP" });
   }
 
-  await prisma.def_user_mfas.update({
+  const updatedMFA = await prisma.def_user_mfas.update({
     where: { mfa_id: mfa.mfa_id },
     data: {
       mfa_enabled: true,
@@ -79,7 +79,7 @@ exports.verifyOTP = async (req, res) => {
     },
   });
 
-  return res.status(200).json({ message: "MFA enabled" });
+  return res.status(200).json({ result: updatedMFA, message: "MFA enabled" });
 };
 
 exports.checkPassword = async (req, res) => {
@@ -154,7 +154,8 @@ exports.deleteMFA = async (req, res) => {
     const mfa = await prisma.def_user_mfas.delete({
       where: { user_id: req.user.user_id, mfa_id },
     });
-    if (mfa) return res.status(200).json({ message: "MFA deleted" });
+    if (mfa)
+      return res.status(200).json({ message: "MFA record has been deleted" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
