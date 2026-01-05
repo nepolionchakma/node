@@ -5,11 +5,11 @@ const {
 } = require("../Variables/variables");
 
 exports.loginLimiter = rateLimit({
-  windowMs: LOGIN_RATE_LIMIT_WINDOW * 60 * 1000 || 60 * 60 * 1000,
-  max: LOGIN_RATE_LIMIT_ATTEMPTS || 5,
+  windowMs: Number(LOGIN_RATE_LIMIT_WINDOW) * 60 * 1000 || 60 * 60 * 1000,
+  max: Number(LOGIN_RATE_LIMIT_ATTEMPTS) || 5,
   message: {
     message: `Too many attempts. Please try again after ${
-      LOGIN_RATE_LIMIT_WINDOW / 60000
+      Number(LOGIN_RATE_LIMIT_WINDOW) / 60000
     } minutes.`,
   },
   standardHeaders: true, // Return rate limit info in RateLimit-* headers
