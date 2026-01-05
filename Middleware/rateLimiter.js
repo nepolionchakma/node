@@ -1,10 +1,16 @@
 const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
+const {
+  LOGIN_RATE_LIMIT_WINDOW,
+  LOGIN_RATE_LIMIT_ATTEMPTS,
+} = require("../Variables/variables");
 
 exports.loginLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 60 minutes
-  max: 5, // 5 login attempts per window per IP
+  windowMs: LOGIN_RATE_LIMIT_WINDOW * 60 * 1000 || 60 * 60 * 1000,
+  max: LOGIN_RATE_LIMIT_ATTEMPTS || 5,
   message: {
-    message: "Too many attempts. Please try again after 60 minutes.",
+    message: `Too many attempts. Please try again after ${
+      LOGIN_RATE_LIMIT_WINDOW / 60000
+    } minutes.`,
   },
   standardHeaders: true, // Return rate limit info in RateLimit-* headers
   legacyHeaders: false,
