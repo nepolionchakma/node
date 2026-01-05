@@ -55,7 +55,7 @@ exports.login = async (req, res) => {
   //------------------ Verify password
   const verifyPassword = (storedData, password) => {
     return new Promise((resolve, reject) => {
-      const [, digest, iterations, salt, storedHash] = storedData.split(/[:$]/);
+      const [  digest, iterations, salt, storedHash] = storedData.split(/[:$]/);
 
       const iterationsNumber = parseInt(iterations, 10);
 
