@@ -193,7 +193,7 @@ exports.login = async (req, res) => {
 exports.verifyMFALogin = async (req, res) => {
   // console.log("first");
   const mfa_token = req.body.mfa_token;
-  const otp = Number(req.body.otp);
+  const otp = req.body.otp;
   const mfa_id = Number(req.body.mfa_id);
   // console.log({ mfa_token, otp, mfa_id }, "MFA body 182 line");
   if (!mfa_token || !otp || !mfa_id)
